@@ -196,6 +196,16 @@ After saving the configuration, restart your MCP client (Cursor, Claude Desktop,
 | `get_all_external_task_links` | 📋 Get all external links attached to a task | "Show all external links for task 123" |
 | `remove_external_task_link` | 🗑️ Remove an external link | "Remove external link 456 from task 789" |
 
+### 👥 Group Management
+
+| Tool | Description | Example |
+|------|-------------|---------|
+| `create_group` | ➕ Create a new group | "Create a group named 'Development Team' with external ID 'dev_001'" |
+| `update_group` | ✏️ Update a group | "Rename group 123 to 'QA Team' and change its external ID to 'qa_001'" |
+| `remove_group` | 🗑️ Remove a group | "Remove group with ID 456" |
+| `get_group` | 🔍 Get one group | "Get details for group 789" |
+| `get_all_groups` | 📋 Get all groups | "Show me all user groups" |
+
 ### 👥 User Management
 
 | Tool | Description | Example |
