@@ -8,6 +8,7 @@ import (
 	"encoding/json"
 	"os"
 	"encoding/base64"
+	"strconv"
 
 	"github.com/mark3labs/mcp-go/mcp"
 	"github.com/mark3labs/mcp-go/server"
@@ -245,7 +246,7 @@ func main() {
 
 	tool = mcp.NewTool("get_columns",
 		mcp.WithDescription("List project columns"),
-		mcp.WithString("project_id",
+		mcp.WithNumber("project_id",
 			mcp.Required(),
 			mcp.Description("ID of the project to get columns from"),
 		),
@@ -879,12 +880,12 @@ func (kc *kanboardClient) removeUserHandler(ctx context.Context, request mcp.Cal
 }
 
 func (kc *kanboardClient) getColumnsHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
-	project_id, err := request.RequireString("project_id")
+	project_id, err := request.RequireInt("project_id")
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
 
-	params := map[string]string{"project_id": project_id}
+	params := map[string]int{"project_id": project_id}
 	result, err := kc.callKanboardAPI(ctx, "getColumns", params)
 	if err != nil {
 		return mcp.NewToolResultError(fmt.Sprintf("Failed to get columns: %v", err)), nil
@@ -899,9 +900,13 @@ func (kc *kanboardClient) getColumnsHandler(ctx context.Context, request mcp.Cal
 }
 
 func (kc *kanboardClient) createColumnHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
-	project_id, err := request.RequireString("project_id")
+	project_id_str, err := request.RequireString("project_id")
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
+	}
+	project_id, err := strconv.Atoi(project_id_str)
+	if err != nil {
+		return mcp.NewToolResultError(fmt.Sprintf("Invalid project_id: %v", err)), nil
 	}
 	name, err := request.RequireString("name")
 	if err != nil {
@@ -910,7 +915,7 @@ func (kc *kanboardClient) createColumnHandler(ctx context.Context, request mcp.C
 
 	params := map[string]interface{}{
 		"project_id": project_id,
-		"name":       name,
+		"title":      name, // Kanboard API expects 'title'
 	}
 
 	limit := request.GetInt("limit", 0)
@@ -941,7 +946,24 @@ func (kc *kanboardClient) updateColumnHandler(ctx context.Context, request mcp.C
 
 	name := request.GetString("name", "")
 	if name != "" {
-		params["name"] = name
+		params["title"] = name // Kanboard API expects 'title'
+	} else {
+		// If name is not provided, fetch the existing column to get its current title
+		result, err := kc.callKanboardAPI(ctx, "getColumn", map[string]int{"column_id": column_id})
+		if err != nil {
+			return mcp.NewToolResultError(fmt.Sprintf("Failed to get column details to infer title: %v", err)), nil
+		}
+		var columnInfo struct {
+			Title string `json:"title"`
+		}
+		tempBytes, err := json.Marshal(result)
+		if err != nil {
+			return mcp.NewToolResultError(fmt.Sprintf("Failed to marshal column info for parsing: %v", err)), nil
+		}
+		if err := json.Unmarshal(tempBytes, &columnInfo); err != nil {
+			return mcp.NewToolResultError(fmt.Sprintf("Failed to parse column info to infer title: %v", err)), nil
+		}
+		params["title"] = columnInfo.Title // Use the existing title
 	}
 
 	limit := request.GetInt("limit", 0)
@@ -982,7 +1004,7 @@ func (kc *kanboardClient) deleteColumnHandler(ctx context.Context, request mcp.C
 }
 
 func (kc *kanboardClient) reorderColumnsHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
-	project_id, err := request.RequireString("project_id")
+	project_id, err := request.RequireInt("project_id")
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
@@ -1131,7 +1153,7 @@ func (kc *kanboardClient) getSwimlanesHandler(ctx context.Context, request mcp.C
 }
 
 func (kc *kanboardClient) createSwimlaneHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
-	project_id, err := request.RequireString("project_id")
+	project_id, err := request.RequireInt("project_id")
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
