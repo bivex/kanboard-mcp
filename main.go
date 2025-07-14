@@ -328,8 +328,9 @@ func main() {
 
 	tool = mcp.NewTool("get_categories",
 		mcp.WithDescription("List project categories"),
-		mcp.WithString("project_id",
-			mcp.Description("ID of the project to get categories from (optional)"),
+		mcp.WithNumber("project_id",
+			mcp.Required(),
+			mcp.Description("ID of the project to get categories from"),
 		),
 	)
 	s.AddTool(tool, kbClient.getCategoriesHandler)
@@ -340,11 +341,24 @@ func main() {
 			mcp.Required(),
 			mcp.Description("Name of the category to create"),
 		),
-		mcp.WithString("project_id",
-			mcp.Description("ID of the project to add the category to (optional)"),
+		mcp.WithNumber("project_id",
+			mcp.Required(),
+			mcp.Description("ID of the project to add the category to"),
+		),
+		mcp.WithString("color_id",
+			mcp.Description("Color ID for the category (e.g., 'blue', 'green')"),
 		),
 	)
 	s.AddTool(tool, kbClient.createCategoryHandler)
+
+	tool = mcp.NewTool("get_category",
+		mcp.WithDescription("Get category information"),
+		mcp.WithNumber("category_id",
+			mcp.Required(),
+			mcp.Description("ID of the category to get details for"),
+		),
+	)
+	s.AddTool(tool, kbClient.getCategoryHandler)
 
 	tool = mcp.NewTool("update_category",
 		mcp.WithDescription("Modify categories"),
@@ -354,6 +368,9 @@ func main() {
 		),
 		mcp.WithString("name",
 			mcp.Description("New name for the category"),
+		),
+		mcp.WithString("color_id",
+			mcp.Description("Color ID for the category (e.g., 'blue', 'green')"),
 		),
 	)
 	s.AddTool(tool, kbClient.updateCategoryHandler)
@@ -1069,17 +1086,17 @@ func (kc *kanboardClient) reorderColumnsHandler(ctx context.Context, request mcp
 }
 
 func (kc *kanboardClient) getCategoriesHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
-	project_id := request.GetString("project_id", "") // Categories can be global or project-specific
-
-	var result interface{}
-	var err error
-	if project_id != "" {
-		params := map[string]string{"project_id": project_id}
-		result, err = kc.callKanboardAPI(ctx, "getAllCategories", params)
-	} else {
-		result, err = kc.callKanboardAPI(ctx, "getAllCategories", nil)
+	project_id_str, err := request.RequireString("project_id")
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	project_id, err := strconv.Atoi(project_id_str)
+	if err != nil {
+		return mcp.NewToolResultError(fmt.Sprintf("Invalid project_id: %v", err)), nil
 	}
 
+	params := map[string]int{"project_id": project_id}
+	result, err := kc.callKanboardAPI(ctx, "getAllCategories", params)
 	if err != nil {
 		return mcp.NewToolResultError(fmt.Sprintf("Failed to get categories: %v", err)), nil
 	}
@@ -1093,20 +1110,48 @@ func (kc *kanboardClient) getCategoriesHandler(ctx context.Context, request mcp.
 }
 
 func (kc *kanboardClient) createCategoryHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
-	project_id := request.GetString("project_id", "")
+	project_id_str, err := request.RequireString("project_id")
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	project_id, err := strconv.Atoi(project_id_str)
+	if err != nil {
+		return mcp.NewToolResultError(fmt.Sprintf("Invalid project_id: %v", err)), nil
+	}
 	name, err := request.RequireString("name")
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
 
-	params := map[string]interface{}{"name": name}
-	if project_id != "" {
-		params["project_id"] = project_id
+	params := map[string]interface{}{"name": name, "project_id": project_id}
+
+	color_id := request.GetString("color_id", "")
+	if color_id != "" {
+		params["color_id"] = color_id
 	}
 
 	result, err := kc.callKanboardAPI(ctx, "createCategory", params)
 	if err != nil {
 		return mcp.NewToolResultError(fmt.Sprintf("Failed to create category: %v", err)), nil
+	}
+
+	resultBytes, err := json.MarshalIndent(result, "", "  ")
+	if err != nil {
+		return mcp.NewToolResultError(fmt.Sprintf("Failed to marshal API result: %v", err)), nil
+	}
+
+	return mcp.NewToolResultText(string(resultBytes)), nil
+}
+
+func (kc *kanboardClient) getCategoryHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+	category_id, err := request.RequireInt("category_id")
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	params := map[string]int{"category_id": category_id}
+	result, err := kc.callKanboardAPI(ctx, "getCategory", params)
+	if err != nil {
+		return mcp.NewToolResultError(fmt.Sprintf("Failed to get category details: %v", err)), nil
 	}
 
 	resultBytes, err := json.MarshalIndent(result, "", "  ")
@@ -1127,6 +1172,11 @@ func (kc *kanboardClient) updateCategoryHandler(ctx context.Context, request mcp
 	name := request.GetString("name", "")
 	if name != "" {
 		params["name"] = name
+	}
+
+	color_id := request.GetString("color_id", "")
+	if color_id != "" {
+		params["color_id"] = color_id
 	}
 
 	result, err := kc.callKanboardAPI(ctx, "updateCategory", params)

@@ -141,9 +141,10 @@ After saving the configuration, restart your MCP client (Cursor, Claude Desktop,
 
 | Tool | Description | Example |
 |------|-------------|---------|
-| `get_categories` | 📋 List project categories | "Show me all task categories" |
-| `create_category` | ➕ Add task categories | "Create a 'Bug Fixes' category" |
-| `update_category` | ✏️ Modify categories | "Rename 'Bug Fixes' to 'Critical Issues'" |
+| `get_categories` | 📋 List project categories | "Show me all task categories for project 123" |
+| `get_category` | 🔍 Get category information | "Get details for category 456" |
+| `create_category` | ➕ Add task categories | "Create a 'Bug Fixes' category in project 123 with color 'red'" |
+| `update_category` | ✏️ Modify categories | "Rename category 123 to 'Critical Issues' and set color to 'blue'" |
 | `delete_category` | 🗑️ Remove categories | "Delete the unused 'Archive' category" |
 
 ### 🏊 Swimlane Management
