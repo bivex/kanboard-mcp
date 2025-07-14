@@ -298,6 +298,48 @@ func main() {
 	)
 	s.AddTool(tool, kbClient.deleteCategoryHandler)
 
+	tool = mcp.NewTool("get_swimlanes",
+		mcp.WithDescription("List project swimlanes"),
+		mcp.WithString("project_id",
+			mcp.Description("ID of the project to get swimlanes from (optional)"),
+		),
+	)
+	s.AddTool(tool, kbClient.getSwimlanesHandler)
+
+	tool = mcp.NewTool("create_swimlane",
+		mcp.WithDescription("Add team swimlanes"),
+		mcp.WithString("project_id",
+			mcp.Required(),
+			mcp.Description("ID of the project to add the swimlane to"),
+		),
+		mcp.WithString("name",
+			mcp.Required(),
+			mcp.Description("Name of the swimlane to create"),
+		),
+	)
+	s.AddTool(tool, kbClient.createSwimlaneHandler)
+
+	tool = mcp.NewTool("update_swimlane",
+		mcp.WithDescription("Modify swimlanes"),
+		mcp.WithNumber("swimlane_id",
+			mcp.Required(),
+			mcp.Description("ID of the swimlane to update"),
+		),
+		mcp.WithString("name",
+			mcp.Description("New name for the swimlane"),
+		),
+	)
+	s.AddTool(tool, kbClient.updateSwimlaneHandler)
+
+	tool = mcp.NewTool("delete_swimlane",
+		mcp.WithDescription("Remove swimlanes"),
+		mcp.WithNumber("swimlane_id",
+			mcp.Required(),
+			mcp.Description("ID of the swimlane to delete"),
+		),
+	)
+	s.AddTool(tool, kbClient.deleteSwimlaneHandler)
+
 	// Start the stdio server
 	if err := server.ServeStdio(s); err != nil {
 		fmt.Printf("Server error: %v\n", err)
@@ -1002,6 +1044,102 @@ func (kc *kanboardClient) deleteCategoryHandler(ctx context.Context, request mcp
 	result, err := kc.callKanboardAPI(ctx, "removeCategory", params)
 	if err != nil {
 		return mcp.NewToolResultError(fmt.Sprintf("Failed to delete category: %v", err)), nil
+	}
+
+	resultBytes, err := json.MarshalIndent(result, "", "  ")
+	if err != nil {
+		return mcp.NewToolResultError(fmt.Sprintf("Failed to marshal API result: %v", err)), nil
+	}
+
+	return mcp.NewToolResultText(string(resultBytes)), nil
+}
+
+func (kc *kanboardClient) getSwimlanesHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+	project_id := request.GetString("project_id", "") // Swimlanes can be global or project-specific
+
+	var result interface{}
+	var err error
+	if project_id != "" {
+		params := map[string]string{"project_id": project_id}
+		result, err = kc.callKanboardAPI(ctx, "getAllSwimlanes", params)
+	} else {
+		result, err = kc.callKanboardAPI(ctx, "getAllSwimlanes", nil)
+	}
+
+	if err != nil {
+		return mcp.NewToolResultError(fmt.Sprintf("Failed to get swimlanes: %v", err)), nil
+	}
+
+	resultBytes, err := json.MarshalIndent(result, "", "  ")
+	if err != nil {
+		return mcp.NewToolResultError(fmt.Sprintf("Failed to marshal API result: %v", err)), nil
+	}
+
+	return mcp.NewToolResultText(string(resultBytes)), nil
+}
+
+func (kc *kanboardClient) createSwimlaneHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+	project_id, err := request.RequireString("project_id")
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	name, err := request.RequireString("name")
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+
+	params := map[string]interface{}{
+		"project_id": project_id,
+		"name":       name,
+	}
+
+	result, err := kc.callKanboardAPI(ctx, "addSwimlane", params)
+	if err != nil {
+		return mcp.NewToolResultError(fmt.Sprintf("Failed to create swimlane: %v", err)), nil
+	}
+
+	resultBytes, err := json.MarshalIndent(result, "", "  ")
+	if err != nil {
+		return mcp.NewToolResultError(fmt.Sprintf("Failed to marshal API result: %v", err)), nil
+	}
+
+	return mcp.NewToolResultText(string(resultBytes)), nil
+}
+
+func (kc *kanboardClient) updateSwimlaneHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+	swimlane_id, err := request.RequireInt("swimlane_id")
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+
+	params := map[string]interface{}{"id": swimlane_id}
+	name := request.GetString("name", "")
+	if name != "" {
+		params["name"] = name
+	}
+
+	result, err := kc.callKanboardAPI(ctx, "updateSwimlane", params)
+	if err != nil {
+		return mcp.NewToolResultError(fmt.Sprintf("Failed to update swimlane: %v", err)), nil
+	}
+
+	resultBytes, err := json.MarshalIndent(result, "", "  ")
+	if err != nil {
+		return mcp.NewToolResultError(fmt.Sprintf("Failed to marshal API result: %v", err)), nil
+	}
+
+	return mcp.NewToolResultText(string(resultBytes)), nil
+}
+
+func (kc *kanboardClient) deleteSwimlaneHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+	swimlane_id, err := request.RequireInt("swimlane_id")
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	params := map[string]int{"swimlane_id": swimlane_id}
+	result, err := kc.callKanboardAPI(ctx, "removeSwimlane", params)
+	if err != nil {
+		return mcp.NewToolResultError(fmt.Sprintf("Failed to delete swimlane: %v", err)), nil
 	}
 
 	resultBytes, err := json.MarshalIndent(result, "", "  ")

@@ -64,3 +64,7 @@ Once configured, Cursor will be able to discover and interact with the following
 | `create_category`  | Add task categories       | `"Create a Bug Fixes category"`                    |
 | `update_category`  | Modify categories         | `"Rename Bug Fixes to Critical Issues"`            |
 | `delete_category`  | Remove categories         | `"Delete the unused category"`                     |
+| `get_swimlanes`    | List project swimlanes    | `"Show me all team swimlanes"`                     |
+| `create_swimlane`  | Add team swimlanes        | `"Create a Frontend Team swimlane"`                |
+| `update_swimlane`  | Modify swimlanes          | `"Rename Mobile Team to Cross-Platform Team"`      |
+| `delete_swimlane`  | Remove swimlanes          | `"Delete the inactive team swimlane"`              |
