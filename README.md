@@ -174,10 +174,16 @@ After saving the configuration, restart your MCP client (Cursor, Claude Desktop,
 
 | Tool | Description | Example |
 |------|-------------|---------|
-| `get_swimlanes` | 📋 List project swimlanes | "Show me all team swimlanes" |
-| `create_swimlane` | ➕ Add team swimlanes | "Create a 'Frontend Team' swimlane" |
-| `update_swimlane` | ✏️ Modify swimlanes | "Rename 'Mobile Team' to 'Cross-Platform Team'" |
-| `delete_swimlane` | 🗑️ Remove swimlanes | "Delete the inactive 'Legacy Team' swimlane" |
+| `get_swimlanes` | 📋 List all swimlanes of a project (enabled or disabled) and sorted by position | "Show me all swimlanes for project 1" |
+| `get_active_swimlanes` | 📋 Get the list of enabled swimlanes of a project (include default swimlane if enabled) | "Get active swimlanes for project 1" |
+| `get_swimlane_by_id` | 🔍 Get a swimlane by ID | "Get swimlane details for ID 1" |
+| `get_swimlane_by_name` | 🔍 Get a swimlane by name | "Get swimlane details for project 1 with name 'Swimlane 1'" |
+| `change_swimlane_position` | 🔄 Move a swimlane's position (only for active swimlanes) | "Change swimlane 2 position to 3 in project 1" |
+| `create_swimlane` | ➕ Add a new swimlane | "Create a swimlane 'Frontend Team' in project 1" |
+| `update_swimlane` | ✏️ Update swimlane properties | "Update swimlane 1 for project 1 with new name 'Cross-Platform Team'" |
+| `remove_swimlane` | 🗑️ Remove a swimlane | "Remove swimlane 1 from project 2" |
+| `disable_swimlane` | 🚫 Disable a swimlane | "Disable swimlane 1 from project 2" |
+| `enable_swimlane` | ✅ Enable a swimlane | "Enable swimlane 1 from project 2" |
 
 ### 📋 Board Management
 
