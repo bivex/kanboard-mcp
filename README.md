@@ -314,6 +314,15 @@ After saving the configuration, restart your MCP client (Cursor, Claude Desktop,
 | `remove_task_file` | 🗑️ Remove file | "Remove file with ID 456" |
 | `remove_all_task_files` | 🗑️ Remove all files associated to a task | "Remove all files from task 123" |
 
+### 📝 Task Metadata Management
+
+| Tool | Description | Example |
+|------|-------------|---------|
+| `get_task_metadata` | 📋 Get all metadata related to a task by task unique id | "Get all metadata for task 1" |
+| `get_task_metadata_by_name` | 🔍 Get metadata related to a task by task unique id and metakey (name) | "Get metadata 'metaKey1' for task 1" |
+| `save_task_metadata` | 💾 Save/update task metadata | "Save metadata 'metaName:metaValue' for task 1" |
+| `remove_task_metadata` | 🗑️ Remove task metadata by name | "Remove metadata 'metaKey1' from task 1" |
+
 ### ⚙️ Application Management
 
 | Tool | Description | Example |

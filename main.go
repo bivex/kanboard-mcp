@@ -747,7 +747,54 @@ func main() {
 	)
 	s.AddTool(tool, kbClient.getBoardHandler)
 
+	// Task Metadata Management
+	tool = mcp.NewTool("get_task_metadata",
+		mcp.WithDescription("Get all metadata related to a task by task unique id"),
+		mcp.WithNumber("task_id",
+			mcp.Required(),
+			mcp.Description("ID of the task to get metadata from"),
+		),
+	)
+	s.AddTool(tool, kbClient.getTaskMetadataHandler)
 
+	tool = mcp.NewTool("get_task_metadata_by_name",
+		mcp.WithDescription("Get metadata related to a task by task unique id and metakey (name)"),
+		mcp.WithNumber("task_id",
+			mcp.Required(),
+			mcp.Description("ID of the task to get metadata from"),
+		),
+		mcp.WithString("name",
+			mcp.Required(),
+			mcp.Description("Name of the metadata key"),
+		),
+	)
+	s.AddTool(tool, kbClient.getTaskMetadataByNameHandler)
+
+	tool = mcp.NewTool("save_task_metadata",
+		mcp.WithDescription("Save/update task metadata"),
+		mcp.WithNumber("task_id",
+			mcp.Required(),
+			mcp.Description("ID of the task to save/update metadata for"),
+		),
+		mcp.WithObject("values",
+			mcp.Required(),
+			mcp.Description("Dictionary of metadata values (key-value pairs)"),
+		),
+	)
+	s.AddTool(tool, kbClient.saveTaskMetadataHandler)
+
+	tool = mcp.NewTool("remove_task_metadata",
+		mcp.WithDescription("Remove task metadata by name"),
+		mcp.WithNumber("task_id",
+			mcp.Required(),
+			mcp.Description("ID of the task to remove metadata from"),
+		),
+		mcp.WithString("name",
+			mcp.Required(),
+			mcp.Description("Name of the metadata key to remove"),
+		),
+	)
+	s.AddTool(tool, kbClient.removeTaskMetadataHandler)
 
 	tool = mcp.NewTool("create_group",
 		mcp.WithDescription("Create a new group"),
@@ -5461,6 +5508,148 @@ func (kc *kanboardClient) enableSwimlaneHandler(ctx context.Context, request mcp
 		return mcp.NewToolResultError(err.Error()), nil
 	}
 	result, err := kc.EnableSwimlane(project_id, swimlane_id)
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	return mcp.NewToolResultText(strconv.FormatBool(result)), nil
+}
+
+// Task Metadata API Procedures
+func (kc *kanboardClient) GetTaskMetadata(taskID int) (map[string]interface{}, error) {
+	params := []interface{}{taskID}
+	result, err := kc.callKanboardAPI(context.Background(), "getTaskMetadata", params)
+	if err != nil {
+		return nil, err
+	}
+
+	if metadata, ok := result.(map[string]interface{}); ok {
+		return metadata, nil
+	}
+
+	if result == nil {
+		return map[string]interface{}{}, nil
+	}
+	return nil, fmt.Errorf("Unexpected result type for GetTaskMetadata: %T", result)
+}
+
+func (kc *kanboardClient) GetTaskMetadataByName(taskID int, name string) (string, error) {
+	params := []interface{}{taskID, name}
+	result, err := kc.callKanboardAPI(context.Background(), "getTaskMetadataByName", params)
+	if err != nil {
+		return "", err
+	}
+
+	if value, ok := result.(string); ok {
+		return value, nil
+	}
+
+	if result == nil {
+		return "", nil // Kanboard returns null for empty string
+	}
+	return "", fmt.Errorf("Unexpected result type for GetTaskMetadataByName: %T", result)
+}
+
+func (kc *kanboardClient) SaveTaskMetadata(taskID int, values map[string]string) (bool, error) {
+	params := map[string]interface{}{
+		"task_id": taskID,
+		"values":  values,
+	}
+	result, err := kc.callKanboardAPI(context.Background(), "saveTaskMetadata", params)
+	if err != nil {
+		return false, err
+	}
+
+	if success, ok := result.(bool); ok {
+		return success, nil
+	}
+	return false, fmt.Errorf("Unexpected result type for SaveTaskMetadata: %T", result)
+}
+
+func (kc *kanboardClient) RemoveTaskMetadata(taskID int, name string) (bool, error) {
+	params := []interface{}{taskID, name}
+	result, err := kc.callKanboardAPI(context.Background(), "removeTaskMetadata", params)
+	if err != nil {
+		return false, err
+	}
+
+	if success, ok := result.(bool); ok {
+		return success, nil
+	}
+	return false, fmt.Errorf("Unexpected result type for RemoveTaskMetadata: %T", result)
+}
+
+// Task Metadata Handlers
+func (kc *kanboardClient) getTaskMetadataHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+	task_id, err := request.RequireInt("task_id")
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	result, err := kc.GetTaskMetadata(task_id)
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	resultBytes, err := json.MarshalIndent(result, "", "  ")
+	if err != nil {
+		return mcp.NewToolResultError(fmt.Sprintf("Failed to marshal API result: %v", err)), nil
+	}
+	return mcp.NewToolResultText(string(resultBytes)), nil
+}
+
+func (kc *kanboardClient) getTaskMetadataByNameHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+	task_id, err := request.RequireInt("task_id")
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	name, err := request.RequireString("name")
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	result, err := kc.GetTaskMetadataByName(task_id, name)
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	return mcp.NewToolResultText(result), nil
+}
+
+func (kc *kanboardClient) saveTaskMetadataHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+	task_id, err := request.RequireInt("task_id")
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+
+	// Extract 'values' as a map[string]string
+	args := request.GetArguments()
+	valuesMap, ok := args["values"].(map[string]interface{})
+	if !ok {
+		return mcp.NewToolResultError("Missing or invalid 'values' parameter. Expected a map."), nil
+	}
+
+	stringValues := make(map[string]string)
+	for key, val := range valuesMap {
+		strVal, isString := val.(string)
+		if !isString {
+			return mcp.NewToolResultError(fmt.Sprintf("Invalid value for metadata key '%s'. Expected string.", key)), nil
+		}
+		stringValues[key] = strVal
+	}
+
+	result, err := kc.SaveTaskMetadata(task_id, stringValues)
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	return mcp.NewToolResultText(strconv.FormatBool(result)), nil
+}
+
+func (kc *kanboardClient) removeTaskMetadataHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+	task_id, err := request.RequireInt("task_id")
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	name, err := request.RequireString("name")
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	result, err := kc.RemoveTaskMetadata(task_id, name)
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
