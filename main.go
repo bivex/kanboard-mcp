@@ -371,11 +371,11 @@ func main() {
 	)
 	s.AddTool(tool, kbClient.getExternalTaskLinkTypesHandler)
 
-	tool = mcp.NewTool("get_external_task_link_provider_dependencies",
+	tool = mcp.NewTool("get_ext_link_provider_deps",
 		mcp.WithDescription("Get available dependencies for a given provider"),
-		mcp.WithString("provider_name",
+		mcp.WithString("provider",
 			mcp.Required(),
-			mcp.Description("Name of the provider"),
+			mcp.Description("Provider name"),
 		),
 	)
 	s.AddTool(tool, kbClient.getExternalTaskLinkProviderDependenciesHandler)
@@ -1500,6 +1500,72 @@ func main() {
 		),
 	)
 	s.AddTool(tool, kbClient.getTaskTagsHandler)
+
+	tool = mcp.NewTool("create_task_file",
+		mcp.WithDescription("Create and upload a new task attachment"),
+		mcp.WithNumber("project_id",
+			mcp.Required(),
+			mcp.Description("The project ID"),
+		),
+		mcp.WithNumber("task_id",
+			mcp.Required(),
+			mcp.Description("The task ID"),	
+		),
+		mcp.WithString("filename",
+			mcp.Required(),
+			mcp.Description("The filename"),
+		),
+		mcp.WithString("blob",
+			mcp.Required(),
+			mcp.Description("File content encoded in base64"),
+		),
+	)
+	s.AddTool(tool, kbClient.createTaskFileHandler)
+
+	tool = mcp.NewTool("get_all_task_files",
+		mcp.WithDescription("Get all files attached to task"),
+		mcp.WithNumber("task_id",
+			mcp.Required(),
+			mcp.Description("The task ID"),
+		),
+	)
+	s.AddTool(tool, kbClient.getAllTaskFilesHandler)
+
+	tool = mcp.NewTool("get_task_file",
+		mcp.WithDescription("Get file information"),
+		mcp.WithNumber("file_id",
+			mcp.Required(),
+			mcp.Description("The file ID"),
+		),
+	)
+	s.AddTool(tool, kbClient.getTaskFileHandler)
+
+	tool = mcp.NewTool("download_task_file",
+		mcp.WithDescription("Download file contents (encoded in base64)"),
+		mcp.WithNumber("file_id",
+			mcp.Required(),
+			mcp.Description("The file ID"),
+		),
+	)
+	s.AddTool(tool, kbClient.downloadTaskFileHandler)
+
+	tool = mcp.NewTool("remove_task_file",
+		mcp.WithDescription("Remove file"),
+		mcp.WithNumber("file_id",
+			mcp.Required(),
+			mcp.Description("The file ID"),
+		),
+	)
+	s.AddTool(tool, kbClient.removeTaskFileHandler)
+
+	tool = mcp.NewTool("remove_all_task_files",
+		mcp.WithDescription("Remove all files associated to a task"),
+		mcp.WithNumber("task_id",
+			mcp.Required(),
+			mcp.Description("The task ID"),
+		),
+	)
+	s.AddTool(tool, kbClient.removeAllTaskFilesHandler)
 
 	// Start the stdio server
 	if err := server.ServeStdio(s); err != nil {
@@ -4425,5 +4491,195 @@ func (kc *kanboardClient) getTaskTagsHandler(ctx context.Context, request mcp.Ca
 		return mcp.NewToolResultError(err.Error()), nil
 	}
 	return mcp.NewToolResultText(string(resultBytes)), nil
+}
+
+func (kc *kanboardClient) createTaskFileHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+	projectID := request.GetInt("project_id", 0)
+	if projectID == 0 {
+		return mcp.NewToolResultError("project_id is required"), nil
+	}
+	taskID := request.GetInt("task_id", 0)
+	if taskID == 0 {
+		return mcp.NewToolResultError("task_id is required"), nil
+	}
+	filename := request.GetString("filename", "")
+	if filename == "" {
+		return mcp.NewToolResultError("filename is required"), nil
+	}
+	blob := request.GetString("blob", "")
+	if blob == "" {
+		return mcp.NewToolResultError("blob is required"), nil
+	}
+
+	result, err := kc.CreateTaskFile(
+		int(projectID),
+		int(taskID),
+		filename,
+		blob,
+	)
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	resultBytes, err := json.MarshalIndent(result, "", "  ")
+	if err != nil {
+		return mcp.NewToolResultError(fmt.Sprintf("Failed to marshal API result: %v", err)), nil
+	}
+	return mcp.NewToolResultText(string(resultBytes)), nil
+}
+
+func (kc *kanboardClient) getAllTaskFilesHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+	taskID := request.GetInt("task_id", 0)
+	if taskID == 0 {
+		return mcp.NewToolResultError("task_id is required"), nil
+	}
+
+	result, err := kc.GetAllTaskFiles(int(taskID))
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	resultBytes, err := json.MarshalIndent(result, "", "  ")
+	if err != nil {
+		return mcp.NewToolResultError(fmt.Sprintf("Failed to marshal API result: %v", err)), nil
+	}
+	return mcp.NewToolResultText(string(resultBytes)), nil
+}
+
+func (kc *kanboardClient) getTaskFileHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+	fileID := request.GetInt("file_id", 0)
+	if fileID == 0 {
+		return mcp.NewToolResultError("file_id is required"), nil
+	}
+
+	result, err := kc.GetTaskFile(int(fileID))
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	resultBytes, err := json.MarshalIndent(result, "", "  ")
+	if err != nil {
+		return mcp.NewToolResultError(fmt.Sprintf("Failed to marshal API result: %v", err)), nil
+	}
+	return mcp.NewToolResultText(string(resultBytes)), nil
+}
+
+func (kc *kanboardClient) downloadTaskFileHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+	fileID := request.GetInt("file_id", 0)
+	if fileID == 0 {
+		return mcp.NewToolResultError("file_id is required"), nil
+	}
+
+	result, err := kc.DownloadTaskFile(int(fileID))
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	return mcp.NewToolResultText(result), nil
+}
+
+func (kc *kanboardClient) removeTaskFileHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+	fileID := request.GetInt("file_id", 0)
+	if fileID == 0 {
+		return mcp.NewToolResultError("file_id is required"), nil
+	}
+
+	result, err := kc.RemoveTaskFile(int(fileID))
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	resultBytes, err := json.MarshalIndent(result, "", "  ")
+	if err != nil {
+		return mcp.NewToolResultError(fmt.Sprintf("Failed to marshal API result: %v", err)), nil
+	}
+	return mcp.NewToolResultText(string(resultBytes)), nil
+}
+
+func (kc *kanboardClient) removeAllTaskFilesHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+	taskID := request.GetInt("task_id", 0)
+	if taskID == 0 {
+		return mcp.NewToolResultError("task_id is required"), nil
+	}
+
+	result, err := kc.RemoveAllTaskFiles(int(taskID))
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	resultBytes, err := json.MarshalIndent(result, "", "  ")
+	if err != nil {
+		return mcp.NewToolResultError(fmt.Sprintf("Failed to marshal API result: %v", err)), nil
+	}
+	return mcp.NewToolResultText(string(resultBytes)), nil
+}
+
+func (kc *kanboardClient) CreateTaskFile(projectID, taskID int, filename, blob string) (int, error) {
+	params := []interface{}{projectID, taskID, filename, blob}
+	result, err := kc.callKanboardAPI(context.Background(), "createTaskFile", params)
+	if err != nil {
+		return 0, err
+	}
+
+	// Kanboard API returns 1 on success for some operations like creating a file
+	if fileID, ok := result.(float64); ok {
+		return int(fileID), nil
+	}
+	return 0, fmt.Errorf("Unexpected result type for CreateTaskFile: %T", result)
+}
+
+func (kc *kanboardClient) GetAllTaskFiles(taskID int) ([]interface{}, error) {
+	params := map[string]interface{}{"task_id": taskID}
+	result, err := kc.callKanboardAPI(context.Background(), "getAllTaskFiles", params)
+	if err != nil {
+		return nil, err
+	}
+
+	if files, ok := result.([]interface{}); ok {
+		return files, nil
+	}
+	return nil, fmt.Errorf("Unexpected result type for GetAllTaskFiles: %T", result)
+}
+
+func (kc *kanboardClient) GetTaskFile(fileID int) (interface{}, error) {
+	params := []interface{}{fileID}
+	result, err := kc.callKanboardAPI(context.Background(), "getTaskFile", params)
+	if err != nil {
+		return nil, err
+	}
+	return result, nil
+}
+
+func (kc *kanboardClient) DownloadTaskFile(fileID int) (string, error) {
+	params := []interface{}{fileID}
+	result, err := kc.callKanboardAPI(context.Background(), "downloadTaskFile", params)
+	if err != nil {
+		return "", err
+	}
+
+	if content, ok := result.(string); ok {
+		return content, nil
+	}
+	return "", fmt.Errorf("Unexpected result type for DownloadTaskFile: %T", result)
+}
+
+func (kc *kanboardClient) RemoveTaskFile(fileID int) (bool, error) {
+	params := []interface{}{fileID}
+	result, err := kc.callKanboardAPI(context.Background(), "removeTaskFile", params)
+	if err != nil {
+		return false, err
+	}
+
+	if success, ok := result.(bool); ok {
+		return success, nil
+	}
+	return false, fmt.Errorf("Unexpected result type for RemoveTaskFile: %T", result)
+}
+
+func (kc *kanboardClient) RemoveAllTaskFiles(taskID int) (bool, error) {
+	params := map[string]interface{}{"task_id": taskID}
+	result, err := kc.callKanboardAPI(context.Background(), "removeAllTaskFiles", params)
+	if err != nil {
+		return false, err
+	}
+
+	if success, ok := result.(bool); ok {
+		return success, nil
+	}
+	return false, fmt.Errorf("Unexpected result type for RemoveAllTaskFiles: %T", result)
 }
 

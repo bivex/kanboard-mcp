@@ -202,7 +202,7 @@ After saving the configuration, restart your MCP client (Cursor, Claude Desktop,
 | Tool | Description | Example |
 |------|-------------|---------|
 | `get_external_task_link_types` | 📋 Get all registered external link providers | "Show me all external link types" |
-| `get_external_task_link_provider_dependencies` | ⛓️ Get available dependencies for a given provider | "Get dependencies for 'weblink' provider" |
+| `get_ext_link_provider_deps` | ⛓️ Get available dependencies for a given provider | "Get dependencies for 'weblink' provider" |
 | `create_external_task_link` | ➕ Create a new external link | "Create an external link for task 123 to 'http://example.com/doc.pdf' with dependency 'related' and type 'attachment'" |
 | `update_external_task_link` | ✏️ Update external task link | "Update external link 456 for task 789 with new title 'Updated Document' and URL 'http://new.example.com/doc.pdf'" |
 | `get_external_task_link_by_id` | 🔍 Get an external task link by ID | "Get external link 456 for task 789" |
@@ -295,6 +295,17 @@ After saving the configuration, restart your MCP client (Cursor, Claude Desktop,
 | `remove_tag` | 🗑️ Remove a tag | "Remove tag with ID 456" |
 | `set_task_tags` | 🏷️ Assign/Create/Update tags for a task | "Set tags 'urgent', 'bug' for task 123 in project 456" |
 | `get_task_tags` | 🔍 Get assigned tags to a task | "Get tags assigned to task 123" |
+
+### 📂 Task File Management
+
+| Tool | Description | Example |
+|------|-------------|---------|
+| `create_task_file` | ➕ Create and upload a new task attachment | "Create a file 'meeting_notes.txt' for project 1 with task 2 and base64 content 'Zm9vYmFy'" |
+| `get_all_task_files` | 📋 Get all files attached to task | "Show all files for task 123" |
+| `get_task_file` | 🔍 Get file information | "Get details for file 456" |
+| `download_task_file` | 📥 Download file contents (encoded in base64) | "Download file 456" |
+| `remove_task_file` | 🗑️ Remove file | "Remove file with ID 456" |
+| `remove_all_task_files` | 🗑️ Remove all files associated to a task | "Remove all files from task 123" |
 
 ### 👥 Group Management
 
