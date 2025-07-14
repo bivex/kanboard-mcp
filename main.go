@@ -215,7 +215,7 @@ func newKanboardClient(apiEndpoint, apiKey string) *kanboardClient {
 	}
 }
 
-func (kc *kanboardClient) callKanboardAPI(ctx context.Context, method string, params interface{}) (*mcp.CallToolResult, error) {
+func (kc *kanboardClient) callKanboardAPI(ctx context.Context, method string, params interface{}) (interface{}, error) {
 	requestBody := map[string]interface{}{
 		"jsonrpc": "2.0",
 		"method":  method,
@@ -225,12 +225,12 @@ func (kc *kanboardClient) callKanboardAPI(ctx context.Context, method string, pa
 
 	jsonBody, err := json.Marshal(requestBody)
 	if err != nil {
-		return mcp.NewToolResultError(fmt.Sprintf("Failed to marshal request: %v", err)), nil
+		return nil, fmt.Errorf("Failed to marshal request: %v", err)
 	}
 
 	req, err := http.NewRequestWithContext(ctx, "POST", kc.apiEndpoint, bytes.NewBuffer(jsonBody))
 	if err != nil {
-		return mcp.NewToolResultError(fmt.Sprintf("Failed to create request: %v", err)), nil
+		return nil, fmt.Errorf("Failed to create request: %v", err)
 	}
 
 	req.Header.Set("Content-Type", "application/json")
@@ -238,12 +238,12 @@ func (kc *kanboardClient) callKanboardAPI(ctx context.Context, method string, pa
 
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
-		return mcp.NewToolResultError(fmt.Sprintf("Failed to send request: %v", err)), nil
+		return nil, fmt.Errorf("Failed to send request: %v", err)
 	}
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
-		return mcp.NewToolResultError(fmt.Sprintf("API request failed with status code: %d", resp.StatusCode)), nil
+		return nil, fmt.Errorf("API request failed with status code: %d", resp.StatusCode)
 	}
 
 	var apiResponse struct {
@@ -257,24 +257,28 @@ func (kc *kanboardClient) callKanboardAPI(ctx context.Context, method string, pa
 	}
 
 	if err := json.NewDecoder(resp.Body).Decode(&apiResponse); err != nil {
-		return mcp.NewToolResultError(fmt.Sprintf("Failed to decode API response: %v", err)), nil
+		return nil, fmt.Errorf("Failed to decode API response: %v", err)
 	}
 
 	if apiResponse.Error != nil {
-		return mcp.NewToolResultError(fmt.Sprintf("Kanboard API error: %s (Code: %d)", apiResponse.Error.Message, apiResponse.Error.Code)), nil
+		return nil, fmt.Errorf("Kanboard API error: %s (Code: %d)", apiResponse.Error.Message, apiResponse.Error.Code)
 	}
 
-	// Convert result to JSON string for display
-	resultBytes, err := json.MarshalIndent(apiResponse.Result, "", "  ")
+	return apiResponse.Result, nil
+}
+
+func (kc *kanboardClient) getProjectsHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+	result, err := kc.callKanboardAPI(ctx, "getAllProjects", nil)
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+
+	resultBytes, err := json.MarshalIndent(result, "", "  ")
 	if err != nil {
 		return mcp.NewToolResultError(fmt.Sprintf("Failed to marshal API result: %v", err)), nil
 	}
 
 	return mcp.NewToolResultText(string(resultBytes)), nil
-}
-
-func (kc *kanboardClient) getProjectsHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
-	return kc.callKanboardAPI(ctx, "getAllProjects", nil)
 }
 
 func (kc *kanboardClient) createProjectHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
@@ -283,7 +287,17 @@ func (kc *kanboardClient) createProjectHandler(ctx context.Context, request mcp.
 		return mcp.NewToolResultError(err.Error()), nil
 	}
 	params := map[string]string{"name": name}
-	return kc.callKanboardAPI(ctx, "createProject", params)
+	result, err := kc.callKanboardAPI(ctx, "createProject", params)
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+
+	resultBytes, err := json.MarshalIndent(result, "", "  ")
+	if err != nil {
+		return mcp.NewToolResultError(fmt.Sprintf("Failed to marshal API result: %v", err)), nil
+	}
+
+	return mcp.NewToolResultText(string(resultBytes)), nil
 }
 
 func (kc *kanboardClient) getTasksHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
@@ -293,17 +307,21 @@ func (kc *kanboardClient) getTasksHandler(ctx context.Context, request mcp.CallT
 	}
 
 	// First, get the project ID from the project name
-	projectParams := map[string]string{"name": project_name}
-	projectResult, err := kc.callKanboardAPI(ctx, "getProjectByName", projectParams)
+	result, err := kc.callKanboardAPI(ctx, "getProjectByName", map[string]string{"name": project_name})
 	if err != nil {
 		return mcp.NewToolResultError(fmt.Sprintf("Failed to get project ID: %v", err)), nil
 	}
 
-	// Assuming the result is a JSON string, parse it to extract the ID
+	// Assuming the result is an object, parse it to extract the ID
 	var projectInfo struct {
 		ID string `json:"id"`
 	}
-	if err := json.Unmarshal([]byte(projectResult.Text), &projectInfo); err != nil {
+	// Marshal and unmarshal to ensure correct type conversion from interface{} to struct
+	tempBytes, err := json.Marshal(result)
+	if err != nil {
+		return mcp.NewToolResultError(fmt.Sprintf("Failed to marshal project info for parsing: %v", err)), nil
+	}
+	if err := json.Unmarshal(tempBytes, &projectInfo); err != nil {
 		return mcp.NewToolResultError(fmt.Sprintf("Failed to parse project info: %v", err)), nil
 	}
 
@@ -312,7 +330,17 @@ func (kc *kanboardClient) getTasksHandler(ctx context.Context, request mcp.CallT
 	}
 
 	params := map[string]interface{}{"project_id": projectInfo.ID}
-	return kc.callKanboardAPI(ctx, "getAllTasks", params)
+	result, err = kc.callKanboardAPI(ctx, "getAllTasks", params)
+	if err != nil {
+		return mcp.NewToolResultError(fmt.Sprintf("Failed to get tasks: %v", err)), nil
+	}
+
+	resultBytes, err := json.MarshalIndent(result, "", "  ")
+	if err != nil {
+		return mcp.NewToolResultError(fmt.Sprintf("Failed to marshal API result: %v", err)), nil
+	}
+
+	return mcp.NewToolResultText(string(resultBytes)), nil
 }
 
 func (kc *kanboardClient) createTaskHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
@@ -326,8 +354,7 @@ func (kc *kanboardClient) createTaskHandler(ctx context.Context, request mcp.Cal
 	}
 
 	// First, get the project ID from the project name
-	projectParams := map[string]string{"name": project_name}
-	projectResult, err := kc.callKanboardAPI(ctx, "getProjectByName", projectParams)
+	result, err := kc.callKanboardAPI(ctx, "getProjectByName", map[string]string{"name": project_name})
 	if err != nil {
 		return mcp.NewToolResultError(fmt.Sprintf("Failed to get project ID: %v", err)), nil
 	}
@@ -335,7 +362,11 @@ func (kc *kanboardClient) createTaskHandler(ctx context.Context, request mcp.Cal
 	var projectInfo struct {
 		ID string `json:"id"`
 	}
-	if err := json.Unmarshal([]byte(projectResult.Text), &projectInfo); err != nil {
+	tempBytes, err := json.Marshal(result)
+	if err != nil {
+		return mcp.NewToolResultError(fmt.Sprintf("Failed to marshal project info for parsing: %v", err)), nil
+	}
+	if err := json.Unmarshal(tempBytes, &projectInfo); err != nil {
 		return mcp.NewToolResultError(fmt.Sprintf("Failed to parse project info: %v", err)), nil
 	}
 
@@ -347,7 +378,17 @@ func (kc *kanboardClient) createTaskHandler(ctx context.Context, request mcp.Cal
 		"project_id": projectInfo.ID,
 		"title":      title,
 	}
-	return kc.callKanboardAPI(ctx, "createTask", params)
+	result, err = kc.callKanboardAPI(ctx, "createTask", params)
+	if err != nil {
+		return mcp.NewToolResultError(fmt.Sprintf("Failed to create task: %v", err)), nil
+	}
+
+	resultBytes, err := json.MarshalIndent(result, "", "  ")
+	if err != nil {
+		return mcp.NewToolResultError(fmt.Sprintf("Failed to marshal API result: %v", err)), nil
+	}
+
+	return mcp.NewToolResultText(string(resultBytes)), nil
 }
 
 func (kc *kanboardClient) updateTaskHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
@@ -358,17 +399,27 @@ func (kc *kanboardClient) updateTaskHandler(ctx context.Context, request mcp.Cal
 
 	params := map[string]interface{}{"id": task_id}
 
-	description, err := request.GetString("description")
-	if err == nil && description != "" {
+	description := request.GetString("description", "")
+	if description != "" {
 		params["description"] = description
 	}
 
-	title, err := request.GetString("title")
-	if err == nil && title != "" {
+	title := request.GetString("title", "")
+	if title != "" {
 		params["title"] = title
 	}
 
-	return kc.callKanboardAPI(ctx, "updateTask", params)
+	result, err := kc.callKanboardAPI(ctx, "updateTask", params)
+	if err != nil {
+		return mcp.NewToolResultError(fmt.Sprintf("Failed to update task: %v", err)), nil
+	}
+
+	resultBytes, err := json.MarshalIndent(result, "", "  ")
+	if err != nil {
+		return mcp.NewToolResultError(fmt.Sprintf("Failed to marshal API result: %v", err)), nil
+	}
+
+	return mcp.NewToolResultText(string(resultBytes)), nil
 }
 
 func (kc *kanboardClient) deleteTaskHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
@@ -377,7 +428,17 @@ func (kc *kanboardClient) deleteTaskHandler(ctx context.Context, request mcp.Cal
 		return mcp.NewToolResultError(err.Error()), nil
 	}
 	params := map[string]int{"task_id": task_id}
-	return kc.callKanboardAPI(ctx, "removeTask", params)
+	result, err := kc.callKanboardAPI(ctx, "removeTask", params)
+	if err != nil {
+		return mcp.NewToolResultError(fmt.Sprintf("Failed to delete task: %v", err)), nil
+	}
+
+	resultBytes, err := json.MarshalIndent(result, "", "  ")
+	if err != nil {
+		return mcp.NewToolResultError(fmt.Sprintf("Failed to marshal API result: %v", err)), nil
+	}
+
+	return mcp.NewToolResultText(string(resultBytes)), nil
 }
 
 func (kc *kanboardClient) getTaskDetailsHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
@@ -386,7 +447,17 @@ func (kc *kanboardClient) getTaskDetailsHandler(ctx context.Context, request mcp
 		return mcp.NewToolResultError(err.Error()), nil
 	}
 	params := map[string]int{"task_id": task_id}
-	return kc.callKanboardAPI(ctx, "getTask", params)
+	result, err := kc.callKanboardAPI(ctx, "getTask", params)
+	if err != nil {
+		return mcp.NewToolResultError(fmt.Sprintf("Failed to get task details: %v", err)), nil
+	}
+
+	resultBytes, err := json.MarshalIndent(result, "", "  ")
+	if err != nil {
+		return mcp.NewToolResultError(fmt.Sprintf("Failed to marshal API result: %v", err)), nil
+	}
+
+	return mcp.NewToolResultText(string(resultBytes)), nil
 }
 
 func (kc *kanboardClient) moveTaskHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
@@ -401,8 +472,7 @@ func (kc *kanboardClient) moveTaskHandler(ctx context.Context, request mcp.CallT
 
 	// To move a task, we need the column_id. First, get the project ID for the task.
 	// This involves a couple of steps: get the task, then get its project ID.
-	taskParams := map[string]int{"task_id": task_id}
-	taskResult, err := kc.callKanboardAPI(ctx, "getTask", taskParams)
+	result, err := kc.callKanboardAPI(ctx, "getTask", map[string]int{"task_id": task_id})
 	if err != nil {
 		return mcp.NewToolResultError(fmt.Sprintf("Failed to get task details: %v", err)), nil
 	}
@@ -410,7 +480,11 @@ func (kc *kanboardClient) moveTaskHandler(ctx context.Context, request mcp.CallT
 	var taskInfo struct {
 		ProjectID string `json:"project_id"`
 	}
-	if err := json.Unmarshal([]byte(taskResult.Text), &taskInfo); err != nil {
+	tempBytes, err := json.Marshal(result)
+	if err != nil {
+		return mcp.NewToolResultError(fmt.Sprintf("Failed to marshal task info for parsing: %v", err)), nil
+	}
+	if err := json.Unmarshal(tempBytes, &taskInfo); err != nil {
 		return mcp.NewToolResultError(fmt.Sprintf("Failed to parse task info: %v", err)), nil
 	}
 
@@ -419,8 +493,7 @@ func (kc *kanboardClient) moveTaskHandler(ctx context.Context, request mcp.CallT
 	}
 
 	// Now, get the columns for that project to find the column_id by name.
-	columnParams := map[string]string{"project_id": taskInfo.ProjectID}
-	columnsResult, err := kc.callKanboardAPI(ctx, "getColumns", columnParams)
+	result, err = kc.callKanboardAPI(ctx, "getColumns", map[string]string{"project_id": taskInfo.ProjectID})
 	if err != nil {
 		return mcp.NewToolResultError(fmt.Sprintf("Failed to get columns for project: %v", err)), nil
 	}
@@ -430,7 +503,11 @@ func (kc *kanboardClient) moveTaskHandler(ctx context.Context, request mcp.CallT
 		Name string `json:"title"` // Kanboard API returns 'title' for column name
 	}
 
-	if err := json.Unmarshal([]byte(columnsResult.Text), &columns); err != nil {
+	tempBytes, err = json.Marshal(result)
+	if err != nil {
+		return mcp.NewToolResultError(fmt.Sprintf("Failed to marshal columns info for parsing: %v", err)), nil
+	}
+	if err := json.Unmarshal(tempBytes, &columns); err != nil {
 		return mcp.NewToolResultError(fmt.Sprintf("Failed to parse columns info: %v", err)), nil
 	}
 
@@ -454,11 +531,31 @@ func (kc *kanboardClient) moveTaskHandler(ctx context.Context, request mcp.CallT
 		"swimlane_id": 0, // Assuming default swimlane
 		"project_id": taskInfo.ProjectID, // Required for moveTaskPosition
 	}
-	return kc.callKanboardAPI(ctx, "moveTaskPosition", moveParams)
+	result, err = kc.callKanboardAPI(ctx, "moveTaskPosition", moveParams)
+	if err != nil {
+		return mcp.NewToolResultError(fmt.Sprintf("Failed to move task: %v", err)), nil
+	}
+
+	resultBytes, err := json.MarshalIndent(result, "", "  ")
+	if err != nil {
+		return mcp.NewToolResultError(fmt.Sprintf("Failed to marshal API result: %v", err)), nil
+	}
+
+	return mcp.NewToolResultText(string(resultBytes)), nil
 }
 
 func (kc *kanboardClient) getUsersHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
-	return kc.callKanboardAPI(ctx, "getAllUsers", nil)
+	result, err := kc.callKanboardAPI(ctx, "getAllUsers", nil)
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+
+	resultBytes, err := json.MarshalIndent(result, "", "  ")
+	if err != nil {
+		return mcp.NewToolResultError(fmt.Sprintf("Failed to marshal API result: %v", err)), nil
+	}
+
+	return mcp.NewToolResultText(string(resultBytes)), nil
 }
 
 func (kc *kanboardClient) getUserByNameHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
@@ -467,7 +564,17 @@ func (kc *kanboardClient) getUserByNameHandler(ctx context.Context, request mcp.
 		return mcp.NewToolResultError(err.Error()), nil
 	}
 	params := map[string]string{"username": username}
-	return kc.callKanboardAPI(ctx, "getUserByName", params)
+	result, err := kc.callKanboardAPI(ctx, "getUserByName", params)
+	if err != nil {
+		return mcp.NewToolResultError(fmt.Sprintf("Failed to get user by name: %v", err)), nil
+	}
+
+	resultBytes, err := json.MarshalIndent(result, "", "  ")
+	if err != nil {
+		return mcp.NewToolResultError(fmt.Sprintf("Failed to marshal API result: %v", err)), nil
+	}
+
+	return mcp.NewToolResultText(string(resultBytes)), nil
 }
 
 func (kc *kanboardClient) createUserHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
@@ -485,17 +592,27 @@ func (kc *kanboardClient) createUserHandler(ctx context.Context, request mcp.Cal
 		"password": password,
 	}
 
-	name, err := request.GetString("name")
-	if err == nil && name != "" {
+	name := request.GetString("name", "")
+	if name != "" {
 		params["name"] = name
 	}
 
-	email, err := request.GetString("email")
-	if err == nil && email != "" {
+	email := request.GetString("email", "")
+	if email != "" {
 		params["email"] = email
 	}
 
-	return kc.callKanboardAPI(ctx, "createUser", params)
+	result, err := kc.callKanboardAPI(ctx, "createUser", params)
+	if err != nil {
+		return mcp.NewToolResultError(fmt.Sprintf("Failed to create user: %v", err)), nil
+	}
+
+	resultBytes, err := json.MarshalIndent(result, "", "  ")
+	if err != nil {
+		return mcp.NewToolResultError(fmt.Sprintf("Failed to marshal API result: %v", err)), nil
+	}
+
+	return mcp.NewToolResultText(string(resultBytes)), nil
 }
 
 func (kc *kanboardClient) updateUserHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
@@ -506,24 +623,34 @@ func (kc *kanboardClient) updateUserHandler(ctx context.Context, request mcp.Cal
 
 	params := map[string]interface{}{"id": user_id}
 
-	username, err := request.GetString("username")
-	if err == nil && username != "" {
+	username := request.GetString("username", "")
+	if username != "" {
 		params["username"] = username
 	}
-	password, err := request.GetString("password")
-	if err == nil && password != "" {
+	password := request.GetString("password", "")
+	if password != "" {
 		params["password"] = password
 	}
-	name, err := request.GetString("name")
-	if err == nil && name != "" {
+	name := request.GetString("name", "")
+	if name != "" {
 		params["name"] = name
 	}
-	email, err := request.GetString("email")
-	if err == nil && email != "" {
+	email := request.GetString("email", "")
+	if email != "" {
 		params["email"] = email
 	}
 
-	return kc.callKanboardAPI(ctx, "updateUser", params)
+	result, err := kc.callKanboardAPI(ctx, "updateUser", params)
+	if err != nil {
+		return mcp.NewToolResultError(fmt.Sprintf("Failed to update user: %v", err)), nil
+	}
+
+	resultBytes, err := json.MarshalIndent(result, "", "  ")
+	if err != nil {
+		return mcp.NewToolResultError(fmt.Sprintf("Failed to marshal API result: %v", err)), nil
+	}
+
+	return mcp.NewToolResultText(string(resultBytes)), nil
 }
 
 func (kc *kanboardClient) removeUserHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
@@ -532,5 +659,15 @@ func (kc *kanboardClient) removeUserHandler(ctx context.Context, request mcp.Cal
 		return mcp.NewToolResultError(err.Error()), nil
 	}
 	params := map[string]int{"user_id": user_id}
-	return kc.callKanboardAPI(ctx, "removeUser", params)
+	result, err := kc.callKanboardAPI(ctx, "removeUser", params)
+	if err != nil {
+		return mcp.NewToolResultError(fmt.Sprintf("Failed to remove user: %v", err)), nil
+	}
+
+	resultBytes, err := json.MarshalIndent(result, "", "  ")
+	if err != nil {
+		return mcp.NewToolResultError(fmt.Sprintf("Failed to marshal API result: %v", err)), nil
+	}
+
+	return mcp.NewToolResultText(string(resultBytes)), nil
 }
