@@ -2231,9 +2231,9 @@ func (kc *kanboardClient) createProjectHandler(ctx context.Context, request mcp.
 		params["priority_start"] = priorityStart
 	}
 
-	priority_end := request.GetInt("priority_end", 0)
-	if priority_end != 0 {
-		params["priority_end"] = priority_end
+	priorityEnd := request.GetInt("priority_end", 0)
+	if priorityEnd != 0 {
+		params["priority_end"] = priorityEnd
 	}
 
 	email := request.GetString("email", "")
@@ -2255,13 +2255,13 @@ func (kc *kanboardClient) createProjectHandler(ctx context.Context, request mcp.
 }
 
 func (kc *kanboardClient) getTasksHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
-	project_name, err := request.RequireString("project_name")
+	projectName, err := request.RequireString("project_name")
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
 
 	// First, get the project ID from the project name
-	result, err := kc.callKanboardAPI(ctx, "getProjectByName", map[string]string{"name": project_name})
+	result, err := kc.callKanboardAPI(ctx, "getProjectByName", map[string]string{"name": projectName})
 	if err != nil {
 		return mcp.NewToolResultError(fmt.Sprintf("Failed to get project ID: %v", err)), nil
 	}
@@ -2280,7 +2280,7 @@ func (kc *kanboardClient) getTasksHandler(ctx context.Context, request mcp.CallT
 	}
 
 	if projectInfo.ID == "" {
-		return mcp.NewToolResultError(fmt.Sprintf("Project '%s' not found", project_name)), nil
+		return mcp.NewToolResultError(fmt.Sprintf("Project '%s' not found", projectName)), nil
 	}
 
 	params := map[string]interface{}{"project_id": projectInfo.ID}
@@ -2298,7 +2298,7 @@ func (kc *kanboardClient) getTasksHandler(ctx context.Context, request mcp.CallT
 }
 
 func (kc *kanboardClient) createTaskHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
-	project_name, err := request.RequireString("project_name")
+	projectName, err := request.RequireString("project_name")
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
@@ -2308,7 +2308,7 @@ func (kc *kanboardClient) createTaskHandler(ctx context.Context, request mcp.Cal
 	}
 
 	// First, get the project ID from the project name
-	result, err := kc.callKanboardAPI(ctx, "getProjectByName", map[string]string{"name": project_name})
+	result, err := kc.callKanboardAPI(ctx, "getProjectByName", map[string]string{"name": projectName})
 	if err != nil {
 		return mcp.NewToolResultError(fmt.Sprintf("Failed to get project ID: %v", err)), nil
 	}
@@ -2325,7 +2325,7 @@ func (kc *kanboardClient) createTaskHandler(ctx context.Context, request mcp.Cal
 	}
 
 	if projectInfo.ID == "" {
-		return mcp.NewToolResultError(fmt.Sprintf("Project '%s' not found", project_name)), nil
+		return mcp.NewToolResultError(fmt.Sprintf("Project '%s' not found", projectName)), nil
 	}
 
 	params := map[string]interface{}{
