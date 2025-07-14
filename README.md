@@ -24,7 +24,10 @@ To connect this MCP server to Cursor (or any compatible MCP client like Claude D
         "kanboard-mcp-server": {
           "command": "/path/to/your/kanboard-mcp.exe",
           "args": [],
-          "env": {}
+          "env": {
+            "KANBOARD_API_ENDPOINT": "https://t.b-b.top/jsonrpc.php",
+            "KANBOARD_API_KEY": "your-kanboard-api-key"
+          }
         }
       }
     }
