@@ -265,6 +265,16 @@ After saving the configuration, restart your MCP client (Cursor, Claude Desktop,
 | `change_project_group_role` | ✏️ Change role of a group for a project | "Change group 456's role in project 123 to 'project-manager'" |
 | `get_project_user_role` | 🔍 Get the role of a user for a given project | "Get the role of user 1 in project 123" |
 
+### 📝 Subtask Management
+
+| Tool | Description | Example |
+|------|-------------|---------|
+| `create_subtask` | ➕ Create a new subtask | "Create a subtask 'Review designs' for task 123 with user 1 assigned" |
+| `get_subtask` | 🔍 Get subtask information | "Get details for subtask 456" |
+| `get_all_subtasks` | 📋 Get all available subtasks for a task | "Show all subtasks for task 123" |
+| `update_subtask` | ✏️ Update a subtask | "Update subtask 456 for task 123 to status 2 (Done)" |
+| `remove_subtask` | 🗑️ Remove a subtask | "Remove subtask with ID 456" |
+
 ###  Group Management
 
 | Tool | Description | Example |

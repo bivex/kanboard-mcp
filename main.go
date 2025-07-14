@@ -1288,6 +1288,87 @@ func main() {
 	)
 	s.AddTool(tool, kbClient.getProjectUserRoleHandler)
 
+	// Subtask Management
+	tool = mcp.NewTool("create_subtask",
+		mcp.WithDescription("Create a new subtask"),
+		mcp.WithNumber("task_id",
+			mcp.Required(),
+			mcp.Description("ID of the task to associate the subtask with"),
+		),
+		mcp.WithString("title",
+			mcp.Required(),
+			mcp.Description("Title of the subtask"),
+		),
+		mcp.WithNumber("user_id",
+			mcp.Description("ID of the user assigned to the subtask (optional)"),
+		),
+		mcp.WithNumber("time_estimated",
+			mcp.Description("Estimated time for the subtask in hours (optional)"),
+		),
+		mcp.WithNumber("time_spent",
+			mcp.Description("Time spent on the subtask in hours (optional)"),
+		),
+		mcp.WithNumber("status",
+			mcp.Description("Status of the subtask (0: Todo, 1: In Progress, 2: Done) (optional)"),
+		),
+	)
+	s.AddTool(tool, kbClient.createSubtaskHandler)
+
+	tool = mcp.NewTool("get_subtask",
+		mcp.WithDescription("Get subtask information"),
+		mcp.WithNumber("subtask_id",
+			mcp.Required(),
+			mcp.Description("ID of the subtask to retrieve"),
+		),
+	)
+	s.AddTool(tool, kbClient.getSubtaskHandler)
+
+	tool = mcp.NewTool("get_all_subtasks",
+		mcp.WithDescription("Get all available subtasks for a task"),
+		mcp.WithNumber("task_id",
+			mcp.Required(),
+			mcp.Description("ID of the task to get subtasks for"),
+		),
+	)
+	s.AddTool(tool, kbClient.getAllSubtasksHandler)
+
+	tool = mcp.NewTool("update_subtask",
+		mcp.WithDescription("Update a subtask"),
+		mcp.WithNumber("id",
+			mcp.Required(),
+			mcp.Description("ID of the subtask to update"),
+		),
+		mcp.WithNumber("task_id",
+			mcp.Required(),
+			mcp.Description("ID of the associated task"),
+		),
+		mcp.WithString("title",
+			mcp.Description("New title for the subtask (optional)"),
+		),
+		mcp.WithNumber("user_id",
+			mcp.Description("New user ID assigned to the subtask (optional)"),
+		),
+		mcp.WithNumber("time_estimated",
+			mcp.Description("New estimated time for the subtask in hours (optional)"),
+		),
+		mcp.WithNumber("time_spent",
+			mcp.Description("New time spent on the subtask in hours (optional)"),
+		),
+		mcp.WithNumber("status",
+			mcp.Description("New status of the subtask (0: Todo, 1: In Progress, 2: Done) (optional)"),
+		),
+	)
+	s.AddTool(tool, kbClient.updateSubtaskHandler)
+
+	tool = mcp.NewTool("remove_subtask",
+		mcp.WithDescription("Remove a subtask"),
+		mcp.WithNumber("subtask_id",
+			mcp.Required(),
+			mcp.Description("ID of the subtask to remove"),
+		),
+	)
+	s.AddTool(tool, kbClient.removeSubtaskHandler)
+
 	// Start the stdio server
 	if err := server.ServeStdio(s); err != nil {
 		fmt.Printf("Server error: %v\n", err)
@@ -3848,6 +3929,140 @@ func (kc *kanboardClient) getProjectUserRoleHandler(ctx context.Context, request
 	}
 	params := map[string]interface{}{"project_id": project_id, "user_id": user_id}
 	result, err := kc.callKanboardAPI(ctx, "getProjectUserRole", params)
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	resultBytes, err := json.MarshalIndent(result, "", "  ")
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	return mcp.NewToolResultText(string(resultBytes)), nil
+}
+
+func (kc *kanboardClient) createSubtaskHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+	task_id, err := request.RequireInt("task_id")
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	title, err := request.RequireString("title")
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+
+	params := map[string]interface{}{"task_id": task_id, "title": title}
+
+	user_id := request.GetInt("user_id", 0)
+	if user_id != 0 {
+		params["user_id"] = user_id
+	}
+	time_estimated := request.GetInt("time_estimated", 0)
+	if time_estimated != 0 {
+		params["time_estimated"] = time_estimated
+	}
+	time_spent := request.GetInt("time_spent", 0)
+	if time_spent != 0 {
+		params["time_spent"] = time_spent
+	}
+	status := request.GetInt("status", 0)
+	if status != 0 {
+		params["status"] = status
+	}
+
+	result, err := kc.callKanboardAPI(ctx, "createSubtask", params)
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	resultBytes, err := json.MarshalIndent(result, "", "  ")
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	return mcp.NewToolResultText(string(resultBytes)), nil
+}
+
+func (kc *kanboardClient) getSubtaskHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+	subtask_id, err := request.RequireInt("subtask_id")
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	params := map[string]interface{}{"subtask_id": subtask_id}
+	result, err := kc.callKanboardAPI(ctx, "getSubtask", params)
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	resultBytes, err := json.MarshalIndent(result, "", "  ")
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	return mcp.NewToolResultText(string(resultBytes)), nil
+}
+
+func (kc *kanboardClient) getAllSubtasksHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+	task_id, err := request.RequireInt("task_id")
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	params := map[string]interface{}{"task_id": task_id}
+	result, err := kc.callKanboardAPI(ctx, "getAllSubtasks", params)
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	resultBytes, err := json.MarshalIndent(result, "", "  ")
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	return mcp.NewToolResultText(string(resultBytes)), nil
+}
+
+func (kc *kanboardClient) updateSubtaskHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+	id, err := request.RequireInt("id")
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	task_id, err := request.RequireInt("task_id")
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	params := map[string]interface{}{"id": id, "task_id": task_id}
+
+	title := request.GetString("title", "")
+	if title != "" {
+		params["title"] = title
+	}
+	user_id := request.GetInt("user_id", 0)
+	if user_id != 0 {
+		params["user_id"] = user_id
+	}
+	time_estimated := request.GetInt("time_estimated", 0)
+	if time_estimated != 0 {
+		params["time_estimated"] = time_estimated
+	}
+	time_spent := request.GetInt("time_spent", 0)
+	if time_spent != 0 {
+		params["time_spent"] = time_spent
+	}
+	status := request.GetInt("status", 0)
+	if status != 0 {
+		params["status"] = status
+	}
+
+	result, err := kc.callKanboardAPI(ctx, "updateSubtask", params)
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	resultBytes, err := json.MarshalIndent(result, "", "  ")
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	return mcp.NewToolResultText(string(resultBytes)), nil
+}
+
+func (kc *kanboardClient) removeSubtaskHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+	subtask_id, err := request.RequireInt("subtask_id")
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	params := map[string]interface{}{"subtask_id": subtask_id}
+	result, err := kc.callKanboardAPI(ctx, "removeSubtask", params)
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
