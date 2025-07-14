@@ -257,6 +257,47 @@ func main() {
 	)
 	s.AddTool(tool, kbClient.reorderColumnsHandler)
 
+	tool = mcp.NewTool("get_categories",
+		mcp.WithDescription("List project categories"),
+		mcp.WithString("project_id",
+			mcp.Description("ID of the project to get categories from (optional)"),
+		),
+	)
+	s.AddTool(tool, kbClient.getCategoriesHandler)
+
+	tool = mcp.NewTool("create_category",
+		mcp.WithDescription("Add task categories"),
+		mcp.WithString("name",
+			mcp.Required(),
+			mcp.Description("Name of the category to create"),
+		),
+		mcp.WithString("project_id",
+			mcp.Description("ID of the project to add the category to (optional)"),
+		),
+	)
+	s.AddTool(tool, kbClient.createCategoryHandler)
+
+	tool = mcp.NewTool("update_category",
+		mcp.WithDescription("Modify categories"),
+		mcp.WithNumber("category_id",
+			mcp.Required(),
+			mcp.Description("ID of the category to update"),
+		),
+		mcp.WithString("name",
+			mcp.Description("New name for the category"),
+		),
+	)
+	s.AddTool(tool, kbClient.updateCategoryHandler)
+
+	tool = mcp.NewTool("delete_category",
+		mcp.WithDescription("Remove categories"),
+		mcp.WithNumber("category_id",
+			mcp.Required(),
+			mcp.Description("ID of the category to delete"),
+		),
+	)
+	s.AddTool(tool, kbClient.deleteCategoryHandler)
+
 	// Start the stdio server
 	if err := server.ServeStdio(s); err != nil {
 		fmt.Printf("Server error: %v\n", err)
@@ -868,6 +909,99 @@ func (kc *kanboardClient) reorderColumnsHandler(ctx context.Context, request mcp
 	result, err := kc.callKanboardAPI(ctx, "moveColumnPosition", params)
 	if err != nil {
 		return mcp.NewToolResultError(fmt.Sprintf("Failed to reorder columns: %v", err)), nil
+	}
+
+	resultBytes, err := json.MarshalIndent(result, "", "  ")
+	if err != nil {
+		return mcp.NewToolResultError(fmt.Sprintf("Failed to marshal API result: %v", err)), nil
+	}
+
+	return mcp.NewToolResultText(string(resultBytes)), nil
+}
+
+func (kc *kanboardClient) getCategoriesHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+	project_id := request.GetString("project_id", "") // Categories can be global or project-specific
+
+	var result interface{}
+	var err error
+	if project_id != "" {
+		params := map[string]string{"project_id": project_id}
+		result, err = kc.callKanboardAPI(ctx, "getAllCategories", params)
+	} else {
+		result, err = kc.callKanboardAPI(ctx, "getAllCategories", nil)
+	}
+
+	if err != nil {
+		return mcp.NewToolResultError(fmt.Sprintf("Failed to get categories: %v", err)), nil
+	}
+
+	resultBytes, err := json.MarshalIndent(result, "", "  ")
+	if err != nil {
+		return mcp.NewToolResultError(fmt.Sprintf("Failed to marshal API result: %v", err)), nil
+	}
+
+	return mcp.NewToolResultText(string(resultBytes)), nil
+}
+
+func (kc *kanboardClient) createCategoryHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+	project_id := request.GetString("project_id", "")
+	name, err := request.RequireString("name")
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+
+	params := map[string]interface{}{"name": name}
+	if project_id != "" {
+		params["project_id"] = project_id
+	}
+
+	result, err := kc.callKanboardAPI(ctx, "createCategory", params)
+	if err != nil {
+		return mcp.NewToolResultError(fmt.Sprintf("Failed to create category: %v", err)), nil
+	}
+
+	resultBytes, err := json.MarshalIndent(result, "", "  ")
+	if err != nil {
+		return mcp.NewToolResultError(fmt.Sprintf("Failed to marshal API result: %v", err)), nil
+	}
+
+	return mcp.NewToolResultText(string(resultBytes)), nil
+}
+
+func (kc *kanboardClient) updateCategoryHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+	category_id, err := request.RequireInt("category_id")
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+
+	params := map[string]interface{}{"id": category_id}
+	name := request.GetString("name", "")
+	if name != "" {
+		params["name"] = name
+	}
+
+	result, err := kc.callKanboardAPI(ctx, "updateCategory", params)
+	if err != nil {
+		return mcp.NewToolResultError(fmt.Sprintf("Failed to update category: %v", err)), nil
+	}
+
+	resultBytes, err := json.MarshalIndent(result, "", "  ")
+	if err != nil {
+		return mcp.NewToolResultError(fmt.Sprintf("Failed to marshal API result: %v", err)), nil
+	}
+
+	return mcp.NewToolResultText(string(resultBytes)), nil
+}
+
+func (kc *kanboardClient) deleteCategoryHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+	category_id, err := request.RequireInt("category_id")
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	params := map[string]int{"category_id": category_id}
+	result, err := kc.callKanboardAPI(ctx, "removeCategory", params)
+	if err != nil {
+		return mcp.NewToolResultError(fmt.Sprintf("Failed to delete category: %v", err)), nil
 	}
 
 	resultBytes, err := json.MarshalIndent(result, "", "  ")

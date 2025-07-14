@@ -60,3 +60,7 @@ Once configured, Cursor will be able to discover and interact with the following
 | `update_column`    | Modify column settings    | `"Change the Review column limit to 3 tasks"`      |
 | `delete_column`    | Remove columns            | `"Delete the unused Draft column"`                 |
 | `reorder_columns`  | Change column positions   | `"Move Testing column before Done"`                |
+| `get_categories`   | List project categories   | `"Show me all task categories"`                    |
+| `create_category`  | Add task categories       | `"Create a Bug Fixes category"`                    |
+| `update_category`  | Modify categories         | `"Rename Bug Fixes to Critical Issues"`            |
+| `delete_category`  | Remove categories         | `"Delete the unused category"`                     |
