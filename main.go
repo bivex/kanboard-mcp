@@ -1567,6 +1567,42 @@ func main() {
 	)
 	s.AddTool(tool, kbClient.removeAllTaskFilesHandler)
 
+	// Application API Procedures
+	tool = mcp.NewTool("get_version",
+		mcp.WithDescription("Get the application version"),
+	)
+	s.AddTool(tool, kbClient.getVersionHandler)
+
+	tool = mcp.NewTool("get_timezone",
+		mcp.WithDescription("Get the timezone of the connected user"),
+	)
+	s.AddTool(tool, kbClient.getTimezoneHandler)
+
+	tool = mcp.NewTool("get_default_task_colors",
+		mcp.WithDescription("Get all default task colors"),
+	)
+	s.AddTool(tool, kbClient.getDefaultTaskColorsHandler)
+
+	tool = mcp.NewTool("get_default_task_color",
+		mcp.WithDescription("Get default task color"),
+	)
+	s.AddTool(tool, kbClient.getDefaultTaskColorHandler)
+
+	tool = mcp.NewTool("get_color_list",
+		mcp.WithDescription("Get the list of task colors"),
+	)
+	s.AddTool(tool, kbClient.getColorListHandler)
+
+	tool = mcp.NewTool("get_application_roles",
+		mcp.WithDescription("Get the application roles"),
+	)
+	s.AddTool(tool, kbClient.getApplicationRolesHandler)
+
+	tool = mcp.NewTool("get_project_roles",
+		mcp.WithDescription("Get the project roles"),
+	)
+	s.AddTool(tool, kbClient.getProjectRolesHandler)
+
 	// Start the stdio server
 	if err := server.ServeStdio(s); err != nil {
 		fmt.Printf("Server error: %v\n", err)
@@ -4681,5 +4717,161 @@ func (kc *kanboardClient) RemoveAllTaskFiles(taskID int) (bool, error) {
 		return success, nil
 	}
 	return false, fmt.Errorf("Unexpected result type for RemoveAllTaskFiles: %T", result)
+}
+
+func (kc *kanboardClient) GetVersion() (string, error) {
+	result, err := kc.callKanboardAPI(context.Background(), "getVersion", nil)
+	if err != nil {
+		return "", err
+	}
+
+	if version, ok := result.(string); ok {
+		return version, nil
+	}
+	return "", fmt.Errorf("Unexpected result type for GetVersion: %T", result)
+}
+
+func (kc *kanboardClient) GetTimezone() (string, error) {
+	result, err := kc.callKanboardAPI(context.Background(), "getTimezone", nil)
+	if err != nil {
+		return "", err
+	}
+
+	if timezone, ok := result.(string); ok {
+		return timezone, nil
+	}
+	return "", fmt.Errorf("Unexpected result type for GetTimezone: %T", result)
+}
+
+func (kc *kanboardClient) GetDefaultTaskColors() (map[string]interface{}, error) {
+	result, err := kc.callKanboardAPI(context.Background(), "getDefaultTaskColors", nil)
+	if err != nil {
+		return nil, err
+	}
+
+	if colors, ok := result.(map[string]interface{}); ok {
+		return colors, nil
+	}
+	return nil, fmt.Errorf("Unexpected result type for GetDefaultTaskColors: %T", result)
+}
+
+func (kc *kanboardClient) GetDefaultTaskColor() (string, error) {
+	result, err := kc.callKanboardAPI(context.Background(), "getDefaultTaskColor", nil)
+	if err != nil {
+		return "", err
+	}
+
+	if colorID, ok := result.(string); ok {
+		return colorID, nil
+	}
+	return "", fmt.Errorf("Unexpected result type for GetDefaultTaskColor: %T", result)
+}
+
+func (kc *kanboardClient) GetColorList() (map[string]interface{}, error) {
+	result, err := kc.callKanboardAPI(context.Background(), "getColorList", nil)
+	if err != nil {
+		return nil, err
+	}
+
+	if colorList, ok := result.(map[string]interface{}); ok {
+		return colorList, nil
+	}
+	return nil, fmt.Errorf("Unexpected result type for GetColorList: %T", result)
+}
+
+func (kc *kanboardClient) GetApplicationRoles() (map[string]interface{}, error) {
+	result, err := kc.callKanboardAPI(context.Background(), "getApplicationRoles", nil)
+	if err != nil {
+		return nil, err
+	}
+
+	if roles, ok := result.(map[string]interface{}); ok {
+		return roles, nil
+	}
+	return nil, fmt.Errorf("Unexpected result type for GetApplicationRoles: %T", result)
+}
+
+func (kc *kanboardClient) GetProjectRoles() (map[string]interface{}, error) {
+	result, err := kc.callKanboardAPI(context.Background(), "getProjectRoles", nil)
+	if err != nil {
+		return nil, err
+	}
+
+	if roles, ok := result.(map[string]interface{}); ok {
+		return roles, nil
+	}
+	return nil, fmt.Errorf("Unexpected result type for GetProjectRoles: %T", result)
+}
+
+func (kc *kanboardClient) getVersionHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+	result, err := kc.GetVersion()
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	return mcp.NewToolResultText(result), nil
+}
+
+func (kc *kanboardClient) getTimezoneHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+	result, err := kc.GetTimezone()
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	return mcp.NewToolResultText(result), nil
+}
+
+func (kc *kanboardClient) getDefaultTaskColorsHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+	result, err := kc.GetDefaultTaskColors()
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	resultBytes, err := json.MarshalIndent(result, "", "  ")
+	if err != nil {
+		return mcp.NewToolResultError(fmt.Sprintf("Failed to marshal API result: %v", err)), nil
+	}
+	return mcp.NewToolResultText(string(resultBytes)), nil
+}
+
+func (kc *kanboardClient) getDefaultTaskColorHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+	result, err := kc.GetDefaultTaskColor()
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	return mcp.NewToolResultText(result), nil
+}
+
+func (kc *kanboardClient) getColorListHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+	result, err := kc.GetColorList()
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	resultBytes, err := json.MarshalIndent(result, "", "  ")
+	if err != nil {
+		return mcp.NewToolResultError(fmt.Sprintf("Failed to marshal API result: %v", err)), nil
+	}
+	return mcp.NewToolResultText(string(resultBytes)), nil
+}
+
+func (kc *kanboardClient) getApplicationRolesHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+	result, err := kc.GetApplicationRoles()
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	resultBytes, err := json.MarshalIndent(result, "", "  ")
+	if err != nil {
+		return mcp.NewToolResultError(fmt.Sprintf("Failed to marshal API result: %v", err)), nil
+	}
+	return mcp.NewToolResultText(string(resultBytes)), nil
+}
+
+func (kc *kanboardClient) getProjectRolesHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+	result, err := kc.GetProjectRoles()
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	resultBytes, err := json.MarshalIndent(result, "", "  ")
+	if err != nil {
+		return mcp.NewToolResultError(fmt.Sprintf("Failed to marshal API result: %v", err)), nil
+	}
+	return mcp.NewToolResultText(string(resultBytes)), nil
 }
 

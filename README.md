@@ -307,6 +307,18 @@ After saving the configuration, restart your MCP client (Cursor, Claude Desktop,
 | `remove_task_file` | 🗑️ Remove file | "Remove file with ID 456" |
 | `remove_all_task_files` | 🗑️ Remove all files associated to a task | "Remove all files from task 123" |
 
+### ⚙️ Application Management
+
+| Tool | Description | Example |
+|------|-------------|---------|
+| `get_version` | 📋 Get the application version | "What is the Kanboard version?" |
+| `get_timezone` | 🌐 Get the timezone of the connected user | "What is my current timezone?" |
+| `get_default_task_colors` | 🌈 Get all default task colors | "Show me all default task colors" |
+| `get_default_task_color` | 🎨 Get default task color | "What is the default task color?" |
+| `get_color_list` | 📋 Get the list of task colors | "List all available task colors" |
+| `get_application_roles` | 👥 Get the application roles | "List all application roles" |
+| `get_project_roles` | 👥 Get the project roles | "List all project roles" |
+
 ### 👥 Group Management
 
 | Tool | Description | Example |
