@@ -176,6 +176,7 @@ After saving the configuration, restart your MCP client (Cursor, Claude Desktop,
 |------|-------------|---------|
 | `get_swimlanes` | 📋 List all swimlanes of a project (enabled or disabled) and sorted by position | "Show me all swimlanes for project 1" |
 | `get_active_swimlanes` | 📋 Get the list of enabled swimlanes of a project (include default swimlane if enabled) | "Get active swimlanes for project 1" |
+| `get_swimlane` | 🔍 Get a swimlane by ID | "Get swimlane details for ID 1" |
 | `get_swimlane_by_id` | 🔍 Get a swimlane by ID | "Get swimlane details for ID 1" |
 | `get_swimlane_by_name` | 🔍 Get a swimlane by name | "Get swimlane details for project 1 with name 'Swimlane 1'" |
 | `change_swimlane_position` | 🔄 Move a swimlane's position (only for active swimlanes) | "Change swimlane 2 position to 3 in project 1" |
