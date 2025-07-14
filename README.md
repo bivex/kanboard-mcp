@@ -319,6 +319,17 @@ After saving the configuration, restart your MCP client (Cursor, Claude Desktop,
 | `get_application_roles` | 👥 Get the application roles | "List all application roles" |
 | `get_project_roles` | 👥 Get the project roles | "List all project roles" |
 
+### 🤖 Automatic Actions Management
+
+| Tool | Description | Example |
+|------|-------------|---------|
+| `get_available_actions` | 📋 Get list of available automatic actions | "Show available automatic actions" |
+| `get_available_action_events` | 📋 Get list of available events for actions | "Show available action events" |
+| `get_compatible_action_events` | 🔍 Get list of events compatible with an action | "Get compatible events for action 'TaskClose'" |
+| `get_actions` | 📋 Get list of actions for a project | "Get actions for project 123" |
+| `create_action` | ➕ Create an action | "Create an action for project 1, event 'task.move.column', action '\Kanboard\Action\TaskClose', with params 'column_id:3'" |
+| `remove_action` | 🗑️ Remove an action | "Remove action with ID 456" |
+
 ### 👥 Group Management
 
 | Tool | Description | Example |

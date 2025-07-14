@@ -1603,6 +1603,65 @@ func main() {
 	)
 	s.AddTool(tool, kbClient.getProjectRolesHandler)
 
+	// Automatic Actions API Procedures
+	tool = mcp.NewTool("get_available_actions",
+		mcp.WithDescription("Get list of available automatic actions"),
+	)
+	s.AddTool(tool, kbClient.getAvailableActionsHandler)
+
+	tool = mcp.NewTool("get_available_action_events",
+		mcp.WithDescription("Get list of available events for actions"),
+	)
+	s.AddTool(tool, kbClient.getAvailableActionEventsHandler)
+
+	tool = mcp.NewTool("get_compatible_action_events",
+		mcp.WithDescription("Get list of events compatible with an action"),
+		mcp.WithString("action_name",
+			mcp.Required(),
+			mcp.Description("Action name"),
+		),
+	)
+	s.AddTool(tool, kbClient.getCompatibleActionEventsHandler)
+
+	tool = mcp.NewTool("get_actions",
+		mcp.WithDescription("Get list of actions for a project"),
+		mcp.WithNumber("project_id",
+			mcp.Required(),
+			mcp.Description("Project ID"),
+		),
+	)
+	s.AddTool(tool, kbClient.getActionsHandler)
+
+	tool = mcp.NewTool("create_action",
+		mcp.WithDescription("Create an action"),
+		mcp.WithNumber("project_id",
+			mcp.Required(),
+			mcp.Description("Project ID"),
+		),
+		mcp.WithString("event_name",
+			mcp.Required(),
+			mcp.Description("Event name"),
+		),
+		mcp.WithString("action_name",
+			mcp.Required(),
+			mcp.Description("Action name"),
+		),
+		mcp.WithObject("params",
+			mcp.Required(),
+			mcp.Description("Key/value parameters"),
+		),
+	)
+	s.AddTool(tool, kbClient.createActionHandler)
+
+	tool = mcp.NewTool("remove_action",
+		mcp.WithDescription("Remove an action"),
+		mcp.WithNumber("action_id",
+			mcp.Required(),
+			mcp.Description("Action ID"),
+		),
+	)
+	s.AddTool(tool, kbClient.removeActionHandler)
+
 	// Start the stdio server
 	if err := server.ServeStdio(s); err != nil {
 		fmt.Printf("Server error: %v\n", err)
@@ -4873,5 +4932,183 @@ func (kc *kanboardClient) getProjectRolesHandler(ctx context.Context, request mc
 		return mcp.NewToolResultError(fmt.Sprintf("Failed to marshal API result: %v", err)), nil
 	}
 	return mcp.NewToolResultText(string(resultBytes)), nil
+}
+
+func (kc *kanboardClient) GetAvailableActions() (map[string]interface{}, error) {
+	result, err := kc.callKanboardAPI(context.Background(), "getAvailableActions", nil)
+	if err != nil {
+		return nil, err
+	}
+
+	if actions, ok := result.(map[string]interface{}); ok {
+		return actions, nil
+	}
+	return nil, fmt.Errorf("Unexpected result type for GetAvailableActions: %T", result)
+}
+
+func (kc *kanboardClient) GetAvailableActionEvents() (map[string]interface{}, error) {
+	result, err := kc.callKanboardAPI(context.Background(), "getAvailableActionEvents", nil)
+	if err != nil {
+		return nil, err
+	}
+
+	if events, ok := result.(map[string]interface{}); ok {
+		return events, nil
+	}
+	return nil, fmt.Errorf("Unexpected result type for GetAvailableActionEvents: %T", result)
+}
+
+func (kc *kanboardClient) GetCompatibleActionEvents(actionName string) (map[string]interface{}, error) {
+	params := []interface{}{actionName}
+	result, err := kc.callKanboardAPI(context.Background(), "getCompatibleActionEvents", params)
+	if err != nil {
+		return nil, err
+	}
+
+	if events, ok := result.(map[string]interface{}); ok {
+		return events, nil
+	}
+	return nil, fmt.Errorf("Unexpected result type for GetCompatibleActionEvents: %T", result)
+}
+
+func (kc *kanboardClient) GetActions(projectID int) ([]interface{}, error) {
+	params := []interface{}{projectID}
+	result, err := kc.callKanboardAPI(context.Background(), "getActions", params)
+	if err != nil {
+		return nil, err
+	}
+
+	if actions, ok := result.([]interface{}); ok {
+		return actions, nil
+	}
+	return nil, fmt.Errorf("Unexpected result type for GetActions: %T", result)
+}
+
+func (kc *kanboardClient) CreateAction(projectID int, eventName, actionName string, params map[string]interface{}) (int, error) {
+	realParams := map[string]interface{}{
+		"project_id": projectID,
+		"event_name": eventName,
+		"action_name": actionName,
+		"params": params,
+	}
+	result, err := kc.callKanboardAPI(context.Background(), "createAction", realParams)
+	if err != nil {
+		return 0, err
+	}
+
+	if actionID, ok := result.(float64); ok {
+		return int(actionID), nil
+	}
+	return 0, fmt.Errorf("Unexpected result type for CreateAction: %T", result)
+}
+
+func (kc *kanboardClient) RemoveAction(actionID int) (bool, error) {
+	params := []interface{}{actionID}
+	result, err := kc.callKanboardAPI(context.Background(), "removeAction", params)
+	if err != nil {
+		return false, err
+	}
+
+	if success, ok := result.(bool); ok {
+		return success, nil
+	}
+	return false, fmt.Errorf("Unexpected result type for RemoveAction: %T", result)
+}
+
+func (kc *kanboardClient) getAvailableActionsHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+	result, err := kc.GetAvailableActions()
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	resultBytes, err := json.MarshalIndent(result, "", "  ")
+	if err != nil {
+		return mcp.NewToolResultError(fmt.Sprintf("Failed to marshal API result: %v", err)), nil
+	}
+	return mcp.NewToolResultText(string(resultBytes)), nil
+}
+
+func (kc *kanboardClient) getAvailableActionEventsHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+	result, err := kc.GetAvailableActionEvents()
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	resultBytes, err := json.MarshalIndent(result, "", "  ")
+	if err != nil {
+		return mcp.NewToolResultError(fmt.Sprintf("Failed to marshal API result: %v", err)), nil
+	}
+	return mcp.NewToolResultText(string(resultBytes)), nil
+}
+
+func (kc *kanboardClient) getCompatibleActionEventsHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+	actionName := request.GetString("action_name", "")
+	if actionName == "" {
+		return mcp.NewToolResultError("action_name is required"), nil
+	}
+	result, err := kc.GetCompatibleActionEvents(actionName)
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	resultBytes, err := json.MarshalIndent(result, "", "  ")
+	if err != nil {
+		return mcp.NewToolResultError(fmt.Sprintf("Failed to marshal API result: %v", err)), nil
+	}
+	return mcp.NewToolResultText(string(resultBytes)), nil
+}
+
+func (kc *kanboardClient) getActionsHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+	projectID := request.GetInt("project_id", 0)
+	if projectID == 0 {
+		return mcp.NewToolResultError("project_id is required"), nil
+	}
+	result, err := kc.GetActions(int(projectID))
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	resultBytes, err := json.MarshalIndent(result, "", "  ")
+	if err != nil {
+		return mcp.NewToolResultError(fmt.Sprintf("Failed to marshal API result: %v", err)), nil
+	}
+	return mcp.NewToolResultText(string(resultBytes)), nil
+}
+
+func (kc *kanboardClient) createActionHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+	projectID := request.GetInt("project_id", 0)
+	if projectID == 0 {
+		return mcp.NewToolResultError("project_id is required"), nil
+	}
+	eventName := request.GetString("event_name", "")
+	if eventName == "" {
+		return mcp.NewToolResultError("event_name is required"), nil
+	}
+	actionName := request.GetString("action_name", "")
+	if actionName == "" {
+		return mcp.NewToolResultError("action_name is required"), nil
+	}
+	
+	// Retrieve all arguments and then extract 'params'
+	allArgs := request.GetArguments()
+	params, ok := allArgs["params"].(map[string]interface{})
+	if !ok {
+		// If 'params' is not provided or not a map, return an error or an empty map
+		return mcp.NewToolResultError("params must be a map or omitted"), nil
+	}
+
+	actionID, err := kc.CreateAction(int(projectID), eventName, actionName, params)
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	return mcp.NewToolResultText(strconv.Itoa(actionID)), nil
+}
+
+func (kc *kanboardClient) removeActionHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+	actionID := request.GetInt("action_id", 0)
+	if actionID == 0 {
+		return mcp.NewToolResultError("action_id is required"), nil
+	}
+	result, err := kc.RemoveAction(int(actionID))
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	return mcp.NewToolResultText(strconv.FormatBool(result)), nil
 }
 
