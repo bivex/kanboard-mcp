@@ -339,6 +339,98 @@ func main() {
 	)
 	s.AddTool(tool, kbClient.getMyProjectsHandler)
 
+	tool = mcp.NewTool("get_external_task_link_types",
+		mcp.WithDescription("Get all registered external link providers"),
+	)
+	s.AddTool(tool, kbClient.getExternalTaskLinkTypesHandler)
+
+	tool = mcp.NewTool("get_external_task_link_provider_dependencies",
+		mcp.WithDescription("Get available dependencies for a given provider"),
+		mcp.WithString("provider_name",
+			mcp.Required(),
+			mcp.Description("Name of the provider"),
+		),
+	)
+	s.AddTool(tool, kbClient.getExternalTaskLinkProviderDependenciesHandler)
+
+	tool = mcp.NewTool("create_external_task_link",
+		mcp.WithDescription("Create a new external link"),
+		mcp.WithNumber("task_id",
+			mcp.Required(),
+			mcp.Description("ID of the task"),
+		),
+		mcp.WithString("url",
+			mcp.Required(),
+			mcp.Description("URL of the external link"),
+		),
+		mcp.WithString("dependency",
+			mcp.Required(),
+			mcp.Description("Dependency of the external link"),
+		),
+		mcp.WithString("type",
+			mcp.Description("Type of the external link (optional)"),
+		),
+		mcp.WithString("title",
+			mcp.Description("Title of the external link (optional)"),
+		),
+	)
+	s.AddTool(tool, kbClient.createExternalTaskLinkHandler)
+
+	tool = mcp.NewTool("update_external_task_link",
+		mcp.WithDescription("Update external task link"),
+		mcp.WithNumber("task_id",
+			mcp.Required(),
+			mcp.Description("ID of the task"),
+		),
+		mcp.WithNumber("link_id",
+			mcp.Required(),
+			mcp.Description("ID of the external link to update"),
+		),
+		mcp.WithString("title",
+			mcp.Description("New title for the external link"),
+		),
+		mcp.WithString("url",
+			mcp.Description("New URL for the external link"),		),
+		mcp.WithString("dependency",
+			mcp.Description("New dependency for the external link"),
+		),
+	)
+	s.AddTool(tool, kbClient.updateExternalTaskLinkHandler)
+
+	tool = mcp.NewTool("get_external_task_link_by_id",
+		mcp.WithDescription("Get an external task link by ID"),
+		mcp.WithNumber("task_id",
+			mcp.Required(),
+			mcp.Description("ID of the task"),
+		),
+		mcp.WithNumber("link_id",
+			mcp.Required(),
+			mcp.Description("ID of the external link to retrieve"),		),
+	)
+	s.AddTool(tool, kbClient.getExternalTaskLinkByIdHandler)
+
+	tool = mcp.NewTool("get_all_external_task_links",
+		mcp.WithDescription("Get all external links attached to a task"),
+		mcp.WithNumber("task_id",
+			mcp.Required(),
+			mcp.Description("ID of the task to get external links for"),
+		),
+	)
+	s.AddTool(tool, kbClient.getAllExternalTaskLinksHandler)
+
+	tool = mcp.NewTool("remove_external_task_link",
+		mcp.WithDescription("Remove an external link"),
+		mcp.WithNumber("task_id",
+			mcp.Required(),
+			mcp.Description("ID of the task"),
+		),
+		mcp.WithNumber("link_id",
+			mcp.Required(),
+			mcp.Description("ID of the external link to remove"),
+		),
+	)
+	s.AddTool(tool, kbClient.removeExternalTaskLinkHandler)
+
 	tool = mcp.NewTool("get_columns",
 		mcp.WithDescription("List project columns"),
 		mcp.WithString("project_id",
@@ -1099,6 +1191,171 @@ func (kc *kanboardClient) getMyOverdueTasksHandler(ctx context.Context, request 
 
 func (kc *kanboardClient) getMyProjectsHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
 	result, err := kc.callKanboardAPI(ctx, "getMyProjects", nil)
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	resultBytes, err := json.MarshalIndent(result, "", "  ")
+	if err != nil {
+		return mcp.NewToolResultError(fmt.Sprintf("Failed to marshal API result: %v", err)), nil
+	}
+	return mcp.NewToolResultText(string(resultBytes)), nil
+}
+
+func (kc *kanboardClient) getExternalTaskLinkTypesHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+	result, err := kc.callKanboardAPI(ctx, "getExternalTaskLinkTypes", nil)
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	resultBytes, err := json.MarshalIndent(result, "", "  ")
+	if err != nil {
+		return mcp.NewToolResultError(fmt.Sprintf("Failed to marshal API result: %v", err)), nil
+	}
+	return mcp.NewToolResultText(string(resultBytes)), nil
+}
+
+func (kc *kanboardClient) getExternalTaskLinkProviderDependenciesHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+	providerName, err := request.RequireString("provider_name")
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	params := map[string]string{"providerName": providerName}
+	result, err := kc.callKanboardAPI(ctx, "getExternalTaskLinkProviderDependencies", params)
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	resultBytes, err := json.MarshalIndent(result, "", "  ")
+	if err != nil {
+		return mcp.NewToolResultError(fmt.Sprintf("Failed to marshal API result: %v", err)), nil
+	}
+	return mcp.NewToolResultText(string(resultBytes)), nil
+}
+
+func (kc *kanboardClient) createExternalTaskLinkHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+	task_id, err := request.RequireInt("task_id")
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	url, err := request.RequireString("url")
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	dependency, err := request.RequireString("dependency")
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+
+	params := map[string]interface{}{
+		"task_id":    task_id,
+		"url":        url,
+		"dependency": dependency,
+	}
+
+	type_name := request.GetString("type", "")
+	if type_name != "" {
+		params["type"] = type_name
+	}
+
+	title := request.GetString("title", "")
+	if title != "" {
+		params["title"] = title
+	}
+
+	result, err := kc.callKanboardAPI(ctx, "createExternalTaskLink", params)
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	resultBytes, err := json.MarshalIndent(result, "", "  ")
+	if err != nil {
+		return mcp.NewToolResultError(fmt.Sprintf("Failed to marshal API result: %v", err)), nil
+	}
+	return mcp.NewToolResultText(string(resultBytes)), nil
+}
+
+func (kc *kanboardClient) updateExternalTaskLinkHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+	task_id, err := request.RequireInt("task_id")
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	link_id, err := request.RequireInt("link_id")
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+
+	params := map[string]interface{}{"task_id": task_id, "link_id": link_id}
+
+	title := request.GetString("title", "")
+	if title != "" {
+		params["title"] = title
+	}
+	url := request.GetString("url", "")
+	if url != "" {
+		params["url"] = url
+	}
+	dependency := request.GetString("dependency", "")
+	if dependency != "" {
+		params["dependency"] = dependency
+	}
+
+	result, err := kc.callKanboardAPI(ctx, "updateExternalTaskLink", params)
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	resultBytes, err := json.MarshalIndent(result, "", "  ")
+	if err != nil {
+		return mcp.NewToolResultError(fmt.Sprintf("Failed to marshal API result: %v", err)), nil
+	}
+	return mcp.NewToolResultText(string(resultBytes)), nil
+}
+
+func (kc *kanboardClient) getExternalTaskLinkByIdHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+	task_id, err := request.RequireInt("task_id")
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	link_id, err := request.RequireInt("link_id")
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	params := map[string]int{"task_id": task_id, "link_id": link_id}
+	result, err := kc.callKanboardAPI(ctx, "getExternalTaskLinkById", params)
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	resultBytes, err := json.MarshalIndent(result, "", "  ")
+	if err != nil {
+		return mcp.NewToolResultError(fmt.Sprintf("Failed to marshal API result: %v", err)), nil
+	}
+	return mcp.NewToolResultText(string(resultBytes)), nil
+}
+
+func (kc *kanboardClient) getAllExternalTaskLinksHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+	task_id, err := request.RequireInt("task_id")
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	params := map[string]int{"task_id": task_id}
+	result, err := kc.callKanboardAPI(ctx, "getAllExternalTaskLinks", params)
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	resultBytes, err := json.MarshalIndent(result, "", "  ")
+	if err != nil {
+		return mcp.NewToolResultError(fmt.Sprintf("Failed to marshal API result: %v", err)), nil
+	}
+	return mcp.NewToolResultText(string(resultBytes)), nil
+}
+
+func (kc *kanboardClient) removeExternalTaskLinkHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+	task_id, err := request.RequireInt("task_id")
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	link_id, err := request.RequireInt("link_id")
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	params := map[string]int{"task_id": task_id, "link_id": link_id}
+	result, err := kc.callKanboardAPI(ctx, "removeExternalTaskLink", params)
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}

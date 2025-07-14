@@ -184,6 +184,18 @@ After saving the configuration, restart your MCP client (Cursor, Claude Desktop,
 | `get_my_overdue_tasks` | ⏰ Get my overdue tasks | "Show me all my tasks that are overdue" |
 | `get_my_projects` | 📝 Get projects of connected user with full details | "Get detailed information about all my projects" |
 
+### 🔗 External Task Link Management
+
+| Tool | Description | Example |
+|------|-------------|---------|
+| `get_external_task_link_types` | 📋 Get all registered external link providers | "Show me all external link types" |
+| `get_external_task_link_provider_dependencies` | ⛓️ Get available dependencies for a given provider | "Get dependencies for 'weblink' provider" |
+| `create_external_task_link` | ➕ Create a new external link | "Create an external link for task 123 to 'http://example.com/doc.pdf' with dependency 'related' and type 'attachment'" |
+| `update_external_task_link` | ✏️ Update external task link | "Update external link 456 for task 789 with new title 'Updated Document' and URL 'http://new.example.com/doc.pdf'" |
+| `get_external_task_link_by_id` | 🔍 Get an external task link by ID | "Get external link 456 for task 789" |
+| `get_all_external_task_links` | 📋 Get all external links attached to a task | "Show all external links for task 123" |
+| `remove_external_task_link` | 🗑️ Remove an external link | "Remove external link 456 from task 789" |
+
 ### 👥 User Management
 
 | Tool | Description | Example |
