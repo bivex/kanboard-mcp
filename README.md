@@ -172,6 +172,18 @@ After saving the configuration, restart your MCP client (Cursor, Claude Desktop,
 |------|-------------|---------|
 | `get_board` | 📋 Get all necessary information to display a board | "Show me the board for project 123" |
 
+### 🧑‍💻 Current User Management
+
+| Tool | Description | Example |
+|------|-------------|---------|
+| `get_me` | 👤 Get logged user session | "Get my user session information" |
+| `get_my_dashboard` | 📊 Get the dashboard of the logged user | "Show me my dashboard" |
+| `get_my_activity_stream` | 📢 Get the last 100 events for the logged user | "Show me my recent activity" |
+| `create_my_private_project` | ➕ Create a private project for the logged user | "Create a private project named 'My Secret Project' with description 'For personal tasks'" |
+| `get_my_projects_list` | 📋 Get projects of the connected user | "List all projects I'm involved in" |
+| `get_my_overdue_tasks` | ⏰ Get my overdue tasks | "Show me all my tasks that are overdue" |
+| `get_my_projects` | 📝 Get projects of connected user with full details | "Get detailed information about all my projects" |
+
 ### 👥 User Management
 
 | Tool | Description | Example |
