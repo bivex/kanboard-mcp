@@ -466,7 +466,7 @@ func (kc *kanboardClient) callKanboardAPI(ctx context.Context, method string, pa
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("API request failed with status code: %d", resp.StatusCode)
+		return nil, fmt.Errorf("API request failed with status code: %d, Response: %s", resp.StatusCode, resp.Status)
 	}
 
 	var apiResponse struct {
@@ -1364,14 +1364,31 @@ func (kc *kanboardClient) assignUserToProjectHandler(ctx context.Context, reques
 
 	role := request.GetString("role", "project-member") // Default to project-member
 
+	// Validate role
+	validRoles := []string{"project-member", "project-manager", "project-viewer"}
+	roleValid := false
+	for _, validRole := range validRoles {
+		if role == validRole {
+			roleValid = true
+			break
+		}
+	}
+	if !roleValid {
+		return mcp.NewToolResultError(fmt.Sprintf("Invalid role '%s'. Valid roles are: %v", role, validRoles)), nil
+	}
+
 	params := map[string]interface{}{
 		"project_id": project_id,
 		"user_id":    user_id,
 		"role":       role,
 	}
 
-	result, err := kc.callKanboardAPI(ctx, "addProjectUser", params) // Assuming addProjectUser API call
+	result, err := kc.callKanboardAPI(ctx, "addProjectUser", params)
 	if err != nil {
+		// Provide more helpful error message for 403 errors
+		if err.Error() == "API request failed with status code: 403, Response: 403 Forbidden" {
+			return mcp.NewToolResultError(fmt.Sprintf("Permission denied (403 Forbidden). The API user does not have sufficient privileges to assign users to projects. Please ensure the API user has 'app-admin' role in Kanboard. Project ID: %d, User ID: %d, Role: %s", project_id, user_id, role)), nil
+		}
 		return mcp.NewToolResultError(fmt.Sprintf("Failed to assign user to project: %v", err)), nil
 	}
 
