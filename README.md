@@ -55,3 +55,8 @@ Once configured, Cursor will be able to discover and interact with the following
 | `create_user`      | Create a new user         | `"Create a new user 'testuser' with password 'pass123'"` |
 | `update_user`      | Modify an existing user   | `"Update user 1 with new email 'test@example.com'"` |
 | `remove_user`      | Remove a user             | `"Remove user with ID 2"`                          |
+| `get_columns`      | List project columns      | `"Show me all columns in this project"`            |
+| `create_column`    | Add new columns           | `"Create a Testing column with 5 task limit"`      |
+| `update_column`    | Modify column settings    | `"Change the Review column limit to 3 tasks"`      |
+| `delete_column`    | Remove columns            | `"Delete the unused Draft column"`                 |
+| `reorder_columns`  | Change column positions   | `"Move Testing column before Done"`                |

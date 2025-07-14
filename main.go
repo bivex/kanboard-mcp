@@ -191,6 +191,72 @@ func main() {
 	)
 	s.AddTool(tool, kbClient.removeUserHandler)
 
+	tool = mcp.NewTool("get_columns",
+		mcp.WithDescription("List project columns"),
+		mcp.WithString("project_id",
+			mcp.Required(),
+			mcp.Description("ID of the project to get columns from"),
+		),
+	)
+	s.AddTool(tool, kbClient.getColumnsHandler)
+
+	tool = mcp.NewTool("create_column",
+		mcp.WithDescription("Add new columns"),
+		mcp.WithString("project_id",
+			mcp.Required(),
+			mcp.Description("ID of the project to add the column to"),
+		),
+		mcp.WithString("name",
+			mcp.Required(),
+			mcp.Description("Name of the column to create"),
+		),
+		mcp.WithNumber("limit",
+			mcp.Description("Task limit for the new column"),
+		),
+	)
+	s.AddTool(tool, kbClient.createColumnHandler)
+
+	tool = mcp.NewTool("update_column",
+		mcp.WithDescription("Modify column settings"),
+		mcp.WithNumber("column_id",
+			mcp.Required(),
+			mcp.Description("ID of the column to update"),
+		),
+		mcp.WithString("name",
+			mcp.Description("New name for the column"),
+		),
+		mcp.WithNumber("limit",
+			mcp.Description("New task limit for the column"),
+		),
+	)
+	s.AddTool(tool, kbClient.updateColumnHandler)
+
+	tool = mcp.NewTool("delete_column",
+		mcp.WithDescription("Remove columns"),
+		mcp.WithNumber("column_id",
+			mcp.Required(),
+			mcp.Description("ID of the column to delete"),
+		),
+	)
+	s.AddTool(tool, kbClient.deleteColumnHandler)
+
+	tool = mcp.NewTool("reorder_columns",
+		mcp.WithDescription("Change column positions"),
+		mcp.WithString("project_id",
+			mcp.Required(),
+			mcp.Description("ID of the project containing the columns"),
+		),
+		mcp.WithNumber("column_id",
+			mcp.Required(),
+			mcp.Description("ID of the column to reorder"),
+		),
+		mcp.WithNumber("new_position",
+			mcp.Required(),
+			mcp.Description("New position for the column"),
+		),
+	)
+	s.AddTool(tool, kbClient.reorderColumnsHandler)
+
 	// Start the stdio server
 	if err := server.ServeStdio(s); err != nil {
 		fmt.Printf("Server error: %v\n", err)
@@ -667,6 +733,141 @@ func (kc *kanboardClient) removeUserHandler(ctx context.Context, request mcp.Cal
 	result, err := kc.callKanboardAPI(ctx, "removeUser", params)
 	if err != nil {
 		return mcp.NewToolResultError(fmt.Sprintf("Failed to remove user: %v", err)), nil
+	}
+
+	resultBytes, err := json.MarshalIndent(result, "", "  ")
+	if err != nil {
+		return mcp.NewToolResultError(fmt.Sprintf("Failed to marshal API result: %v", err)), nil
+	}
+
+	return mcp.NewToolResultText(string(resultBytes)), nil
+}
+
+func (kc *kanboardClient) getColumnsHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+	project_id, err := request.RequireString("project_id")
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+
+	params := map[string]string{"project_id": project_id}
+	result, err := kc.callKanboardAPI(ctx, "getColumns", params)
+	if err != nil {
+		return mcp.NewToolResultError(fmt.Sprintf("Failed to get columns: %v", err)), nil
+	}
+
+	resultBytes, err := json.MarshalIndent(result, "", "  ")
+	if err != nil {
+		return mcp.NewToolResultError(fmt.Sprintf("Failed to marshal API result: %v", err)), nil
+	}
+
+	return mcp.NewToolResultText(string(resultBytes)), nil
+}
+
+func (kc *kanboardClient) createColumnHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+	project_id, err := request.RequireString("project_id")
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	name, err := request.RequireString("name")
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+
+	params := map[string]interface{}{
+		"project_id": project_id,
+		"name":       name,
+	}
+
+	limit := request.GetInt("limit", 0)
+	if limit != 0 {
+		params["task_limit"] = limit
+	}
+
+	result, err := kc.callKanboardAPI(ctx, "addColumn", params)
+	if err != nil {
+		return mcp.NewToolResultError(fmt.Sprintf("Failed to create column: %v", err)), nil
+	}
+
+	resultBytes, err := json.MarshalIndent(result, "", "  ")
+	if err != nil {
+		return mcp.NewToolResultError(fmt.Sprintf("Failed to marshal API result: %v", err)), nil
+	}
+
+	return mcp.NewToolResultText(string(resultBytes)), nil
+}
+
+func (kc *kanboardClient) updateColumnHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+	column_id, err := request.RequireInt("column_id")
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+
+	params := map[string]interface{}{"id": column_id}
+
+	name := request.GetString("name", "")
+	if name != "" {
+		params["name"] = name
+	}
+
+	limit := request.GetInt("limit", 0)
+	if limit != 0 {
+		params["task_limit"] = limit
+	}
+
+	result, err := kc.callKanboardAPI(ctx, "updateColumn", params)
+	if err != nil {
+		return mcp.NewToolResultError(fmt.Sprintf("Failed to update column: %v", err)), nil
+	}
+
+	resultBytes, err := json.MarshalIndent(result, "", "  ")
+	if err != nil {
+		return mcp.NewToolResultError(fmt.Sprintf("Failed to marshal API result: %v", err)), nil
+	}
+
+	return mcp.NewToolResultText(string(resultBytes)), nil
+}
+
+func (kc *kanboardClient) deleteColumnHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+	column_id, err := request.RequireInt("column_id")
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	params := map[string]int{"column_id": column_id}
+	result, err := kc.callKanboardAPI(ctx, "removeColumn", params)
+	if err != nil {
+		return mcp.NewToolResultError(fmt.Sprintf("Failed to delete column: %v", err)), nil
+	}
+
+	resultBytes, err := json.MarshalIndent(result, "", "  ")
+	if err != nil {
+		return mcp.NewToolResultError(fmt.Sprintf("Failed to marshal API result: %v", err)), nil
+	}
+
+	return mcp.NewToolResultText(string(resultBytes)), nil
+}
+
+func (kc *kanboardClient) reorderColumnsHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+	project_id, err := request.RequireString("project_id")
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	new_position, err := request.RequireInt("new_position")
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+
+	params := map[string]interface{}{
+		"project_id":  project_id,
+		"column_id":   request.GetInt("column_id", 0), // column_id is needed but not exposed directly in NLP, might need to get it via column name
+		"position":    new_position,
+	}
+
+	// Kanboard's moveColumnPosition requires a column_id. If we only have name, we need to resolve it.
+	// For simplicity, assuming column_id is provided, or a mechanism to resolve it exists for the LLM.
+
+	result, err := kc.callKanboardAPI(ctx, "moveColumnPosition", params)
+	if err != nil {
+		return mcp.NewToolResultError(fmt.Sprintf("Failed to reorder columns: %v", err)), nil
 	}
 
 	resultBytes, err := json.MarshalIndent(result, "", "  ")
