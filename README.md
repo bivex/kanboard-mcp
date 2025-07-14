@@ -275,6 +275,15 @@ After saving the configuration, restart your MCP client (Cursor, Claude Desktop,
 | `update_subtask` | ✏️ Update a subtask | "Update subtask 456 for task 123 to status 2 (Done)" |
 | `remove_subtask` | 🗑️ Remove a subtask | "Remove subtask with ID 456" |
 
+### ⏰ Subtask Time Tracking
+
+| Tool | Description | Example |
+|------|-------------|---------|
+| `has_subtask_timer` | ⏱️ Check if a timer is started for the given subtask and user | "Check if a timer is active for subtask 123 by user 4" |
+| `set_subtask_start_time` | ▶️ Start subtask timer for a user | "Start timer for subtask 123 by user 4" |
+| `set_subtask_end_time` | ⏹️ Stop subtask timer for a user | "Stop timer for subtask 123 by user 4" |
+| `get_subtask_time_spent` | 📊 Get time spent on a subtask for a user | "Get time spent on subtask 123 by user 4" |
+
 ###  Group Management
 
 | Tool | Description | Example |
