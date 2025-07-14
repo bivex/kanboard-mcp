@@ -206,6 +206,18 @@ After saving the configuration, restart your MCP client (Cursor, Claude Desktop,
 | `get_all_task_links` | 📋 Get all links related to a task | "Show all links for task 123" |
 | `remove_task_link` | 🗑️ Remove a link between two tasks | "Remove task link 101" |
 
+### 🔗 Link Management
+
+| Tool | Description | Example |
+|------|-------------|---------|
+| `get_all_links` | 📋 Get the list of possible relations between tasks | "Show all possible task relations" |
+| `get_opposite_link_id` | 🔍 Get the opposite link id of a task link | "Get the opposite link ID for link 2" |
+| `get_link_by_label` | 🔍 Get a link by label | "Get details for link with label 'blocks'" |
+| `get_link_by_id` | 🔍 Get a link by ID | "Get details for link with ID 4" |
+| `create_link` | ➕ Create a new task relation | "Create a link 'foo' with opposite label 'bar'" |
+| `update_link` | ✏️ Update a link | "Update link 14 with opposite link 12 and label 'boo'" |
+| `remove_link` | 🗑️ Remove a link | "Remove link with ID 14" |
+
 ### 👥 Group Management
 
 | Tool | Description | Example |
