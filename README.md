@@ -242,6 +242,15 @@ After saving the configuration, restart your MCP client (Cursor, Claude Desktop,
 | `remove_project_file` | 🗑️ Remove a file associated to a project | "Remove file 456 from project 123" |
 | `remove_all_project_files` | 🗑️ Remove all files associated to a project | "Remove all files from project 123" |
 
+### 📝 Project Metadata Management
+
+| Tool | Description | Example |
+|------|-------------|---------|
+| `get_project_metadata` | 📋 Get Project metadata | "Get all metadata for project 123" |
+| `get_project_metadata_by_name` | 🔍 Fetch single metadata value | "Get metadata 'my_key' for project 123" |
+| `save_project_metadata` | 💾 Add or update metadata | "Save metadata 'key1:value1, key2:value2' for project 123" |
+| `remove_project_metadata` | 🗑️ Remove a project metadata | "Remove metadata 'my_key' from project 123" |
+
 ### �� Group Management
 
 | Tool | Description | Example |

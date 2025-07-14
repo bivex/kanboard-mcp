@@ -1112,6 +1112,55 @@ func main() {
 	)
 	s.AddTool(tool, kbClient.removeAllProjectFilesHandler)
 
+	// Project Metadata Management
+	tool = mcp.NewTool("get_project_metadata",
+		mcp.WithDescription("Get Project metadata"),
+		mcp.WithNumber("project_id",
+			mcp.Required(),
+			mcp.Description("ID of the project to get metadata from"),
+		),
+	)
+	s.AddTool(tool, kbClient.getProjectMetadataHandler)
+
+	tool = mcp.NewTool("get_project_metadata_by_name",
+		mcp.WithDescription("Fetch single metadata value"),
+		mcp.WithNumber("project_id",
+			mcp.Required(),
+			mcp.Description("ID of the project"),
+		),
+		mcp.WithString("name",
+			mcp.Required(),
+			mcp.Description("Name of the metadata key"),
+		),
+	)
+	s.AddTool(tool, kbClient.getProjectMetadataByNameHandler)
+
+	tool = mcp.NewTool("save_project_metadata",
+		mcp.WithDescription("Add or update metadata"),
+		mcp.WithNumber("project_id",
+			mcp.Required(),
+			mcp.Description("ID of the project"),
+		),
+		mcp.WithObject("values",
+			mcp.Required(),
+			mcp.Description("Dictionary of metadata values (key-value pairs)"),
+		),
+	)
+	s.AddTool(tool, kbClient.saveProjectMetadataHandler)
+
+	tool = mcp.NewTool("remove_project_metadata",
+		mcp.WithDescription("Remove a project metadata"),
+		mcp.WithNumber("project_id",
+			mcp.Required(),
+			mcp.Description("ID of the project"),
+		),
+		mcp.WithString("name",
+			mcp.Required(),
+			mcp.Description("Name of the metadata key to remove"),
+		),
+	)
+	s.AddTool(tool, kbClient.removeProjectMetadataHandler)
+
 	// Start the stdio server
 	if err := server.ServeStdio(s); err != nil {
 		fmt.Printf("Server error: %v\n", err)
@@ -3388,6 +3437,90 @@ func (kc *kanboardClient) removeAllProjectFilesHandler(ctx context.Context, requ
 	}
 	params := map[string]int{"project_id": project_id}
 	result, err := kc.callKanboardAPI(ctx, "removeAllProjectFiles", params)
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	resultBytes, err := json.MarshalIndent(result, "", "  ")
+	if err != nil {
+		return mcp.NewToolResultError(fmt.Sprintf("Failed to marshal API result: %v", err)), nil
+	}
+	return mcp.NewToolResultText(string(resultBytes)), nil
+}
+
+func (kc *kanboardClient) getProjectMetadataHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+	project_id, err := request.RequireInt("project_id")
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	params := map[string]int{"project_id": project_id}
+	result, err := kc.callKanboardAPI(ctx, "getProjectMetadata", params)
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	resultBytes, err := json.MarshalIndent(result, "", "  ")
+	if err != nil {
+		return mcp.NewToolResultError(fmt.Sprintf("Failed to marshal API result: %v", err)), nil
+	}
+	return mcp.NewToolResultText(string(resultBytes)), nil
+}
+
+func (kc *kanboardClient) getProjectMetadataByNameHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+	project_id, err := request.RequireInt("project_id")
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	name, err := request.RequireString("name")
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	params := map[string]interface{}{"project_id": project_id, "name": name}
+	result, err := kc.callKanboardAPI(ctx, "getProjectMetadataByName", params)
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	resultBytes, err := json.MarshalIndent(result, "", "  ")
+	if err != nil {
+		return mcp.NewToolResultError(fmt.Sprintf("Failed to marshal API result: %v", err)), nil
+	}
+	return mcp.NewToolResultText(string(resultBytes)), nil
+}
+
+func (kc *kanboardClient) saveProjectMetadataHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+	project_id, err := request.RequireInt("project_id")
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+
+	args := request.GetArguments()
+	values, ok := args["values"].(map[string]interface{})
+	if !ok {
+		return mcp.NewToolResultError("Missing or invalid 'values' parameter"), nil
+	}
+
+	params := map[string]interface{}{"project_id": project_id, "values": values}
+	result, err := kc.callKanboardAPI(ctx, "saveProjectMetadata", params)
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	resultBytes, err := json.MarshalIndent(result, "", "  ")
+	if err != nil {
+		return mcp.NewToolResultError(fmt.Sprintf("Failed to marshal API result: %v", err)), nil
+	}
+
+	return mcp.NewToolResultText(string(resultBytes)), nil
+}
+
+func (kc *kanboardClient) removeProjectMetadataHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+	project_id, err := request.RequireInt("project_id")
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	name, err := request.RequireString("name")
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	params := map[string]interface{}{"project_id": project_id, "name": name}
+	result, err := kc.callKanboardAPI(ctx, "removeProjectMetadata", params)
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
