@@ -2333,29 +2333,29 @@ func (kc *kanboardClient) createTaskHandler(ctx context.Context, request mcp.Cal
 		"title":      title,
 	}
 
-	color_id := request.GetString("color_id", "")
-	if color_id != "" {
-		params["color_id"] = color_id
+	colorId := request.GetString("color_id", "")
+	if colorId != "" {
+		params["color_id"] = colorId
 	}
 
-	column_id := request.GetInt("column_id", 0)
-	if column_id != 0 {
-		params["column_id"] = column_id
+	columnId := request.GetInt("column_id", 0)
+	if columnId != 0 {
+		params["column_id"] = columnId
 	}
 
-	owner_id := request.GetInt("owner_id", 0)
-	if owner_id != 0 {
-		params["owner_id"] = owner_id
+	ownerId := request.GetInt("owner_id", 0)
+	if ownerId != 0 {
+		params["owner_id"] = ownerId
 	}
 
-	creator_id := request.GetInt("creator_id", 0)
-	if creator_id != 0 {
-		params["creator_id"] = creator_id
+	creatorId := request.GetInt("creator_id", 0)
+	if creatorId != 0 {
+		params["creator_id"] = creatorId
 	}
 
-	date_due := request.GetString("date_due", "")
-	if date_due != "" {
-		params["date_due"] = date_due
+	dateDue := request.GetString("date_due", "")
+	if dateDue != "" {
+		params["date_due"] = dateDue
 	}
 
 	description := request.GetString("description", "")
@@ -2363,9 +2363,9 @@ func (kc *kanboardClient) createTaskHandler(ctx context.Context, request mcp.Cal
 		params["description"] = description
 	}
 
-	category_id := request.GetInt("category_id", 0)
-	if category_id != 0 {
-		params["category_id"] = category_id
+	categoryId := request.GetInt("category_id", 0)
+	if categoryId != 0 {
+		params["category_id"] = categoryId
 	}
 
 	score := request.GetInt("score", 0)
@@ -2373,9 +2373,9 @@ func (kc *kanboardClient) createTaskHandler(ctx context.Context, request mcp.Cal
 		params["score"] = score
 	}
 
-	swimlane_id := request.GetInt("swimlane_id", 0)
-	if swimlane_id != 0 {
-		params["swimlane_id"] = swimlane_id
+	swimlaneId := request.GetInt("swimlane_id", 0)
+	if swimlaneId != 0 {
+		params["swimlane_id"] = swimlaneId
 	}
 
 	priority := request.GetInt("priority", 0)
@@ -2383,29 +2383,29 @@ func (kc *kanboardClient) createTaskHandler(ctx context.Context, request mcp.Cal
 		params["priority"] = priority
 	}
 
-	recurrence_status := request.GetInt("recurrence_status", 0)
-	if recurrence_status != 0 {
-		params["recurrence_status"] = recurrence_status
+	recurrenceStatus := request.GetInt("recurrence_status", 0)
+	if recurrenceStatus != 0 {
+		params["recurrence_status"] = recurrenceStatus
 	}
 
-	recurrence_trigger := request.GetInt("recurrence_trigger", 0)
-	if recurrence_trigger != 0 {
-		params["recurrence_trigger"] = recurrence_trigger
+	recurrenceTrigger := request.GetInt("recurrence_trigger", 0)
+	if recurrenceTrigger != 0 {
+		params["recurrence_trigger"] = recurrenceTrigger
 	}
 
-	recurrence_factor := request.GetInt("recurrence_factor", 0)
-	if recurrence_factor != 0 {
-		params["recurrence_factor"] = recurrence_factor
+	recurrenceFactor := request.GetInt("recurrence_factor", 0)
+	if recurrenceFactor != 0 {
+		params["recurrence_factor"] = recurrenceFactor
 	}
 
-	recurrence_timeframe := request.GetInt("recurrence_timeframe", 0)
-	if recurrence_timeframe != 0 {
-		params["recurrence_timeframe"] = recurrence_timeframe
+	recurrenceTimeframe := request.GetInt("recurrence_timeframe", 0)
+	if recurrenceTimeframe != 0 {
+		params["recurrence_timeframe"] = recurrenceTimeframe
 	}
 
-	recurrence_basedate := request.GetInt("recurrence_basedate", 0)
-	if recurrence_basedate != 0 {
-		params["recurrence_basedate"] = recurrence_basedate
+	recurrenceBasedate := request.GetInt("recurrence_basedate", 0)
+	if recurrenceBasedate != 0 {
+		params["recurrence_basedate"] = recurrenceBasedate
 	}
 
 	reference := request.GetString("reference", "")
@@ -2418,9 +2418,9 @@ func (kc *kanboardClient) createTaskHandler(ctx context.Context, request mcp.Cal
 		params["tags"] = tags
 	}
 
-	date_started := request.GetString("date_started", "")
-	if date_started != "" {
-		params["date_started"] = date_started
+	dateStarted := request.GetString("date_started", "")
+	if dateStarted != "" {
+		params["date_started"] = dateStarted
 	}
 
 	result, err = kc.callKanboardAPI(ctx, "createTask", params)
@@ -2449,19 +2449,19 @@ func (kc *kanboardClient) updateTaskHandler(ctx context.Context, request mcp.Cal
 		params["title"] = title
 	}
 
-	color_id := request.GetString("color_id", "")
-	if color_id != "" {
-		params["color_id"] = color_id
+	colorId := request.GetString("color_id", "")
+	if colorId != "" {
+		params["color_id"] = colorId
 	}
 
-	owner_id := request.GetInt("owner_id", 0)
-	if owner_id != 0 {
-		params["owner_id"] = owner_id
+	ownerId := request.GetInt("owner_id", 0)
+	if ownerId != 0 {
+		params["owner_id"] = ownerId
 	}
 
-	date_due := request.GetString("date_due", "")
-	if date_due != "" {
-		params["date_due"] = date_due
+	dateDue := request.GetString("date_due", "")
+	if dateDue != "" {
+		params["date_due"] = dateDue
 	}
 
 	description := request.GetString("description", "")
@@ -2469,9 +2469,9 @@ func (kc *kanboardClient) updateTaskHandler(ctx context.Context, request mcp.Cal
 		params["description"] = description
 	}
 
-	category_id := request.GetInt("category_id", 0)
-	if category_id != 0 {
-		params["category_id"] = category_id
+	categoryId := request.GetInt("category_id", 0)
+	if categoryId != 0 {
+		params["category_id"] = categoryId
 	}
 
 	score := request.GetInt("score", 0)
@@ -2484,29 +2484,29 @@ func (kc *kanboardClient) updateTaskHandler(ctx context.Context, request mcp.Cal
 		params["priority"] = priority
 	}
 
-	recurrence_status := request.GetInt("recurrence_status", 0)
-	if recurrence_status != 0 {
-		params["recurrence_status"] = recurrence_status
+	recurrenceStatus := request.GetInt("recurrence_status", 0)
+	if recurrenceStatus != 0 {
+		params["recurrence_status"] = recurrenceStatus
 	}
 
-	recurrence_trigger := request.GetInt("recurrence_trigger", 0)
-	if recurrence_trigger != 0 {
-		params["recurrence_trigger"] = recurrence_trigger
+	recurrenceTrigger := request.GetInt("recurrence_trigger", 0)
+	if recurrenceTrigger != 0 {
+		params["recurrence_trigger"] = recurrenceTrigger
 	}
 
-	recurrence_factor := request.GetInt("recurrence_factor", 0)
-	if recurrence_factor != 0 {
-		params["recurrence_factor"] = recurrence_factor
+	recurrenceFactor := request.GetInt("recurrence_factor", 0)
+	if recurrenceFactor != 0 {
+		params["recurrence_factor"] = recurrenceFactor
 	}
 
-	recurrence_timeframe := request.GetInt("recurrence_timeframe", 0)
-	if recurrence_timeframe != 0 {
-		params["recurrence_timeframe"] = recurrence_timeframe
+	recurrenceTimeframe := request.GetInt("recurrence_timeframe", 0)
+	if recurrenceTimeframe != 0 {
+		params["recurrence_timeframe"] = recurrenceTimeframe
 	}
 
-	recurrence_basedate := request.GetInt("recurrence_basedate", 0)
-	if recurrence_basedate != 0 {
-		params["recurrence_basedate"] = recurrence_basedate
+	recurrenceBasedate := request.GetInt("recurrence_basedate", 0)
+	if recurrenceBasedate != 0 {
+		params["recurrence_basedate"] = recurrenceBasedate
 	}
 
 	reference := request.GetString("reference", "")
@@ -2519,9 +2519,9 @@ func (kc *kanboardClient) updateTaskHandler(ctx context.Context, request mcp.Cal
 		params["tags"] = tags
 	}
 
-	date_started := request.GetString("date_started", "")
-	if date_started != "" {
-		params["date_started"] = date_started
+	dateStarted := request.GetString("date_started", "")
+	if dateStarted != "" {
+		params["date_started"] = dateStarted
 	}
 
 	result, err := kc.callKanboardAPI(ctx, "updateTask", params)
@@ -2538,11 +2538,11 @@ func (kc *kanboardClient) updateTaskHandler(ctx context.Context, request mcp.Cal
 }
 
 func (kc *kanboardClient) deleteTaskHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
-	task_id, err := request.RequireInt("task_id")
+	taskId, err := request.RequireInt("task_id")
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
-	params := map[string]int{"task_id": task_id}
+	params := map[string]int{"task_id": taskId}
 	result, err := kc.callKanboardAPI(ctx, "removeTask", params)
 	if err != nil {
 		return mcp.NewToolResultError(fmt.Sprintf("Failed to delete task: %v", err)), nil
@@ -2557,11 +2557,11 @@ func (kc *kanboardClient) deleteTaskHandler(ctx context.Context, request mcp.Cal
 }
 
 func (kc *kanboardClient) getTaskHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
-	task_id, err := request.RequireInt("task_id")
+	taskId, err := request.RequireInt("task_id")
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
-	params := map[string]int{"task_id": task_id}
+	params := map[string]int{"task_id": taskId}
 	result, err := kc.callKanboardAPI(ctx, "getTask", params)
 	if err != nil {
 		return mcp.NewToolResultError(fmt.Sprintf("Failed to get task details: %v", err)), nil
@@ -2576,15 +2576,15 @@ func (kc *kanboardClient) getTaskHandler(ctx context.Context, request mcp.CallTo
 }
 
 func (kc *kanboardClient) moveTaskPositionHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
-	project_id, err := request.RequireInt("project_id")
+	projectId, err := request.RequireInt("project_id")
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
-	task_id, err := request.RequireInt("task_id")
+	taskId, err := request.RequireInt("task_id")
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
-	column_id, err := request.RequireInt("column_id")
+	columnId, err := request.RequireInt("column_id")
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
@@ -2592,17 +2592,17 @@ func (kc *kanboardClient) moveTaskPositionHandler(ctx context.Context, request m
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
-	swimlane_id, err := request.RequireInt("swimlane_id")
+	swimlaneId, err := request.RequireInt("swimlane_id")
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
 
 	params := map[string]interface{}{
-		"project_id":  project_id,
-		"task_id":     task_id,
-		"column_id":   column_id,
+		"project_id":  projectId,
+		"task_id":     taskId,
+		"column_id":   columnId,
 		"position":    position,
-		"swimlane_id": swimlane_id,
+		"swimlane_id": swimlaneId,
 	}
 
 	result, err := kc.callKanboardAPI(ctx, "moveTaskPosition", params)
@@ -2736,11 +2736,11 @@ func (kc *kanboardClient) updateUserHandler(ctx context.Context, request mcp.Cal
 }
 
 func (kc *kanboardClient) removeUserHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
-	user_id, err := request.RequireInt("user_id")
+	userId, err := request.RequireInt("user_id")
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
-	params := map[string]int{"user_id": user_id}
+	params := map[string]int{"user_id": userId}
 	result, err := kc.callKanboardAPI(ctx, "removeUser", params)
 	if err != nil {
 		return mcp.NewToolResultError(fmt.Sprintf("Failed to remove user: %v", err)), nil
@@ -2877,7 +2877,7 @@ func (kc *kanboardClient) getExternalTaskLinkProviderDependenciesHandler(ctx con
 }
 
 func (kc *kanboardClient) createExternalTaskLinkHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
-	task_id, err := request.RequireInt("task_id")
+	taskId, err := request.RequireInt("task_id")
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
@@ -2891,14 +2891,14 @@ func (kc *kanboardClient) createExternalTaskLinkHandler(ctx context.Context, req
 	}
 
 	params := map[string]interface{}{
-		"task_id":    task_id,
+		"task_id":    taskId,
 		"url":        url,
 		"dependency": dependency,
 	}
 
-	type_name := request.GetString("type", "")
-	if type_name != "" {
-		params["type"] = type_name
+	typeName := request.GetString("type", "")
+	if typeName != "" {
+		params["type"] = typeName
 	}
 
 	title := request.GetString("title", "")
@@ -2918,16 +2918,16 @@ func (kc *kanboardClient) createExternalTaskLinkHandler(ctx context.Context, req
 }
 
 func (kc *kanboardClient) updateExternalTaskLinkHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
-	task_id, err := request.RequireInt("task_id")
+	taskId, err := request.RequireInt("task_id")
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
-	link_id, err := request.RequireInt("link_id")
+	linkId, err := request.RequireInt("link_id")
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
 
-	params := map[string]interface{}{"task_id": task_id, "link_id": link_id}
+	params := map[string]interface{}{"task_id": taskId, "link_id": linkId}
 
 	title := request.GetString("title", "")
 	if title != "" {
@@ -2954,15 +2954,15 @@ func (kc *kanboardClient) updateExternalTaskLinkHandler(ctx context.Context, req
 }
 
 func (kc *kanboardClient) getExternalTaskLinkByIdHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
-	task_id, err := request.RequireInt("task_id")
+	taskId, err := request.RequireInt("task_id")
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
-	link_id, err := request.RequireInt("link_id")
+	linkId, err := request.RequireInt("link_id")
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
-	params := map[string]int{"task_id": task_id, "link_id": link_id}
+	params := map[string]int{"task_id": taskId, "link_id": linkId}
 	result, err := kc.callKanboardAPI(ctx, "getExternalTaskLinkById", params)
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
@@ -2975,11 +2975,11 @@ func (kc *kanboardClient) getExternalTaskLinkByIdHandler(ctx context.Context, re
 }
 
 func (kc *kanboardClient) getAllExternalTaskLinksHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
-	task_id, err := request.RequireInt("task_id")
+	taskId, err := request.RequireInt("task_id")
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
-	params := map[string]int{"task_id": task_id}
+	params := map[string]int{"task_id": taskId}
 	result, err := kc.callKanboardAPI(ctx, "getAllExternalTaskLinks", params)
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
@@ -2992,15 +2992,15 @@ func (kc *kanboardClient) getAllExternalTaskLinksHandler(ctx context.Context, re
 }
 
 func (kc *kanboardClient) removeExternalTaskLinkHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
-	task_id, err := request.RequireInt("task_id")
+	taskId, err := request.RequireInt("task_id")
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
-	link_id, err := request.RequireInt("link_id")
+	linkId, err := request.RequireInt("link_id")
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
-	params := map[string]int{"task_id": task_id, "link_id": link_id}
+	params := map[string]int{"task_id": taskId, "link_id": linkId}
 	result, err := kc.callKanboardAPI(ctx, "removeExternalTaskLink", params)
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
@@ -3013,16 +3013,16 @@ func (kc *kanboardClient) removeExternalTaskLinkHandler(ctx context.Context, req
 }
 
 func (kc *kanboardClient) getColumnsHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
-	project_id_str, err := request.RequireString("project_id")
+	projectIdStr, err := request.RequireString("project_id")
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
-	project_id, err := strconv.Atoi(project_id_str)
+	projectId, err := strconv.Atoi(projectIdStr)
 	if err != nil {
 		return mcp.NewToolResultError(fmt.Sprintf("Invalid project_id: %v", err)), nil
 	}
 
-	params := map[string]int{"project_id": project_id}
+	params := map[string]int{"project_id": projectId}
 	result, err := kc.callKanboardAPI(ctx, "getColumns", params)
 	if err != nil {
 		return mcp.NewToolResultError(fmt.Sprintf("Failed to get columns: %v", err)), nil
@@ -3037,11 +3037,11 @@ func (kc *kanboardClient) getColumnsHandler(ctx context.Context, request mcp.Cal
 }
 
 func (kc *kanboardClient) getColumnHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
-	column_id, err := request.RequireInt("column_id")
+	columnId, err := request.RequireInt("column_id")
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
-	params := map[string]int{"column_id": column_id}
+	params := map[string]int{"column_id": columnId}
 	result, err := kc.callKanboardAPI(ctx, "getColumn", params)
 	if err != nil {
 		return mcp.NewToolResultError(fmt.Sprintf("Failed to get column details: %v", err)), nil
@@ -3056,11 +3056,11 @@ func (kc *kanboardClient) getColumnHandler(ctx context.Context, request mcp.Call
 }
 
 func (kc *kanboardClient) createColumnHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
-	project_id_str, err := request.RequireString("project_id")
+	projectIdStr, err := request.RequireString("project_id")
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
-	project_id, err := strconv.Atoi(project_id_str)
+	projectId, err := strconv.Atoi(projectIdStr)
 	if err != nil {
 		return mcp.NewToolResultError(fmt.Sprintf("Invalid project_id: %v", err)), nil
 	}
@@ -3070,13 +3070,13 @@ func (kc *kanboardClient) createColumnHandler(ctx context.Context, request mcp.C
 	}
 
 	params := map[string]interface{}{
-		"project_id": project_id,
+		"project_id": projectId,
 		"title":      title,
 	}
 
-	task_limit := request.GetInt("task_limit", 0)
-	if task_limit != 0 {
-		params["task_limit"] = task_limit
+	taskLimit := request.GetInt("task_limit", 0)
+	if taskLimit != 0 {
+		params["task_limit"] = taskLimit
 	}
 
 	description := request.GetString("description", "")
@@ -3098,7 +3098,7 @@ func (kc *kanboardClient) createColumnHandler(ctx context.Context, request mcp.C
 }
 
 func (kc *kanboardClient) updateColumnHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
-	column_id, err := request.RequireInt("column_id")
+	columnId, err := request.RequireInt("column_id")
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
@@ -3108,11 +3108,11 @@ func (kc *kanboardClient) updateColumnHandler(ctx context.Context, request mcp.C
 		return mcp.NewToolResultError(err.Error()), nil
 	}
 
-	params := map[string]interface{}{"id": column_id, "title": title}
+	params := map[string]interface{}{"id": columnId, "title": title}
 
-	task_limit := request.GetInt("task_limit", 0)
-	if task_limit != 0 {
-		params["task_limit"] = task_limit
+	taskLimit := request.GetInt("task_limit", 0)
+	if taskLimit != 0 {
+		params["task_limit"] = taskLimit
 	}
 
 	description := request.GetString("description", "")
@@ -3134,11 +3134,11 @@ func (kc *kanboardClient) updateColumnHandler(ctx context.Context, request mcp.C
 }
 
 func (kc *kanboardClient) deleteColumnHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
-	column_id, err := request.RequireInt("column_id")
+	columnId, err := request.RequireInt("column_id")
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
-	params := map[string]int{"column_id": column_id}
+	params := map[string]int{"column_id": columnId}
 	result, err := kc.callKanboardAPI(ctx, "removeColumn", params)
 	if err != nil {
 		return mcp.NewToolResultError(fmt.Sprintf("Failed to delete column: %v", err)), nil
@@ -3153,15 +3153,15 @@ func (kc *kanboardClient) deleteColumnHandler(ctx context.Context, request mcp.C
 }
 
 func (kc *kanboardClient) reorderColumnsHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
-	project_id_str, err := request.RequireString("project_id")
+	projectIdStr, err := request.RequireString("project_id")
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
-	project_id, err := strconv.Atoi(project_id_str)
+	projectId, err := strconv.Atoi(projectIdStr)
 	if err != nil {
 		return mcp.NewToolResultError(fmt.Sprintf("Invalid project_id: %v", err)), nil
 	}
-	column_id, err := request.RequireInt("column_id")
+	columnId, err := request.RequireInt("column_id")
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
@@ -3171,8 +3171,8 @@ func (kc *kanboardClient) reorderColumnsHandler(ctx context.Context, request mcp
 	}
 
 	params := map[string]interface{}{
-		"project_id": project_id,
-		"column_id":  column_id,
+		"project_id": projectId,
+		"column_id":  columnId,
 		"position":   position,
 	}
 
@@ -3190,16 +3190,16 @@ func (kc *kanboardClient) reorderColumnsHandler(ctx context.Context, request mcp
 }
 
 func (kc *kanboardClient) getCategoriesHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
-	project_id_str, err := request.RequireString("project_id")
+	projectIdStr, err := request.RequireString("project_id")
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
-	project_id, err := strconv.Atoi(project_id_str)
+	projectId, err := strconv.Atoi(projectIdStr)
 	if err != nil {
 		return mcp.NewToolResultError(fmt.Sprintf("Invalid project_id: %v", err)), nil
 	}
 
-	params := map[string]int{"project_id": project_id}
+	params := map[string]int{"project_id": projectId}
 	result, err := kc.callKanboardAPI(ctx, "getAllCategories", params)
 	if err != nil {
 		return mcp.NewToolResultError(fmt.Sprintf("Failed to get categories: %v", err)), nil
@@ -3214,11 +3214,11 @@ func (kc *kanboardClient) getCategoriesHandler(ctx context.Context, request mcp.
 }
 
 func (kc *kanboardClient) createCategoryHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
-	project_id_str, err := request.RequireString("project_id")
+	projectIdStr, err := request.RequireString("project_id")
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
-	project_id, err := strconv.Atoi(project_id_str)
+	projectId, err := strconv.Atoi(projectIdStr)
 	if err != nil {
 		return mcp.NewToolResultError(fmt.Sprintf("Invalid project_id: %v", err)), nil
 	}
@@ -3227,11 +3227,11 @@ func (kc *kanboardClient) createCategoryHandler(ctx context.Context, request mcp
 		return mcp.NewToolResultError(err.Error()), nil
 	}
 
-	params := map[string]interface{}{"name": name, "project_id": project_id}
+	params := map[string]interface{}{"name": name, "project_id": projectId}
 
-	color_id := request.GetString("color_id", "")
-	if color_id != "" {
-		params["color_id"] = color_id
+	colorId := request.GetString("color_id", "")
+	if colorId != "" {
+		params["color_id"] = colorId
 	}
 
 	result, err := kc.callKanboardAPI(ctx, "createCategory", params)
@@ -3248,11 +3248,11 @@ func (kc *kanboardClient) createCategoryHandler(ctx context.Context, request mcp
 }
 
 func (kc *kanboardClient) getCategoryHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
-	category_id, err := request.RequireInt("category_id")
+	categoryId, err := request.RequireInt("category_id")
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
-	params := map[string]int{"category_id": category_id}
+	params := map[string]int{"category_id": categoryId}
 	result, err := kc.callKanboardAPI(ctx, "getCategory", params)
 	if err != nil {
 		return mcp.NewToolResultError(fmt.Sprintf("Failed to get category details: %v", err)), nil
@@ -3267,20 +3267,20 @@ func (kc *kanboardClient) getCategoryHandler(ctx context.Context, request mcp.Ca
 }
 
 func (kc *kanboardClient) updateCategoryHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
-	category_id, err := request.RequireInt("category_id")
+	categoryId, err := request.RequireInt("category_id")
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
 
-	params := map[string]interface{}{"id": category_id}
+	params := map[string]interface{}{"id": categoryId}
 	name := request.GetString("name", "")
 	if name != "" {
 		params["name"] = name
 	}
 
-	color_id := request.GetString("color_id", "")
-	if color_id != "" {
-		params["color_id"] = color_id
+	colorId := request.GetString("color_id", "")
+	if colorId != "" {
+		params["color_id"] = colorId
 	}
 
 	result, err := kc.callKanboardAPI(ctx, "updateCategory", params)
@@ -3297,11 +3297,11 @@ func (kc *kanboardClient) updateCategoryHandler(ctx context.Context, request mcp
 }
 
 func (kc *kanboardClient) deleteCategoryHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
-	category_id, err := request.RequireInt("category_id")
+	categoryId, err := request.RequireInt("category_id")
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
-	params := map[string]int{"category_id": category_id}
+	params := map[string]int{"category_id": categoryId}
 	result, err := kc.callKanboardAPI(ctx, "removeCategory", params)
 	if err != nil {
 		return mcp.NewToolResultError(fmt.Sprintf("Failed to delete category: %v", err)), nil
@@ -3316,12 +3316,12 @@ func (kc *kanboardClient) deleteCategoryHandler(ctx context.Context, request mcp
 }
 
 func (kc *kanboardClient) getOldSwimlanesHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
-	project_id := request.GetString("project_id", "") // Swimlanes can be global or project-specific
+	projectId := request.GetString("project_id", "") // Swimlanes can be global or project-specific
 
 	var result interface{}
 	var err error
-	if project_id != "" {
-		params := map[string]string{"project_id": project_id}
+	if projectId != "" {
+		params := map[string]string{"project_id": projectId}
 		result, err = kc.callKanboardAPI(ctx, "getAllSwimlanes", params)
 	} else {
 		result, err = kc.callKanboardAPI(ctx, "getAllSwimlanes", nil)
@@ -3340,12 +3340,12 @@ func (kc *kanboardClient) getOldSwimlanesHandler(ctx context.Context, request mc
 }
 
 func (kc *kanboardClient) getBoardHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
-	project_id, err := request.RequireInt("project_id")
+	projectId, err := request.RequireInt("project_id")
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
 
-	params := []int{project_id}
+	params := []int{projectId}
 	result, err := kc.callKanboardAPI(ctx, "getBoard", params)
 	if err != nil {
 		return mcp.NewToolResultError(fmt.Sprintf("Failed to get board details: %v", err)), nil
@@ -3360,16 +3360,16 @@ func (kc *kanboardClient) getBoardHandler(ctx context.Context, request mcp.CallT
 }
 
 func (kc *kanboardClient) assignTaskHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
-	task_id, err := request.RequireInt("task_id")
+	taskId, err := request.RequireInt("task_id")
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
-	user_id, err := request.RequireInt("user_id")
+	userId, err := request.RequireInt("user_id")
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
 
-	params := map[string]int{"task_id": task_id, "owner_id": user_id}
+	params := map[string]int{"task_id": taskId, "owner_id": userId}
 	result, err := kc.callKanboardAPI(ctx, "assignTask", params)
 	if err != nil {
 		return mcp.NewToolResultError(fmt.Sprintf("Failed to assign task: %v", err)), nil
@@ -3384,16 +3384,16 @@ func (kc *kanboardClient) assignTaskHandler(ctx context.Context, request mcp.Cal
 }
 
 func (kc *kanboardClient) setTaskDueDateHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
-	task_id, err := request.RequireInt("task_id")
+	taskId, err := request.RequireInt("task_id")
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
-	due_date, err := request.RequireString("due_date")
+	dueDate, err := request.RequireString("due_date")
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
 
-	params := map[string]interface{}{"task_id": task_id, "date_due": due_date}
+	params := map[string]interface{}{"task_id": taskId, "date_due": dueDate}
 	result, err := kc.callKanboardAPI(ctx, "updateTask", params)
 	if err != nil {
 		return mcp.NewToolResultError(fmt.Sprintf("Failed to set task due date: %v", err)), nil
@@ -3408,11 +3408,11 @@ func (kc *kanboardClient) setTaskDueDateHandler(ctx context.Context, request mcp
 }
 
 func (kc *kanboardClient) createCommentHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
-	task_id, err := request.RequireInt("task_id")
+	taskId, err := request.RequireInt("task_id")
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
-	user_id, err := request.RequireInt("user_id")
+	userId, err := request.RequireInt("user_id")
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
@@ -3422,8 +3422,8 @@ func (kc *kanboardClient) createCommentHandler(ctx context.Context, request mcp.
 	}
 
 	params := map[string]interface{}{
-		"task_id": task_id,
-		"user_id": user_id,
+		"task_id": taskId,
+		"user_id": userId,
 		"content": content,
 	}
 
@@ -3463,11 +3463,11 @@ func (kc *kanboardClient) createCommentHandler(ctx context.Context, request mcp.
 }
 
 func (kc *kanboardClient) getTaskCommentsHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
-	task_id, err := request.RequireInt("task_id")
+	taskId, err := request.RequireInt("task_id")
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
-	params := map[string]int{"task_id": task_id}
+	params := map[string]int{"task_id": taskId}
 	result, err := kc.callKanboardAPI(ctx, "getAllComments", params)
 	if err != nil {
 		return mcp.NewToolResultError(fmt.Sprintf("Failed to get task comments: %v", err)), nil
@@ -3482,11 +3482,11 @@ func (kc *kanboardClient) getTaskCommentsHandler(ctx context.Context, request mc
 }
 
 func (kc *kanboardClient) getCommentHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
-	comment_id, err := request.RequireInt("comment_id")
+	commentId, err := request.RequireInt("comment_id")
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
-	params := map[string]int{"comment_id": comment_id}
+	params := map[string]int{"comment_id": commentId}
 	result, err := kc.callKanboardAPI(ctx, "getComment", params)
 	if err != nil {
 		return mcp.NewToolResultError(fmt.Sprintf("Failed to get comment details: %v", err)), nil
@@ -3525,11 +3525,11 @@ func (kc *kanboardClient) updateCommentHandler(ctx context.Context, request mcp.
 }
 
 func (kc *kanboardClient) removeCommentHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
-	comment_id, err := request.RequireInt("comment_id")
+	commentId, err := request.RequireInt("comment_id")
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
-	params := map[string]int{"comment_id": comment_id}
+	params := map[string]int{"comment_id": commentId}
 	result, err := kc.callKanboardAPI(ctx, "removeComment", params)
 	if err != nil {
 		return mcp.NewToolResultError(fmt.Sprintf("Failed to remove comment: %v", err)), nil
@@ -3544,16 +3544,16 @@ func (kc *kanboardClient) removeCommentHandler(ctx context.Context, request mcp.
 }
 
 func (kc *kanboardClient) assignUserToProjectHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
-	project_id_str, err := request.RequireString("project_id")
+	projectIdStr, err := request.RequireString("project_id")
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
-	project_id, err := strconv.Atoi(project_id_str)
+	projectId, err := strconv.Atoi(projectIdStr)
 	if err != nil {
 		return mcp.NewToolResultError(fmt.Sprintf("Invalid project_id: %v", err)), nil
 	}
 
-	user_id, err := request.RequireInt("user_id")
+	userId, err := request.RequireInt("user_id")
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
@@ -3574,8 +3574,8 @@ func (kc *kanboardClient) assignUserToProjectHandler(ctx context.Context, reques
 	}
 
 	params := map[string]interface{}{
-		"project_id": project_id,
-		"user_id":    user_id,
+		"project_id": projectId,
+		"user_id":    userId,
 		"role":       role,
 	}
 
@@ -3583,7 +3583,7 @@ func (kc *kanboardClient) assignUserToProjectHandler(ctx context.Context, reques
 	if err != nil {
 		// Provide more helpful error message for 403 errors
 		if err.Error() == "API request failed with status code: 403, Response: 403 Forbidden" {
-			return mcp.NewToolResultError(fmt.Sprintf("Permission denied (403 Forbidden). The API user does not have sufficient privileges to assign users to projects. Please ensure the API user has 'app-admin' role in Kanboard. Project ID: %d, User ID: %d, Role: %s", project_id, user_id, role)), nil
+			return mcp.NewToolResultError(fmt.Sprintf("Permission denied (403 Forbidden). The API user does not have sufficient privileges to assign users to projects. Please ensure the API user has 'app-admin' role in Kanboard. Project ID: %d, User ID: %d, Role: %s", projectId, userId, role)), nil
 		}
 		return mcp.NewToolResultError(fmt.Sprintf("Failed to assign user to project: %v", err)), nil
 	}
@@ -3603,9 +3603,9 @@ func (kc *kanboardClient) createGroupHandler(ctx context.Context, request mcp.Ca
 	}
 
 	params := map[string]interface{}{"name": name}
-	external_id := request.GetString("external_id", "")
-	if external_id != "" {
-		params["external_id"] = external_id
+	externalId := request.GetString("external_id", "")
+	if externalId != "" {
+		params["external_id"] = externalId
 	}
 
 	result, err := kc.callKanboardAPI(ctx, "createGroup", params)
@@ -3620,19 +3620,19 @@ func (kc *kanboardClient) createGroupHandler(ctx context.Context, request mcp.Ca
 }
 
 func (kc *kanboardClient) updateGroupHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
-	group_id, err := request.RequireInt("group_id")
+	groupId, err := request.RequireInt("group_id")
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
 
-	params := map[string]interface{}{"id": group_id}
+	params := map[string]interface{}{"id": groupId}
 	name := request.GetString("name", "")
 	if name != "" {
 		params["name"] = name
 	}
-	external_id := request.GetString("external_id", "")
-	if external_id != "" {
-		params["external_id"] = external_id
+	externalId := request.GetString("external_id", "")
+	if externalId != "" {
+		params["external_id"] = externalId
 	}
 
 	result, err := kc.callKanboardAPI(ctx, "updateGroup", params)
@@ -3647,11 +3647,11 @@ func (kc *kanboardClient) updateGroupHandler(ctx context.Context, request mcp.Ca
 }
 
 func (kc *kanboardClient) removeGroupHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
-	group_id, err := request.RequireInt("group_id")
+	groupId, err := request.RequireInt("group_id")
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
-	params := map[string]int{"group_id": group_id}
+	params := map[string]int{"group_id": groupId}
 	result, err := kc.callKanboardAPI(ctx, "removeGroup", params)
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
@@ -3664,11 +3664,11 @@ func (kc *kanboardClient) removeGroupHandler(ctx context.Context, request mcp.Ca
 }
 
 func (kc *kanboardClient) getGroupHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
-	group_id, err := request.RequireInt("group_id")
+	groupId, err := request.RequireInt("group_id")
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
-	params := map[string]int{"group_id": group_id}
+	params := map[string]int{"group_id": groupId}
 	result, err := kc.callKanboardAPI(ctx, "getGroup", params)
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
@@ -3693,11 +3693,11 @@ func (kc *kanboardClient) getAllGroupsHandler(ctx context.Context, _ mcp.CallToo
 }
 
 func (kc *kanboardClient) getMemberGroupsHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
-	user_id, err := request.RequireInt("user_id")
+	userId, err := request.RequireInt("user_id")
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
-	params := map[string]int{"user_id": user_id}
+	params := map[string]int{"user_id": userId}
 	result, err := kc.callKanboardAPI(ctx, "getMemberGroups", params)
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
@@ -3710,11 +3710,11 @@ func (kc *kanboardClient) getMemberGroupsHandler(ctx context.Context, request mc
 }
 
 func (kc *kanboardClient) getGroupMembersHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
-	group_id, err := request.RequireInt("group_id")
+	groupId, err := request.RequireInt("group_id")
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
-	params := map[string]int{"group_id": group_id}
+	params := map[string]int{"group_id": groupId}
 	result, err := kc.callKanboardAPI(ctx, "getGroupMembers", params)
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
@@ -3727,15 +3727,15 @@ func (kc *kanboardClient) getGroupMembersHandler(ctx context.Context, request mc
 }
 
 func (kc *kanboardClient) addGroupMemberHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
-	group_id, err := request.RequireInt("group_id")
+	groupId, err := request.RequireInt("group_id")
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
-	user_id, err := request.RequireInt("user_id")
+	userId, err := request.RequireInt("user_id")
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
-	params := map[string]int{"group_id": group_id, "user_id": user_id}
+	params := map[string]int{"group_id": groupId, "user_id": userId}
 	result, err := kc.callKanboardAPI(ctx, "addGroupMember", params)
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
@@ -3748,15 +3748,15 @@ func (kc *kanboardClient) addGroupMemberHandler(ctx context.Context, request mcp
 }
 
 func (kc *kanboardClient) removeGroupMemberHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
-	group_id, err := request.RequireInt("group_id")
+	groupId, err := request.RequireInt("group_id")
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
-	user_id, err := request.RequireInt("user_id")
+	userId, err := request.RequireInt("user_id")
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
-	params := map[string]int{"group_id": group_id, "user_id": user_id}
+	params := map[string]int{"group_id": groupId, "user_id": userId}
 	result, err := kc.callKanboardAPI(ctx, "removeGroupMember", params)
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
@@ -3769,15 +3769,15 @@ func (kc *kanboardClient) removeGroupMemberHandler(ctx context.Context, request 
 }
 
 func (kc *kanboardClient) isGroupMemberHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
-	group_id, err := request.RequireInt("group_id")
+	groupId, err := request.RequireInt("group_id")
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
-	user_id, err := request.RequireInt("user_id")
+	userId, err := request.RequireInt("user_id")
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
-	params := map[string]int{"group_id": group_id, "user_id": user_id}
+	params := map[string]int{"group_id": groupId, "user_id": userId}
 	result, err := kc.callKanboardAPI(ctx, "isGroupMember", params)
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
@@ -3790,22 +3790,22 @@ func (kc *kanboardClient) isGroupMemberHandler(ctx context.Context, request mcp.
 }
 
 func (kc *kanboardClient) createTaskLinkHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
-	task_id, err := request.RequireInt("task_id")
+	taskId, err := request.RequireInt("task_id")
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
-	opposite_task_id, err := request.RequireInt("opposite_task_id")
+	oppositeTaskId, err := request.RequireInt("opposite_task_id")
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
-	link_id, err := request.RequireInt("link_id")
+	linkId, err := request.RequireInt("link_id")
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
 	params := map[string]int{
-		"task_id":          task_id,
-		"opposite_task_id": opposite_task_id,
-		"link_id":          link_id,
+		"task_id":          taskId,
+		"opposite_task_id": oppositeTaskId,
+		"link_id":          linkId,
 	}
 	result, err := kc.callKanboardAPI(ctx, "createTaskLink", params)
 	if err != nil {
@@ -3819,27 +3819,27 @@ func (kc *kanboardClient) createTaskLinkHandler(ctx context.Context, request mcp
 }
 
 func (kc *kanboardClient) updateTaskLinkHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
-	task_link_id, err := request.RequireInt("task_link_id")
+	taskLinkId, err := request.RequireInt("task_link_id")
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
-	task_id, err := request.RequireInt("task_id")
+	taskId, err := request.RequireInt("task_id")
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
-	opposite_task_id, err := request.RequireInt("opposite_task_id")
+	oppositeTaskId, err := request.RequireInt("opposite_task_id")
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
-	link_id, err := request.RequireInt("link_id")
+	linkId, err := request.RequireInt("link_id")
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
 	params := map[string]int{
-		"id":               task_link_id,
-		"task_id":          task_id,
-		"opposite_task_id": opposite_task_id,
-		"link_id":          link_id,
+		"id":               taskLinkId,
+		"task_id":          taskId,
+		"opposite_task_id": oppositeTaskId,
+		"link_id":          linkId,
 	}
 	result, err := kc.callKanboardAPI(ctx, "updateTaskLink", params)
 	if err != nil {
@@ -3853,11 +3853,11 @@ func (kc *kanboardClient) updateTaskLinkHandler(ctx context.Context, request mcp
 }
 
 func (kc *kanboardClient) getTaskLinkByIdHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
-	task_link_id, err := request.RequireInt("task_link_id")
+	taskLinkId, err := request.RequireInt("task_link_id")
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
-	params := map[string]int{"task_link_id": task_link_id}
+	params := map[string]int{"task_link_id": taskLinkId}
 	result, err := kc.callKanboardAPI(ctx, "getTaskLinkById", params)
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
@@ -3870,11 +3870,11 @@ func (kc *kanboardClient) getTaskLinkByIdHandler(ctx context.Context, request mc
 }
 
 func (kc *kanboardClient) getAllTaskLinksHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
-	task_id, err := request.RequireInt("task_id")
+	taskId, err := request.RequireInt("task_id")
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
-	params := map[string]int{"task_id": task_id}
+	params := map[string]int{"task_id": taskId}
 	result, err := kc.callKanboardAPI(ctx, "getAllTaskLinks", params)
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
@@ -3887,11 +3887,11 @@ func (kc *kanboardClient) getAllTaskLinksHandler(ctx context.Context, request mc
 }
 
 func (kc *kanboardClient) removeTaskLinkHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
-	task_link_id, err := request.RequireInt("task_link_id")
+	taskLinkId, err := request.RequireInt("task_link_id")
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
-	params := map[string]int{"task_link_id": task_link_id}
+	params := map[string]int{"task_link_id": taskLinkId}
 	result, err := kc.callKanboardAPI(ctx, "removeTaskLink", params)
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
@@ -3916,11 +3916,11 @@ func (kc *kanboardClient) getAllLinksHandler(ctx context.Context, _ mcp.CallTool
 }
 
 func (kc *kanboardClient) getOppositeLinkIdHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
-	link_id, err := request.RequireInt("link_id")
+	linkId, err := request.RequireInt("link_id")
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
-	params := map[string]int{"link_id": link_id}
+	params := map[string]int{"link_id": linkId}
 	result, err := kc.callKanboardAPI(ctx, "getOppositeLinkId", params)
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
@@ -3950,11 +3950,11 @@ func (kc *kanboardClient) getLinkByLabelHandler(ctx context.Context, request mcp
 }
 
 func (kc *kanboardClient) getLinkByIdHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
-	link_id, err := request.RequireInt("link_id")
+	linkId, err := request.RequireInt("link_id")
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
-	params := map[string]int{"link_id": link_id}
+	params := map[string]int{"link_id": linkId}
 	result, err := kc.callKanboardAPI(ctx, "getLinkById", params)
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
@@ -3971,11 +3971,11 @@ func (kc *kanboardClient) createLinkHandler(ctx context.Context, request mcp.Cal
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
-	opposite_label := request.GetString("opposite_label", "")
+	oppositeLabel := request.GetString("opposite_label", "")
 
 	params := map[string]interface{}{
 		"label":          label,
-		"opposite_label": opposite_label,
+		"opposite_label": oppositeLabel,
 	}
 
 	result, err := kc.callKanboardAPI(ctx, "createLink", params)
@@ -3990,11 +3990,11 @@ func (kc *kanboardClient) createLinkHandler(ctx context.Context, request mcp.Cal
 }
 
 func (kc *kanboardClient) updateLinkHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
-	link_id, err := request.RequireInt("link_id")
+	linkId, err := request.RequireInt("link_id")
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
-	opposite_link_id, err := request.RequireInt("opposite_link_id")
+	oppositeLinkId, err := request.RequireInt("opposite_link_id")
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
@@ -4004,8 +4004,8 @@ func (kc *kanboardClient) updateLinkHandler(ctx context.Context, request mcp.Cal
 	}
 
 	params := map[string]interface{}{
-		"id":               link_id,
-		"opposite_link_id": opposite_link_id,
+		"id":               linkId,
+		"opposite_link_id": oppositeLinkId,
 		"label":            label,
 	}
 
@@ -4021,11 +4021,11 @@ func (kc *kanboardClient) updateLinkHandler(ctx context.Context, request mcp.Cal
 }
 
 func (kc *kanboardClient) removeLinkHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
-	link_id, err := request.RequireInt("link_id")
+	linkId, err := request.RequireInt("link_id")
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
-	params := map[string]int{"link_id": link_id}
+	params := map[string]int{"link_id": linkId}
 	result, err := kc.callKanboardAPI(ctx, "removeLink", params)
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
@@ -4038,11 +4038,11 @@ func (kc *kanboardClient) removeLinkHandler(ctx context.Context, request mcp.Cal
 }
 
 func (kc *kanboardClient) getProjectByIdHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
-	project_id, err := request.RequireInt("project_id")
+	projectId, err := request.RequireInt("project_id")
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
-	params := map[string]int{"project_id": project_id}
+	params := map[string]int{"project_id": projectId}
 	result, err := kc.callKanboardAPI(ctx, "getProjectById", params)
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
@@ -4118,12 +4118,12 @@ func (kc *kanboardClient) getAllProjectsHandler(ctx context.Context, _ mcp.CallT
 }
 
 func (kc *kanboardClient) updateProjectHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
-	project_id, err := request.RequireInt("project_id")
+	projectId, err := request.RequireInt("project_id")
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
 
-	params := map[string]interface{}{"id": project_id}
+	params := map[string]interface{}{"id": projectId}
 
 	name := request.GetString("name", "")
 	if name != "" {
@@ -4135,9 +4135,9 @@ func (kc *kanboardClient) updateProjectHandler(ctx context.Context, request mcp.
 		params["description"] = description
 	}
 
-	owner_id := request.GetInt("owner_id", 0)
-	if owner_id != 0 {
-		params["owner_id"] = owner_id
+	ownerId := request.GetInt("owner_id", 0)
+	if ownerId != 0 {
+		params["owner_id"] = ownerId
 	}
 
 	identifier := request.GetString("identifier", "")
@@ -4145,29 +4145,29 @@ func (kc *kanboardClient) updateProjectHandler(ctx context.Context, request mcp.
 		params["identifier"] = identifier
 	}
 
-	start_date := request.GetString("start_date", "")
-	if start_date != "" {
-		params["start_date"] = start_date
+	startDate := request.GetString("start_date", "")
+	if startDate != "" {
+		params["start_date"] = startDate
 	}
 
-	end_date := request.GetString("end_date", "")
-	if end_date != "" {
-		params["end_date"] = end_date
+	endDate := request.GetString("end_date", "")
+	if endDate != "" {
+		params["end_date"] = endDate
 	}
 
-	priority_default := request.GetInt("priority_default", 0)
-	if priority_default != 0 {
-		params["priority_default"] = priority_default
+	priorityDefault := request.GetInt("priority_default", 0)
+	if priorityDefault != 0 {
+		params["priority_default"] = priorityDefault
 	}
 
-	priority_start := request.GetInt("priority_start", 0)
-	if priority_start != 0 {
-		params["priority_start"] = priority_start
+	priorityStart := request.GetInt("priority_start", 0)
+	if priorityStart != 0 {
+		params["priority_start"] = priorityStart
 	}
 
-	priority_end := request.GetInt("priority_end", 0)
-	if priority_end != 0 {
-		params["priority_end"] = priority_end
+	priorityEnd := request.GetInt("priority_end", 0)
+	if priorityEnd != 0 {
+		params["priority_end"] = priorityEnd
 	}
 
 	email := request.GetString("email", "")
@@ -4189,11 +4189,11 @@ func (kc *kanboardClient) updateProjectHandler(ctx context.Context, request mcp.
 }
 
 func (kc *kanboardClient) removeProjectHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
-	project_id, err := request.RequireInt("project_id")
+	projectId, err := request.RequireInt("project_id")
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
-	params := map[string]int{"project_id": project_id}
+	params := map[string]int{"project_id": projectId}
 	result, err := kc.callKanboardAPI(ctx, "removeProject", params)
 	if err != nil {
 		return mcp.NewToolResultError(fmt.Sprintf("Failed to remove project: %v", err)), nil
@@ -4206,11 +4206,11 @@ func (kc *kanboardClient) removeProjectHandler(ctx context.Context, request mcp.
 }
 
 func (kc *kanboardClient) enableProjectHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
-	project_id, err := request.RequireInt("project_id")
+	projectId, err := request.RequireInt("project_id")
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
-	params := map[string]int{"project_id": project_id}
+	params := map[string]int{"project_id": projectId}
 	result, err := kc.callKanboardAPI(ctx, "enableProject", params)
 	if err != nil {
 		return mcp.NewToolResultError(fmt.Sprintf("Failed to enable project: %v", err)), nil
@@ -4223,11 +4223,11 @@ func (kc *kanboardClient) enableProjectHandler(ctx context.Context, request mcp.
 }
 
 func (kc *kanboardClient) disableProjectHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
-	project_id, err := request.RequireInt("project_id")
+	projectId, err := request.RequireInt("project_id")
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
-	params := map[string]int{"project_id": project_id}
+	params := map[string]int{"project_id": projectId}
 	result, err := kc.callKanboardAPI(ctx, "disableProject", params)
 	if err != nil {
 		return mcp.NewToolResultError(fmt.Sprintf("Failed to disable project: %v", err)), nil
@@ -4240,11 +4240,11 @@ func (kc *kanboardClient) disableProjectHandler(ctx context.Context, request mcp
 }
 
 func (kc *kanboardClient) enableProjectPublicAccessHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
-	project_id, err := request.RequireInt("project_id")
+	projectId, err := request.RequireInt("project_id")
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
-	params := map[string]int{"project_id": project_id}
+	params := map[string]int{"project_id": projectId}
 	result, err := kc.callKanboardAPI(ctx, "enableProjectPublicAccess", params)
 	if err != nil {
 		return mcp.NewToolResultError(fmt.Sprintf("Failed to enable project public access: %v", err)), nil
@@ -4257,11 +4257,11 @@ func (kc *kanboardClient) enableProjectPublicAccessHandler(ctx context.Context, 
 }
 
 func (kc *kanboardClient) disableProjectPublicAccessHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
-	project_id, err := request.RequireInt("project_id")
+	projectId, err := request.RequireInt("project_id")
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
-	params := map[string]int{"project_id": project_id}
+	params := map[string]int{"project_id": projectId}
 	result, err := kc.callKanboardAPI(ctx, "disableProjectPublicAccess", params)
 	if err != nil {
 		return mcp.NewToolResultError(fmt.Sprintf("Failed to disable project public access: %v", err)), nil
@@ -4274,11 +4274,11 @@ func (kc *kanboardClient) disableProjectPublicAccessHandler(ctx context.Context,
 }
 
 func (kc *kanboardClient) getProjectActivityHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
-	project_id, err := request.RequireInt("project_id")
+	projectId, err := request.RequireInt("project_id")
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
-	params := map[string]int{"project_id": project_id}
+	params := map[string]int{"project_id": projectId}
 	result, err := kc.callKanboardAPI(ctx, "getProjectActivity", params)
 	if err != nil {
 		return mcp.NewToolResultError(fmt.Sprintf("Failed to get project activity: %v", err)), nil
@@ -4291,11 +4291,11 @@ func (kc *kanboardClient) getProjectActivityHandler(ctx context.Context, request
 }
 
 func (kc *kanboardClient) getProjectActivitiesHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
-	project_ids, err := request.RequireIntSlice("project_ids")
+	projectIds, err := request.RequireIntSlice("project_ids")
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
-	params := map[string]interface{}{"project_ids": project_ids}
+	params := map[string]interface{}{"project_ids": projectIds}
 	result, err := kc.callKanboardAPI(ctx, "getProjectActivities", params)
 	if err != nil {
 		return mcp.NewToolResultError(fmt.Sprintf("Failed to get project activities: %v", err)), nil
@@ -4308,7 +4308,7 @@ func (kc *kanboardClient) getProjectActivitiesHandler(ctx context.Context, reque
 }
 
 func (kc *kanboardClient) createProjectFileHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
-	project_id, err := request.RequireInt("project_id")
+	projectId, err := request.RequireInt("project_id")
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
@@ -4322,7 +4322,7 @@ func (kc *kanboardClient) createProjectFileHandler(ctx context.Context, request 
 	}
 
 	params := map[string]interface{}{
-		"project_id": project_id,
+		"project_id": projectId,
 		"filename":   filename,
 		"blob":       blob,
 	}
@@ -4339,11 +4339,11 @@ func (kc *kanboardClient) createProjectFileHandler(ctx context.Context, request 
 }
 
 func (kc *kanboardClient) getAllProjectFilesHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
-	project_id, err := request.RequireInt("project_id")
+	projectId, err := request.RequireInt("project_id")
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
-	params := map[string]int{"project_id": project_id}
+	params := map[string]int{"project_id": projectId}
 	result, err := kc.callKanboardAPI(ctx, "getAllProjectFiles", params)
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
@@ -4356,15 +4356,15 @@ func (kc *kanboardClient) getAllProjectFilesHandler(ctx context.Context, request
 }
 
 func (kc *kanboardClient) getProjectFileHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
-	project_id, err := request.RequireInt("project_id")
+	projectId, err := request.RequireInt("project_id")
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
-	file_id, err := request.RequireInt("file_id")
+	fileId, err := request.RequireInt("file_id")
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
-	params := map[string]int{"project_id": project_id, "file_id": file_id}
+	params := map[string]int{"project_id": projectId, "file_id": fileId}
 	result, err := kc.callKanboardAPI(ctx, "getProjectFile", params)
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
@@ -4377,15 +4377,15 @@ func (kc *kanboardClient) getProjectFileHandler(ctx context.Context, request mcp
 }
 
 func (kc *kanboardClient) downloadProjectFileHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
-	project_id, err := request.RequireInt("project_id")
+	projectId, err := request.RequireInt("project_id")
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
-	file_id, err := request.RequireInt("file_id")
+	fileId, err := request.RequireInt("file_id")
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
-	params := map[string]int{"project_id": project_id, "file_id": file_id}
+	params := map[string]int{"project_id": projectId, "file_id": fileId}
 	result, err := kc.callKanboardAPI(ctx, "downloadProjectFile", params)
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
@@ -4398,15 +4398,15 @@ func (kc *kanboardClient) downloadProjectFileHandler(ctx context.Context, reques
 }
 
 func (kc *kanboardClient) removeProjectFileHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
-	project_id, err := request.RequireInt("project_id")
+	projectId, err := request.RequireInt("project_id")
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
-	file_id, err := request.RequireInt("file_id")
+	fileId, err := request.RequireInt("file_id")
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
-	params := map[string]int{"project_id": project_id, "file_id": file_id}
+	params := map[string]int{"project_id": projectId, "file_id": fileId}
 	result, err := kc.callKanboardAPI(ctx, "removeProjectFile", params)
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
@@ -4419,11 +4419,11 @@ func (kc *kanboardClient) removeProjectFileHandler(ctx context.Context, request 
 }
 
 func (kc *kanboardClient) removeAllProjectFilesHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
-	project_id, err := request.RequireInt("project_id")
+	projectId, err := request.RequireInt("project_id")
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
-	params := map[string]int{"project_id": project_id}
+	params := map[string]int{"project_id": projectId}
 	result, err := kc.callKanboardAPI(ctx, "removeAllProjectFiles", params)
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
@@ -4436,11 +4436,11 @@ func (kc *kanboardClient) removeAllProjectFilesHandler(ctx context.Context, requ
 }
 
 func (kc *kanboardClient) getProjectMetadataHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
-	project_id, err := request.RequireInt("project_id")
+	projectId, err := request.RequireInt("project_id")
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
-	params := map[string]int{"project_id": project_id}
+	params := map[string]int{"project_id": projectId}
 	result, err := kc.callKanboardAPI(ctx, "getProjectMetadata", params)
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
@@ -4453,7 +4453,7 @@ func (kc *kanboardClient) getProjectMetadataHandler(ctx context.Context, request
 }
 
 func (kc *kanboardClient) getProjectMetadataByNameHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
-	project_id, err := request.RequireInt("project_id")
+	projectId, err := request.RequireInt("project_id")
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
@@ -4461,7 +4461,7 @@ func (kc *kanboardClient) getProjectMetadataByNameHandler(ctx context.Context, r
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
-	params := map[string]interface{}{"project_id": project_id, "name": name}
+	params := map[string]interface{}{"project_id": projectId, "name": name}
 	result, err := kc.callKanboardAPI(ctx, "getProjectMetadataByName", params)
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
@@ -4474,7 +4474,7 @@ func (kc *kanboardClient) getProjectMetadataByNameHandler(ctx context.Context, r
 }
 
 func (kc *kanboardClient) saveProjectMetadataHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
-	project_id, err := request.RequireInt("project_id")
+	projectId, err := request.RequireInt("project_id")
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
@@ -4485,7 +4485,7 @@ func (kc *kanboardClient) saveProjectMetadataHandler(ctx context.Context, reques
 		return mcp.NewToolResultError("Missing or invalid 'values' parameter"), nil
 	}
 
-	params := map[string]interface{}{"project_id": project_id, "values": values}
+	params := map[string]interface{}{"project_id": projectId, "values": values}
 	result, err := kc.callKanboardAPI(ctx, "saveProjectMetadata", params)
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
@@ -4499,7 +4499,7 @@ func (kc *kanboardClient) saveProjectMetadataHandler(ctx context.Context, reques
 }
 
 func (kc *kanboardClient) removeProjectMetadataHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
-	project_id, err := request.RequireInt("project_id")
+	projectId, err := request.RequireInt("project_id")
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
@@ -4507,7 +4507,7 @@ func (kc *kanboardClient) removeProjectMetadataHandler(ctx context.Context, requ
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
-	params := map[string]interface{}{"project_id": project_id, "name": name}
+	params := map[string]interface{}{"project_id": projectId, "name": name}
 	result, err := kc.callKanboardAPI(ctx, "removeProjectMetadata", params)
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
@@ -4520,11 +4520,11 @@ func (kc *kanboardClient) removeProjectMetadataHandler(ctx context.Context, requ
 }
 
 func (kc *kanboardClient) getProjectUsersHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
-	project_id, err := request.RequireInt("project_id")
+	projectId, err := request.RequireInt("project_id")
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
-	params := map[string]interface{}{"project_id": project_id}
+	params := map[string]interface{}{"project_id": projectId}
 	result, err := kc.callKanboardAPI(ctx, "getProjectUsers", params)
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
@@ -4537,14 +4537,14 @@ func (kc *kanboardClient) getProjectUsersHandler(ctx context.Context, request mc
 }
 
 func (kc *kanboardClient) getAssignableUsersHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
-	project_id, err := request.RequireInt("project_id")
+	projectId, err := request.RequireInt("project_id")
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
 
-	prepend_unassigned := request.GetBool("prepend_unassigned", false)
+	prependUnassigned := request.GetBool("prepend_unassigned", false)
 
-	params := map[string]interface{}{"project_id": project_id, "prepend_unassigned": prepend_unassigned}
+	params := map[string]interface{}{"project_id": projectId, "prepend_unassigned": prependUnassigned}
 	result, err := kc.callKanboardAPI(ctx, "getAssignableUsers", params)
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
@@ -4557,16 +4557,16 @@ func (kc *kanboardClient) getAssignableUsersHandler(ctx context.Context, request
 }
 
 func (kc *kanboardClient) addProjectUserHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
-	project_id, err := request.RequireInt("project_id")
+	projectId, err := request.RequireInt("project_id")
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
-	user_id, err := request.RequireInt("user_id")
+	userId, err := request.RequireInt("user_id")
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
 	role := request.GetString("role", "")
-	params := map[string]interface{}{"project_id": project_id, "user_id": user_id}
+	params := map[string]interface{}{"project_id": projectId, "user_id": userId}
 	if role != "" {
 		params["role"] = role
 	}
@@ -4582,16 +4582,16 @@ func (kc *kanboardClient) addProjectUserHandler(ctx context.Context, request mcp
 }
 
 func (kc *kanboardClient) addProjectGroupHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
-	project_id, err := request.RequireInt("project_id")
+	projectId, err := request.RequireInt("project_id")
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
-	group_id, err := request.RequireInt("group_id")
+	groupId, err := request.RequireInt("group_id")
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
 	role := request.GetString("role", "")
-	params := map[string]interface{}{"project_id": project_id, "group_id": group_id}
+	params := map[string]interface{}{"project_id": projectId, "group_id": groupId}
 	if role != "" {
 		params["role"] = role
 	}
@@ -4607,15 +4607,15 @@ func (kc *kanboardClient) addProjectGroupHandler(ctx context.Context, request mc
 }
 
 func (kc *kanboardClient) removeProjectUserHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
-	project_id, err := request.RequireInt("project_id")
+	projectId, err := request.RequireInt("project_id")
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
-	user_id, err := request.RequireInt("user_id")
+	userId, err := request.RequireInt("user_id")
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
-	params := map[string]interface{}{"project_id": project_id, "user_id": user_id}
+	params := map[string]interface{}{"project_id": projectId, "user_id": userId}
 	result, err := kc.callKanboardAPI(ctx, "removeProjectUser", params)
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
@@ -4628,15 +4628,15 @@ func (kc *kanboardClient) removeProjectUserHandler(ctx context.Context, request 
 }
 
 func (kc *kanboardClient) removeProjectGroupHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
-	project_id, err := request.RequireInt("project_id")
+	projectId, err := request.RequireInt("project_id")
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
-	group_id, err := request.RequireInt("group_id")
+	groupId, err := request.RequireInt("group_id")
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
-	params := map[string]interface{}{"project_id": project_id, "group_id": group_id}
+	params := map[string]interface{}{"project_id": projectId, "group_id": groupId}
 	result, err := kc.callKanboardAPI(ctx, "removeProjectGroup", params)
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
@@ -4649,11 +4649,11 @@ func (kc *kanboardClient) removeProjectGroupHandler(ctx context.Context, request
 }
 
 func (kc *kanboardClient) changeProjectUserRoleHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
-	project_id, err := request.RequireInt("project_id")
+	projectId, err := request.RequireInt("project_id")
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
-	user_id, err := request.RequireInt("user_id")
+	userId, err := request.RequireInt("user_id")
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
@@ -4661,7 +4661,7 @@ func (kc *kanboardClient) changeProjectUserRoleHandler(ctx context.Context, requ
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
-	params := map[string]interface{}{"project_id": project_id, "user_id": user_id, "role": role}
+	params := map[string]interface{}{"project_id": projectId, "user_id": userId, "role": role}
 	result, err := kc.callKanboardAPI(ctx, "changeProjectUserRole", params)
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
@@ -4674,11 +4674,11 @@ func (kc *kanboardClient) changeProjectUserRoleHandler(ctx context.Context, requ
 }
 
 func (kc *kanboardClient) changeProjectGroupRoleHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
-	project_id, err := request.RequireInt("project_id")
+	projectId, err := request.RequireInt("project_id")
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
-	group_id, err := request.RequireInt("group_id")
+	groupId, err := request.RequireInt("group_id")
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
@@ -4686,7 +4686,7 @@ func (kc *kanboardClient) changeProjectGroupRoleHandler(ctx context.Context, req
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
-	params := map[string]interface{}{"project_id": project_id, "group_id": group_id, "role": role}
+	params := map[string]interface{}{"project_id": projectId, "group_id": groupId, "role": role}
 	result, err := kc.callKanboardAPI(ctx, "changeProjectGroupRole", params)
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
@@ -4699,15 +4699,15 @@ func (kc *kanboardClient) changeProjectGroupRoleHandler(ctx context.Context, req
 }
 
 func (kc *kanboardClient) getProjectUserRoleHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
-	project_id, err := request.RequireInt("project_id")
+	projectId, err := request.RequireInt("project_id")
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
-	user_id, err := request.RequireInt("user_id")
+	userId, err := request.RequireInt("user_id")
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
-	params := map[string]interface{}{"project_id": project_id, "user_id": user_id}
+	params := map[string]interface{}{"project_id": projectId, "user_id": userId}
 	result, err := kc.callKanboardAPI(ctx, "getProjectUserRole", params)
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
@@ -4721,7 +4721,7 @@ func (kc *kanboardClient) getProjectUserRoleHandler(ctx context.Context, request
 
 // Subtask Management
 func (kc *kanboardClient) createSubtaskHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
-	task_id, err := request.RequireInt("task_id")
+	taskId, err := request.RequireInt("task_id")
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
@@ -4730,19 +4730,19 @@ func (kc *kanboardClient) createSubtaskHandler(ctx context.Context, request mcp.
 		return mcp.NewToolResultError(err.Error()), nil
 	}
 
-	params := map[string]interface{}{"task_id": task_id, "title": title}
+	params := map[string]interface{}{"task_id": taskId, "title": title}
 
-	user_id := request.GetInt("user_id", 0)
-	if user_id != 0 {
-		params["user_id"] = user_id
+	userId := request.GetInt("user_id", 0)
+	if userId != 0 {
+		params["user_id"] = userId
 	}
-	time_estimated := request.GetInt("time_estimated", 0)
-	if time_estimated != 0 {
-		params["time_estimated"] = time_estimated
+	timeEstimated := request.GetInt("time_estimated", 0)
+	if timeEstimated != 0 {
+		params["time_estimated"] = timeEstimated
 	}
-	time_spent := request.GetInt("time_spent", 0)
-	if time_spent != 0 {
-		params["time_spent"] = time_spent
+	timeSpent := request.GetInt("time_spent", 0)
+	if timeSpent != 0 {
+		params["time_spent"] = timeSpent
 	}
 	status := request.GetInt("status", 0)
 	if status != 0 {
@@ -4761,11 +4761,11 @@ func (kc *kanboardClient) createSubtaskHandler(ctx context.Context, request mcp.
 }
 
 func (kc *kanboardClient) getSubtaskHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
-	subtask_id, err := request.RequireInt("subtask_id")
+	subtaskId, err := request.RequireInt("subtask_id")
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
-	params := map[string]interface{}{"subtask_id": subtask_id}
+	params := map[string]interface{}{"subtask_id": subtaskId}
 	result, err := kc.callKanboardAPI(ctx, "getSubtask", params)
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
@@ -4778,11 +4778,11 @@ func (kc *kanboardClient) getSubtaskHandler(ctx context.Context, request mcp.Cal
 }
 
 func (kc *kanboardClient) getAllSubtasksHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
-	task_id, err := request.RequireInt("task_id")
+	taskId, err := request.RequireInt("task_id")
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
-	params := map[string]interface{}{"task_id": task_id}
+	params := map[string]interface{}{"task_id": taskId}
 	result, err := kc.callKanboardAPI(ctx, "getAllSubtasks", params)
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
@@ -4799,27 +4799,27 @@ func (kc *kanboardClient) updateSubtaskHandler(ctx context.Context, request mcp.
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
-	task_id, err := request.RequireInt("task_id")
+	taskId, err := request.RequireInt("task_id")
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
-	params := map[string]interface{}{"id": id, "task_id": task_id}
+	params := map[string]interface{}{"id": id, "task_id": taskId}
 
 	title := request.GetString("title", "")
 	if title != "" {
 		params["title"] = title
 	}
-	user_id := request.GetInt("user_id", 0)
-	if user_id != 0 {
-		params["user_id"] = user_id
+	userId := request.GetInt("user_id", 0)
+	if userId != 0 {
+		params["user_id"] = userId
 	}
-	time_estimated := request.GetInt("time_estimated", 0)
-	if time_estimated != 0 {
-		params["time_estimated"] = time_estimated
+	timeEstimated := request.GetInt("time_estimated", 0)
+	if timeEstimated != 0 {
+		params["time_estimated"] = timeEstimated
 	}
-	time_spent := request.GetInt("time_spent", 0)
-	if time_spent != 0 {
-		params["time_spent"] = time_spent
+	timeSpent := request.GetInt("time_spent", 0)
+	if timeSpent != 0 {
+		params["time_spent"] = timeSpent
 	}
 	status := request.GetInt("status", 0)
 	if status != 0 {
@@ -4838,11 +4838,11 @@ func (kc *kanboardClient) updateSubtaskHandler(ctx context.Context, request mcp.
 }
 
 func (kc *kanboardClient) removeSubtaskHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
-	subtask_id, err := request.RequireInt("subtask_id")
+	subtaskId, err := request.RequireInt("subtask_id")
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
-	params := map[string]interface{}{"subtask_id": subtask_id}
+	params := map[string]interface{}{"subtask_id": subtaskId}
 	result, err := kc.callKanboardAPI(ctx, "removeSubtask", params)
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
@@ -4855,14 +4855,14 @@ func (kc *kanboardClient) removeSubtaskHandler(ctx context.Context, request mcp.
 }
 
 func (kc *kanboardClient) hasSubtaskTimerHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
-	subtask_id, err := request.RequireInt("subtask_id")
+	subtaskId, err := request.RequireInt("subtask_id")
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
-	params := map[string]interface{}{"subtask_id": subtask_id}
-	user_id := request.GetInt("user_id", 0)
-	if user_id != 0 {
-		params["user_id"] = user_id
+	params := map[string]interface{}{"subtask_id": subtaskId}
+	userId := request.GetInt("user_id", 0)
+	if userId != 0 {
+		params["user_id"] = userId
 	}
 	result, err := kc.callKanboardAPI(ctx, "hasSubtaskTimer", params)
 	if err != nil {
@@ -4876,14 +4876,14 @@ func (kc *kanboardClient) hasSubtaskTimerHandler(ctx context.Context, request mc
 }
 
 func (kc *kanboardClient) setSubtaskStartTimeHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
-	subtask_id, err := request.RequireInt("subtask_id")
+	subtaskId, err := request.RequireInt("subtask_id")
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
-	params := map[string]interface{}{"subtask_id": subtask_id}
-	user_id := request.GetInt("user_id", 0)
-	if user_id != 0 {
-		params["user_id"] = user_id
+	params := map[string]interface{}{"subtask_id": subtaskId}
+	userId := request.GetInt("user_id", 0)
+	if userId != 0 {
+		params["user_id"] = userId
 	}
 	result, err := kc.callKanboardAPI(ctx, "setSubtaskStartTime", params)
 	if err != nil {
@@ -4897,14 +4897,14 @@ func (kc *kanboardClient) setSubtaskStartTimeHandler(ctx context.Context, reques
 }
 
 func (kc *kanboardClient) setSubtaskEndTimeHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
-	subtask_id, err := request.RequireInt("subtask_id")
+	subtaskId, err := request.RequireInt("subtask_id")
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
-	params := map[string]interface{}{"subtask_id": subtask_id}
-	user_id := request.GetInt("user_id", 0)
-	if user_id != 0 {
-		params["user_id"] = user_id
+	params := map[string]interface{}{"subtask_id": subtaskId}
+	userId := request.GetInt("user_id", 0)
+	if userId != 0 {
+		params["user_id"] = userId
 	}
 	result, err := kc.callKanboardAPI(ctx, "setSubtaskEndTime", params)
 	if err != nil {
@@ -4918,14 +4918,14 @@ func (kc *kanboardClient) setSubtaskEndTimeHandler(ctx context.Context, request 
 }
 
 func (kc *kanboardClient) getSubtaskTimeSpentHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
-	subtask_id, err := request.RequireInt("subtask_id")
+	subtaskId, err := request.RequireInt("subtask_id")
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
-	params := map[string]interface{}{"subtask_id": subtask_id}
-	user_id := request.GetInt("user_id", 0)
-	if user_id != 0 {
-		params["user_id"] = user_id
+	params := map[string]interface{}{"subtask_id": subtaskId}
+	userId := request.GetInt("user_id", 0)
+	if userId != 0 {
+		params["user_id"] = userId
 	}
 	result, err := kc.callKanboardAPI(ctx, "getSubtaskTimeSpent", params)
 	if err != nil {
@@ -4951,11 +4951,11 @@ func (kc *kanboardClient) getAllTagsHandler(ctx context.Context, _ mcp.CallToolR
 }
 
 func (kc *kanboardClient) getTagsByProjectHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
-	project_id, err := request.RequireInt("project_id")
+	projectId, err := request.RequireInt("project_id")
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
-	params := map[string]interface{}{"project_id": project_id}
+	params := map[string]interface{}{"project_id": projectId}
 	result, err := kc.callKanboardAPI(ctx, "getTagsByProject", params)
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
@@ -4968,7 +4968,7 @@ func (kc *kanboardClient) getTagsByProjectHandler(ctx context.Context, request m
 }
 
 func (kc *kanboardClient) createTagHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
-	project_id, err := request.RequireInt("project_id")
+	projectId, err := request.RequireInt("project_id")
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
@@ -4976,10 +4976,10 @@ func (kc *kanboardClient) createTagHandler(ctx context.Context, request mcp.Call
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
-	params := map[string]interface{}{"project_id": project_id, "tag": tag}
-	color_id := request.GetInt("color_id", 0)
-	if color_id != 0 {
-		params["color_id"] = color_id
+	params := map[string]interface{}{"project_id": projectId, "tag": tag}
+	colorId := request.GetInt("color_id", 0)
+	if colorId != 0 {
+		params["color_id"] = colorId
 	}
 	result, err := kc.callKanboardAPI(ctx, "createTag", params)
 	if err != nil {
@@ -4993,7 +4993,7 @@ func (kc *kanboardClient) createTagHandler(ctx context.Context, request mcp.Call
 }
 
 func (kc *kanboardClient) updateTagHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
-	tag_id, err := request.RequireInt("tag_id")
+	tagId, err := request.RequireInt("tag_id")
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
@@ -5001,10 +5001,10 @@ func (kc *kanboardClient) updateTagHandler(ctx context.Context, request mcp.Call
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
-	params := map[string]interface{}{"id": tag_id, "name": tag}
-	color_id := request.GetInt("color_id", 0)
-	if color_id != 0 {
-		params["color_id"] = color_id
+	params := map[string]interface{}{"id": tagId, "name": tag}
+	colorId := request.GetInt("color_id", 0)
+	if colorId != 0 {
+		params["color_id"] = colorId
 	}
 	result, err := kc.callKanboardAPI(ctx, "updateTag", params)
 	if err != nil {
@@ -5018,11 +5018,11 @@ func (kc *kanboardClient) updateTagHandler(ctx context.Context, request mcp.Call
 }
 
 func (kc *kanboardClient) removeTagHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
-	tag_id, err := request.RequireInt("tag_id")
+	tagId, err := request.RequireInt("tag_id")
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
-	params := map[string]interface{}{"id": tag_id}
+	params := map[string]interface{}{"id": tagId}
 	result, err := kc.callKanboardAPI(ctx, "removeTag", params)
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
@@ -5035,11 +5035,11 @@ func (kc *kanboardClient) removeTagHandler(ctx context.Context, request mcp.Call
 }
 
 func (kc *kanboardClient) setTaskTagsHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
-	project_id, err := request.RequireInt("project_id")
+	projectId, err := request.RequireInt("project_id")
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
-	task_id, err := request.RequireInt("task_id")
+	taskId, err := request.RequireInt("task_id")
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
@@ -5047,7 +5047,7 @@ func (kc *kanboardClient) setTaskTagsHandler(ctx context.Context, request mcp.Ca
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
-	params := map[string]interface{}{"project_id": project_id, "task_id": task_id, "tags": tags}
+	params := map[string]interface{}{"project_id": projectId, "task_id": taskId, "tags": tags}
 	result, err := kc.callKanboardAPI(ctx, "setTaskTags", params)
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
@@ -5060,11 +5060,11 @@ func (kc *kanboardClient) setTaskTagsHandler(ctx context.Context, request mcp.Ca
 }
 
 func (kc *kanboardClient) getTaskTagsHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
-	task_id, err := request.RequireInt("task_id")
+	taskId, err := request.RequireInt("task_id")
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
-	params := map[string]interface{}{"task_id": task_id}
+	params := map[string]interface{}{"task_id": taskId}
 	result, err := kc.callKanboardAPI(ctx, "getTaskTags", params)
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
@@ -5739,11 +5739,11 @@ func (kc *kanboardClient) GetSwimlane(swimlaneID int) (interface{}, error) {
 }
 
 func (kc *kanboardClient) getSwimlaneHandler(_ context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
-	swimlane_id, err := request.RequireInt("swimlane_id")
+	swimlaneId, err := request.RequireInt("swimlane_id")
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
-	result, err := kc.GetSwimlane(swimlane_id)
+	result, err := kc.GetSwimlane(swimlaneId)
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
@@ -5755,11 +5755,11 @@ func (kc *kanboardClient) getSwimlaneHandler(_ context.Context, request mcp.Call
 }
 
 func (kc *kanboardClient) getSwimlaneByIdHandler(_ context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
-	swimlane_id, err := request.RequireInt("swimlane_id")
+	swimlaneId, err := request.RequireInt("swimlane_id")
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
-	result, err := kc.GetSwimlaneById(swimlane_id)
+	result, err := kc.GetSwimlaneById(swimlaneId)
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
@@ -5771,11 +5771,11 @@ func (kc *kanboardClient) getSwimlaneByIdHandler(_ context.Context, request mcp.
 }
 
 func (kc *kanboardClient) getActiveSwimlanesHandler(_ context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
-	project_id, err := request.RequireInt("project_id")
+	projectId, err := request.RequireInt("project_id")
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
-	result, err := kc.GetActiveSwimlanes(project_id)
+	result, err := kc.GetActiveSwimlanes(projectId)
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
@@ -5787,11 +5787,11 @@ func (kc *kanboardClient) getActiveSwimlanesHandler(_ context.Context, request m
 }
 
 func (kc *kanboardClient) getAllSwimlanesHandler(_ context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
-	project_id, err := request.RequireInt("project_id")
+	projectId, err := request.RequireInt("project_id")
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
-	result, err := kc.GetAllSwimlanes(project_id)
+	result, err := kc.GetAllSwimlanes(projectId)
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
@@ -5803,7 +5803,7 @@ func (kc *kanboardClient) getAllSwimlanesHandler(_ context.Context, request mcp.
 }
 
 func (kc *kanboardClient) getSwimlaneByNameHandler(_ context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
-	project_id, err := request.RequireInt("project_id")
+	projectId, err := request.RequireInt("project_id")
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
@@ -5811,7 +5811,7 @@ func (kc *kanboardClient) getSwimlaneByNameHandler(_ context.Context, request mc
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
-	result, err := kc.GetSwimlaneByName(project_id, name)
+	result, err := kc.GetSwimlaneByName(projectId, name)
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
@@ -5823,11 +5823,11 @@ func (kc *kanboardClient) getSwimlaneByNameHandler(_ context.Context, request mc
 }
 
 func (kc *kanboardClient) changeSwimlanePositionHandler(_ context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
-	project_id, err := request.RequireInt("project_id")
+	projectId, err := request.RequireInt("project_id")
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
-	swimlane_id, err := request.RequireInt("swimlane_id")
+	swimlaneId, err := request.RequireInt("swimlane_id")
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
@@ -5835,7 +5835,7 @@ func (kc *kanboardClient) changeSwimlanePositionHandler(_ context.Context, reque
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
-	result, err := kc.ChangeSwimlanePosition(project_id, swimlane_id, position)
+	result, err := kc.ChangeSwimlanePosition(projectId, swimlaneId, position)
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
@@ -5843,7 +5843,7 @@ func (kc *kanboardClient) changeSwimlanePositionHandler(_ context.Context, reque
 }
 
 func (kc *kanboardClient) addSwimlaneHandler(_ context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
-	project_id, err := request.RequireInt("project_id")
+	projectId, err := request.RequireInt("project_id")
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
@@ -5852,7 +5852,7 @@ func (kc *kanboardClient) addSwimlaneHandler(_ context.Context, request mcp.Call
 		return mcp.NewToolResultError(err.Error()), nil
 	}
 	description := request.GetString("description", "")
-	result, err := kc.AddSwimlane(project_id, name, description)
+	result, err := kc.AddSwimlane(projectId, name, description)
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
@@ -5860,17 +5860,17 @@ func (kc *kanboardClient) addSwimlaneHandler(_ context.Context, request mcp.Call
 }
 
 func (kc *kanboardClient) updateSwimlaneHandler(_ context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
-	project_id, err := request.RequireInt("project_id")
+	projectId, err := request.RequireInt("project_id")
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
-	swimlane_id, err := request.RequireInt("swimlane_id")
+	swimlaneId, err := request.RequireInt("swimlane_id")
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
 	name := request.GetString("name", "")
 	description := request.GetString("description", "")
-	result, err := kc.UpdateSwimlane(project_id, swimlane_id, name, description)
+	result, err := kc.UpdateSwimlane(projectId, swimlaneId, name, description)
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
@@ -5878,15 +5878,15 @@ func (kc *kanboardClient) updateSwimlaneHandler(_ context.Context, request mcp.C
 }
 
 func (kc *kanboardClient) removeSwimlaneHandler(_ context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
-	project_id, err := request.RequireInt("project_id")
+	projectId, err := request.RequireInt("project_id")
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
-	swimlane_id, err := request.RequireInt("swimlane_id")
+	swimlaneId, err := request.RequireInt("swimlane_id")
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
-	result, err := kc.RemoveSwimlane(project_id, swimlane_id)
+	result, err := kc.RemoveSwimlane(projectId, swimlaneId)
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
@@ -5894,15 +5894,15 @@ func (kc *kanboardClient) removeSwimlaneHandler(_ context.Context, request mcp.C
 }
 
 func (kc *kanboardClient) disableSwimlaneHandler(_ context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
-	project_id, err := request.RequireInt("project_id")
+	projectId, err := request.RequireInt("project_id")
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
-	swimlane_id, err := request.RequireInt("swimlane_id")
+	swimlaneId, err := request.RequireInt("swimlane_id")
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
-	result, err := kc.DisableSwimlane(project_id, swimlane_id)
+	result, err := kc.DisableSwimlane(projectId, swimlaneId)
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
@@ -5910,15 +5910,15 @@ func (kc *kanboardClient) disableSwimlaneHandler(_ context.Context, request mcp.
 }
 
 func (kc *kanboardClient) enableSwimlaneHandler(_ context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
-	project_id, err := request.RequireInt("project_id")
+	projectId, err := request.RequireInt("project_id")
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
-	swimlane_id, err := request.RequireInt("swimlane_id")
+	swimlaneId, err := request.RequireInt("swimlane_id")
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
-	result, err := kc.EnableSwimlane(project_id, swimlane_id)
+	result, err := kc.EnableSwimlane(projectId, swimlaneId)
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
@@ -5991,11 +5991,11 @@ func (kc *kanboardClient) RemoveTaskMetadata(taskID int, name string) (bool, err
 
 // Task Metadata Handlers
 func (kc *kanboardClient) getTaskMetadataHandler(_ context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
-	task_id, err := request.RequireInt("task_id")
+	taskId, err := request.RequireInt("task_id")
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
-	result, err := kc.GetTaskMetadata(task_id)
+	result, err := kc.GetTaskMetadata(taskId)
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
@@ -6007,7 +6007,7 @@ func (kc *kanboardClient) getTaskMetadataHandler(_ context.Context, request mcp.
 }
 
 func (kc *kanboardClient) getTaskMetadataByNameHandler(_ context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
-	task_id, err := request.RequireInt("task_id")
+	taskId, err := request.RequireInt("task_id")
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
@@ -6015,7 +6015,7 @@ func (kc *kanboardClient) getTaskMetadataByNameHandler(_ context.Context, reques
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
-	result, err := kc.GetTaskMetadataByName(task_id, name)
+	result, err := kc.GetTaskMetadataByName(taskId, name)
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
@@ -6023,7 +6023,7 @@ func (kc *kanboardClient) getTaskMetadataByNameHandler(_ context.Context, reques
 }
 
 func (kc *kanboardClient) saveTaskMetadataHandler(_ context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
-	task_id, err := request.RequireInt("task_id")
+	taskId, err := request.RequireInt("task_id")
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
@@ -6044,7 +6044,7 @@ func (kc *kanboardClient) saveTaskMetadataHandler(_ context.Context, request mcp
 		stringValues[key] = strVal
 	}
 
-	result, err := kc.SaveTaskMetadata(task_id, stringValues)
+	result, err := kc.SaveTaskMetadata(taskId, stringValues)
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
@@ -6052,7 +6052,7 @@ func (kc *kanboardClient) saveTaskMetadataHandler(_ context.Context, request mcp
 }
 
 func (kc *kanboardClient) removeTaskMetadataHandler(_ context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
-	task_id, err := request.RequireInt("task_id")
+	taskId, err := request.RequireInt("task_id")
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
@@ -6060,7 +6060,7 @@ func (kc *kanboardClient) removeTaskMetadataHandler(_ context.Context, request m
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
-	result, err := kc.RemoveTaskMetadata(task_id, name)
+	result, err := kc.RemoveTaskMetadata(taskId, name)
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
@@ -6068,7 +6068,7 @@ func (kc *kanboardClient) removeTaskMetadataHandler(_ context.Context, request m
 }
 
 func (kc *kanboardClient) getTaskByReferenceHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
-	project_id, err := request.RequireInt("project_id")
+	projectId, err := request.RequireInt("project_id")
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
@@ -6076,7 +6076,7 @@ func (kc *kanboardClient) getTaskByReferenceHandler(ctx context.Context, request
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
-	params := map[string]interface{}{"project_id": project_id, "reference": reference}
+	params := map[string]interface{}{"project_id": projectId, "reference": reference}
 	result, err := kc.callKanboardAPI(ctx, "getTaskByReference", params)
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
@@ -6089,15 +6089,15 @@ func (kc *kanboardClient) getTaskByReferenceHandler(ctx context.Context, request
 }
 
 func (kc *kanboardClient) getAllTasksHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
-	project_id, err := request.RequireInt("project_id")
+	projectId, err := request.RequireInt("project_id")
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
-	status_id, err := request.RequireInt("status_id")
+	statusId, err := request.RequireInt("status_id")
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
-	params := map[string]interface{}{"project_id": project_id, "status_id": status_id}
+	params := map[string]interface{}{"project_id": projectId, "status_id": statusId}
 	result, err := kc.callKanboardAPI(ctx, "getAllTasks", params)
 	if err != nil {
 		return mcp.NewToolResultError(fmt.Sprintf("Failed to get tasks: %v", err)), nil
@@ -6122,11 +6122,11 @@ func (kc *kanboardClient) getOverdueTasksHandler(ctx context.Context, _ mcp.Call
 }
 
 func (kc *kanboardClient) getOverdueTasksByProjectHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
-	project_id, err := request.RequireInt("project_id")
+	projectId, err := request.RequireInt("project_id")
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
-	params := map[string]interface{}{"project_id": project_id}
+	params := map[string]interface{}{"project_id": projectId}
 	result, err := kc.callKanboardAPI(ctx, "getOverdueTasksByProject", params)
 	if err != nil {
 		return mcp.NewToolResultError(fmt.Sprintf("Failed to get overdue tasks: %v", err)), nil
@@ -6139,11 +6139,11 @@ func (kc *kanboardClient) getOverdueTasksByProjectHandler(ctx context.Context, r
 }
 
 func (kc *kanboardClient) openTaskHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
-	task_id, err := request.RequireInt("task_id")
+	taskId, err := request.RequireInt("task_id")
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
-	params := map[string]interface{}{"task_id": task_id, "status": "open"}
+	params := map[string]interface{}{"task_id": taskId, "status": "open"}
 	result, err := kc.callKanboardAPI(ctx, "updateTask", params)
 	if err != nil {
 		return mcp.NewToolResultError(fmt.Sprintf("Failed to open task: %v", err)), nil
@@ -6156,11 +6156,11 @@ func (kc *kanboardClient) openTaskHandler(ctx context.Context, request mcp.CallT
 }
 
 func (kc *kanboardClient) closeTaskHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
-	task_id, err := request.RequireInt("task_id")
+	taskId, err := request.RequireInt("task_id")
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
-	params := map[string]interface{}{"task_id": task_id, "status": "closed"}
+	params := map[string]interface{}{"task_id": taskId, "status": "closed"}
 	result, err := kc.callKanboardAPI(ctx, "updateTask", params)
 	if err != nil {
 		return mcp.NewToolResultError(fmt.Sprintf("Failed to close task: %v", err)), nil
@@ -6173,34 +6173,34 @@ func (kc *kanboardClient) closeTaskHandler(ctx context.Context, request mcp.Call
 }
 
 func (kc *kanboardClient) moveTaskToProjectHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
-	task_id, err := request.RequireInt("task_id")
+	taskId, err := request.RequireInt("task_id")
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
-	project_id, err := request.RequireInt("project_id")
+	projectId, err := request.RequireInt("project_id")
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
-	swimlane_id := request.GetInt("swimlane_id", 0)
-	column_id := request.GetInt("column_id", 0)
-	category_id := request.GetInt("category_id", 0)
-	owner_id := request.GetInt("owner_id", 0)
+	swimlaneId := request.GetInt("swimlane_id", 0)
+	columnId := request.GetInt("column_id", 0)
+	categoryId := request.GetInt("category_id", 0)
+	ownerId := request.GetInt("owner_id", 0)
 
 	params := map[string]interface{}{
-		"task_id":    task_id,
-		"project_id": project_id,
+		"task_id":    taskId,
+		"project_id": projectId,
 	}
-	if swimlane_id != 0 {
-		params["swimlane_id"] = swimlane_id
+	if swimlaneId != 0 {
+		params["swimlane_id"] = swimlaneId
 	}
-	if column_id != 0 {
-		params["column_id"] = column_id
+	if columnId != 0 {
+		params["column_id"] = columnId
 	}
-	if category_id != 0 {
-		params["category_id"] = category_id
+	if categoryId != 0 {
+		params["category_id"] = categoryId
 	}
-	if owner_id != 0 {
-		params["owner_id"] = owner_id
+	if ownerId != 0 {
+		params["owner_id"] = ownerId
 	}
 
 	result, err := kc.callKanboardAPI(ctx, "moveTaskToProject", params)
@@ -6217,34 +6217,34 @@ func (kc *kanboardClient) moveTaskToProjectHandler(ctx context.Context, request 
 }
 
 func (kc *kanboardClient) duplicateTaskToProjectHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
-	task_id, err := request.RequireInt("task_id")
+	taskId, err := request.RequireInt("task_id")
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
-	project_id, err := request.RequireInt("project_id")
+	projectId, err := request.RequireInt("project_id")
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
-	swimlane_id := request.GetInt("swimlane_id", 0)
-	column_id := request.GetInt("column_id", 0)
-	category_id := request.GetInt("category_id", 0)
-	owner_id := request.GetInt("owner_id", 0)
+	swimlaneId := request.GetInt("swimlane_id", 0)
+	columnId := request.GetInt("column_id", 0)
+	categoryId := request.GetInt("category_id", 0)
+	ownerId := request.GetInt("owner_id", 0)
 
 	params := map[string]interface{}{
-		"task_id":    task_id,
-		"project_id": project_id,
+		"task_id":    taskId,
+		"project_id": projectId,
 	}
-	if swimlane_id != 0 {
-		params["swimlane_id"] = swimlane_id
+	if swimlaneId != 0 {
+		params["swimlane_id"] = swimlaneId
 	}
-	if column_id != 0 {
-		params["column_id"] = column_id
+	if columnId != 0 {
+		params["column_id"] = columnId
 	}
-	if category_id != 0 {
-		params["category_id"] = category_id
+	if categoryId != 0 {
+		params["category_id"] = categoryId
 	}
-	if owner_id != 0 {
-		params["owner_id"] = owner_id
+	if ownerId != 0 {
+		params["owner_id"] = ownerId
 	}
 
 	result, err := kc.callKanboardAPI(ctx, "duplicateTaskToProject", params)
@@ -6261,7 +6261,7 @@ func (kc *kanboardClient) duplicateTaskToProjectHandler(ctx context.Context, req
 }
 
 func (kc *kanboardClient) searchTasksHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
-	project_id, err := request.RequireInt("project_id")
+	projectId, err := request.RequireInt("project_id")
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
@@ -6271,7 +6271,7 @@ func (kc *kanboardClient) searchTasksHandler(ctx context.Context, request mcp.Ca
 	}
 
 	params := map[string]interface{}{
-		"project_id": project_id,
+		"project_id": projectId,
 		"query":      query,
 	}
 
@@ -6308,11 +6308,11 @@ func (kc *kanboardClient) createLdapUserHandler(ctx context.Context, request mcp
 }
 
 func (kc *kanboardClient) getUserHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
-	user_id, err := request.RequireInt("user_id")
+	userId, err := request.RequireInt("user_id")
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
-	params := map[string]int{"user_id": user_id}
+	params := map[string]int{"user_id": userId}
 	result, err := kc.callKanboardAPI(ctx, "getUser", params)
 	if err != nil {
 		return mcp.NewToolResultError(fmt.Sprintf("Failed to get user: %v", err)), nil
@@ -6327,11 +6327,11 @@ func (kc *kanboardClient) getUserHandler(ctx context.Context, request mcp.CallTo
 }
 
 func (kc *kanboardClient) disableUserHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
-	user_id, err := request.RequireInt("user_id")
+	userId, err := request.RequireInt("user_id")
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
-	params := map[string]int{"user_id": user_id}
+	params := map[string]int{"user_id": userId}
 	result, err := kc.callKanboardAPI(ctx, "disableUser", params)
 	if err != nil {
 		return mcp.NewToolResultError(fmt.Sprintf("Failed to disable user: %v", err)), nil
@@ -6346,11 +6346,11 @@ func (kc *kanboardClient) disableUserHandler(ctx context.Context, request mcp.Ca
 }
 
 func (kc *kanboardClient) enableUserHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
-	user_id, err := request.RequireInt("user_id")
+	userId, err := request.RequireInt("user_id")
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
-	params := map[string]int{"user_id": user_id}
+	params := map[string]int{"user_id": userId}
 	result, err := kc.callKanboardAPI(ctx, "enableUser", params)
 	if err != nil {
 		return mcp.NewToolResultError(fmt.Sprintf("Failed to enable user: %v", err)), nil
@@ -6365,11 +6365,11 @@ func (kc *kanboardClient) enableUserHandler(ctx context.Context, request mcp.Cal
 }
 
 func (kc *kanboardClient) isActiveUserHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
-	user_id, err := request.RequireInt("user_id")
+	userId, err := request.RequireInt("user_id")
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
-	params := map[string]int{"user_id": user_id}
+	params := map[string]int{"user_id": userId}
 	result, err := kc.callKanboardAPI(ctx, "isActiveUser", params)
 	if err != nil {
 		return mcp.NewToolResultError(fmt.Sprintf("Failed to check if user is active: %v", err)), nil
