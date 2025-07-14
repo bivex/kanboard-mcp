@@ -124,8 +124,17 @@ After saving the configuration, restart your MCP client (Cursor, Claude Desktop,
 | `move_task` | ➡️ Move tasks between columns | "Move task 123 to 'Done' column" |
 | `assign_task` | 👤 Assign tasks to users | "Assign the API task to John" |
 | `set_task_due_date` | 📅 Set task deadlines | "Set due date for login task to 2024-01-15" |
-| `add_task_comment` | 💬 Add task comments | "Add comment 'Testing completed' to task 123" |
-| `get_task_comments` | 📝 Get task comments | "Show all comments on task 123" |
+| `get_all_comments` | 📋 Get all available comments | "Show all comments for task 123" |
+
+### 💬 Comment Management
+
+| Tool | Description | Example |
+|------|-------------|---------|
+| `create_comment` | ➕ Create a new comment | "Create a comment 'Meeting notes' for task 123 by user 1, visible to app-managers" |
+| `get_comment` | 🔍 Get comment information | "Get details for comment 789" |
+| `get_all_comments` | 📋 Get all available comments | "Show all comments for task 123" |
+| `update_comment` | ✏️ Update a comment | "Update comment 456 content to 'Revised notes'" |
+| `remove_comment` | 🗑️ Remove a comment | "Remove comment with ID 101" |
 
 ### 🏗️ Column Management
 

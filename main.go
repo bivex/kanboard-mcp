@@ -160,8 +160,8 @@ func main() {
 	)
 	s.AddTool(tool, kbClient.setTaskDueDateHandler)
 
-	tool = mcp.NewTool("add_task_comment",
-		mcp.WithDescription("Add task comments"),
+	tool = mcp.NewTool("create_comment",
+		mcp.WithDescription("Create a new comment"),
 		mcp.WithNumber("task_id",
 			mcp.Required(),
 			mcp.Description("ID of the task to add a comment to"),
@@ -170,12 +170,18 @@ func main() {
 			mcp.Required(),
 			mcp.Description("ID of the user adding the comment"),
 		),
-		mcp.WithString("comment",
+		mcp.WithString("content",
 			mcp.Required(),
-			mcp.Description("Content of the comment"),
+			mcp.Description("Markdown content for the comment"),
+		),
+		mcp.WithString("reference",
+			mcp.Description("External reference for the comment"),
+		),
+		mcp.WithString("visibility",
+			mcp.Description("Visibility of the comment (app-user, app-manager, app-admin)"),
 		),
 	)
-	s.AddTool(tool, kbClient.addTaskCommentHandler)
+	s.AddTool(tool, kbClient.createCommentHandler)
 
 	tool = mcp.NewTool("get_task_comments",
 		mcp.WithDescription("Get task comments"),
@@ -185,6 +191,37 @@ func main() {
 		),
 	)
 	s.AddTool(tool, kbClient.getTaskCommentsHandler)
+
+	tool = mcp.NewTool("get_comment",
+		mcp.WithDescription("Get comment information"),
+		mcp.WithNumber("comment_id",
+			mcp.Required(),
+			mcp.Description("ID of the comment to get details for"),
+		),
+	)
+	s.AddTool(tool, kbClient.getCommentHandler)
+
+	tool = mcp.NewTool("update_comment",
+		mcp.WithDescription("Update a comment"),
+		mcp.WithNumber("id",
+			mcp.Required(),
+			mcp.Description("ID of the comment to update"),
+		),
+		mcp.WithString("content",
+			mcp.Required(),
+			mcp.Description("New Markdown content for the comment"),
+		),
+	)
+	s.AddTool(tool, kbClient.updateCommentHandler)
+
+	tool = mcp.NewTool("remove_comment",
+		mcp.WithDescription("Remove a comment"),
+		mcp.WithNumber("comment_id",
+			mcp.Required(),
+			mcp.Description("ID of the comment to remove"),
+		),
+	)
+	s.AddTool(tool, kbClient.removeCommentHandler)
 
 	tool = mcp.NewTool("assign_user_to_project",
 		mcp.WithDescription("Assign a user to a project with a specific role"),
@@ -1404,7 +1441,7 @@ func (kc *kanboardClient) setTaskDueDateHandler(ctx context.Context, request mcp
 	return mcp.NewToolResultText(string(resultBytes)), nil
 }
 
-func (kc *kanboardClient) addTaskCommentHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+func (kc *kanboardClient) createCommentHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
 	task_id, err := request.RequireInt("task_id")
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
@@ -1413,7 +1450,7 @@ func (kc *kanboardClient) addTaskCommentHandler(ctx context.Context, request mcp
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
-	comment, err := request.RequireString("comment")
+	content, err := request.RequireString("content")
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
@@ -1421,11 +1458,34 @@ func (kc *kanboardClient) addTaskCommentHandler(ctx context.Context, request mcp
 	params := map[string]interface{}{
 		"task_id": task_id,
 		"user_id": user_id,
-		"content": comment,
+		"content": content,
 	}
-	result, err := kc.callKanboardAPI(ctx, "addComment", params)
+
+	reference := request.GetString("reference", "")
+	if reference != "" {
+		params["reference"] = reference
+	}
+
+	visibility := request.GetString("visibility", "")
+	if visibility != "" {
+		// Validate visibility
+		validVisibilities := []string{"app-user", "app-manager", "app-admin"}
+		visibilityValid := false
+		for _, validVisibility := range validVisibilities {
+			if visibility == validVisibility {
+				visibilityValid = true
+				break
+			}
+		}
+		if !visibilityValid {
+			return mcp.NewToolResultError(fmt.Sprintf("Invalid visibility '%s'. Valid visibilities are: %v", visibility, validVisibilities)), nil
+		}
+		params["visibility"] = visibility
+	}
+
+	result, err := kc.callKanboardAPI(ctx, "createComment", params)
 	if err != nil {
-		return mcp.NewToolResultError(fmt.Sprintf("Failed to add task comment: %v", err)), nil
+		return mcp.NewToolResultError(fmt.Sprintf("Failed to create comment: %v", err)), nil
 	}
 
 	resultBytes, err := json.MarshalIndent(result, "", "  ")
@@ -1445,6 +1505,68 @@ func (kc *kanboardClient) getTaskCommentsHandler(ctx context.Context, request mc
 	result, err := kc.callKanboardAPI(ctx, "getAllComments", params)
 	if err != nil {
 		return mcp.NewToolResultError(fmt.Sprintf("Failed to get task comments: %v", err)), nil
+	}
+
+	resultBytes, err := json.MarshalIndent(result, "", "  ")
+	if err != nil {
+		return mcp.NewToolResultError(fmt.Sprintf("Failed to marshal API result: %v", err)), nil
+	}
+
+	return mcp.NewToolResultText(string(resultBytes)), nil
+}
+
+func (kc *kanboardClient) getCommentHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+	comment_id, err := request.RequireInt("comment_id")
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	params := map[string]int{"comment_id": comment_id}
+	result, err := kc.callKanboardAPI(ctx, "getComment", params)
+	if err != nil {
+		return mcp.NewToolResultError(fmt.Sprintf("Failed to get comment details: %v", err)), nil
+	}
+
+	resultBytes, err := json.MarshalIndent(result, "", "  ")
+	if err != nil {
+		return mcp.NewToolResultError(fmt.Sprintf("Failed to marshal API result: %v", err)), nil
+	}
+
+	return mcp.NewToolResultText(string(resultBytes)), nil
+}
+
+func (kc *kanboardClient) updateCommentHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+	id, err := request.RequireInt("id")
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	content, err := request.RequireString("content")
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+
+	params := map[string]interface{}{"id": id, "content": content}
+	result, err := kc.callKanboardAPI(ctx, "updateComment", params)
+	if err != nil {
+		return mcp.NewToolResultError(fmt.Sprintf("Failed to update comment: %v", err)), nil
+	}
+
+	resultBytes, err := json.MarshalIndent(result, "", "  ")
+	if err != nil {
+		return mcp.NewToolResultError(fmt.Sprintf("Failed to marshal API result: %v", err)), nil
+	}
+
+	return mcp.NewToolResultText(string(resultBytes)), nil
+}
+
+func (kc *kanboardClient) removeCommentHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+	comment_id, err := request.RequireInt("comment_id")
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	params := map[string]int{"comment_id": comment_id}
+	result, err := kc.callKanboardAPI(ctx, "removeComment", params)
+	if err != nil {
+		return mcp.NewToolResultError(fmt.Sprintf("Failed to remove comment: %v", err)), nil
 	}
 
 	resultBytes, err := json.MarshalIndent(result, "", "  ")
