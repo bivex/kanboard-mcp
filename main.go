@@ -186,6 +186,22 @@ func main() {
 	)
 	s.AddTool(tool, kbClient.getTaskCommentsHandler)
 
+	tool = mcp.NewTool("assign_user_to_project",
+		mcp.WithDescription("Assign a user to a project with a specific role"),
+		mcp.WithString("project_id",
+			mcp.Required(),
+			mcp.Description("ID of the project to assign the user to"),
+		),
+		mcp.WithNumber("user_id",
+			mcp.Required(),
+			mcp.Description("ID of the user to assign"),
+		),
+		mcp.WithString("role",
+			mcp.Description("Role to assign (e.g., project-member, project-manager)"),
+		),
+	)
+	s.AddTool(tool, kbClient.assignUserToProjectHandler)
+
 	tool = mcp.NewTool("get_user_by_name",
 		mcp.WithDescription("Get user by name"),
 		mcp.WithString("username",
@@ -246,7 +262,7 @@ func main() {
 
 	tool = mcp.NewTool("get_columns",
 		mcp.WithDescription("List project columns"),
-		mcp.WithNumber("project_id",
+		mcp.WithString("project_id",
 			mcp.Required(),
 			mcp.Description("ID of the project to get columns from"),
 		),
@@ -880,9 +896,13 @@ func (kc *kanboardClient) removeUserHandler(ctx context.Context, request mcp.Cal
 }
 
 func (kc *kanboardClient) getColumnsHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
-	project_id, err := request.RequireInt("project_id")
+	project_id_str, err := request.RequireString("project_id")
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
+	}
+	project_id, err := strconv.Atoi(project_id_str)
+	if err != nil {
+		return mcp.NewToolResultError(fmt.Sprintf("Invalid project_id: %v", err)), nil
 	}
 
 	params := map[string]int{"project_id": project_id}
@@ -1004,9 +1024,13 @@ func (kc *kanboardClient) deleteColumnHandler(ctx context.Context, request mcp.C
 }
 
 func (kc *kanboardClient) reorderColumnsHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
-	project_id, err := request.RequireInt("project_id")
+	project_id_str, err := request.RequireString("project_id")
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
+	}
+	project_id, err := strconv.Atoi(project_id_str)
+	if err != nil {
+		return mcp.NewToolResultError(fmt.Sprintf("Invalid project_id: %v", err)), nil
 	}
 	new_position, err := request.RequireInt("new_position")
 	if err != nil {
@@ -1313,6 +1337,42 @@ func (kc *kanboardClient) getTaskCommentsHandler(ctx context.Context, request mc
 	result, err := kc.callKanboardAPI(ctx, "getAllComments", params)
 	if err != nil {
 		return mcp.NewToolResultError(fmt.Sprintf("Failed to get task comments: %v", err)), nil
+	}
+
+	resultBytes, err := json.MarshalIndent(result, "", "  ")
+	if err != nil {
+		return mcp.NewToolResultError(fmt.Sprintf("Failed to marshal API result: %v", err)), nil
+	}
+
+	return mcp.NewToolResultText(string(resultBytes)), nil
+}
+
+func (kc *kanboardClient) assignUserToProjectHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+	project_id_str, err := request.RequireString("project_id")
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	project_id, err := strconv.Atoi(project_id_str)
+	if err != nil {
+		return mcp.NewToolResultError(fmt.Sprintf("Invalid project_id: %v", err)), nil
+	}
+
+	user_id, err := request.RequireInt("user_id")
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+
+	role := request.GetString("role", "project-member") // Default to project-member
+
+	params := map[string]interface{}{
+		"project_id": project_id,
+		"user_id":    user_id,
+		"role":       role,
+	}
+
+	result, err := kc.callKanboardAPI(ctx, "addProjectUser", params) // Assuming addProjectUser API call
+	if err != nil {
+		return mcp.NewToolResultError(fmt.Sprintf("Failed to assign user to project: %v", err)), nil
 	}
 
 	resultBytes, err := json.MarshalIndent(result, "", "  ")
