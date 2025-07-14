@@ -133,19 +133,27 @@ After saving the configuration, restart your MCP client (Cursor, Claude Desktop,
 | `create_task` | ➕ Create new tasks | "Create task 'Design homepage' in 'Website Redesign'" |
 | `update_task` | ✏️ Modify existing tasks | "Update task 123 with description 'New requirements'" |
 | `delete_task` | 🗑️ Remove tasks | "Delete task with ID 456" |
-| `get_task_details` | 🔍 Get detailed task info | "Get details for task 789" |
-| `move_task` | ➡️ Move tasks between columns | "Move task 123 to 'Done' column" |
+| `get_task` | 🔍 Get task by the unique id | "Get details for task 789" |
+| `get_task_by_reference` | 🔍 Get task by the external reference | "Get task for project 1 with reference 'TICKET-1234'" |
+| `get_all_tasks` | 📋 Get all available tasks | "Get all active tasks for project 1" |
+| `get_overdue_tasks` | ⏰ Get all overdue tasks | "Show me all overdue tasks" |
+| `get_overdue_tasks_by_project` | ⏰ Get all overdue tasks for a special project | "Show me overdue tasks for project 1" |
+| `open_task` | ✅ Set a task to the status open | "Open task 123" |
+| `close_task` | ❌ Set a task to the status close | "Close task 123" |
+| `move_task_position` | ➡️ Move a task to another column, position or swimlane inside the same board | "Move task 123 to column 2, position 1, swimlane 1 in project 1" |
+| `move_task_to_project` | ➡️ Move a task to another project | "Move task 123 to project 456" |
+| `duplicate_task_to_project` | 📋 Duplicate a task to another project | "Duplicate task 123 to project 456" |
+| `search_tasks` | 🔍 Find tasks by using the search engine | "Search tasks in project 2 for query 'assignee:nobody'" |
 | `assign_task` | 👤 Assign tasks to users | "Assign the API task to John" |
 | `set_task_due_date` | 📅 Set task deadlines | "Set due date for login task to 2024-01-15" |
-| `get_all_comments` | 📋 Get all available comments | "Show all comments for task 123" |
 
 ### 💬 Comment Management
 
 | Tool | Description | Example |
 |------|-------------|---------|
 | `create_comment` | ➕ Create a new comment | "Create a comment 'Meeting notes' for task 123 by user 1, visible to app-managers" |
+| `get_task_comments` | 📋 Get task comments | "Show all comments for task 123" |
 | `get_comment` | 🔍 Get comment information | "Get details for comment 789" |
-| `get_all_comments` | 📋 Get all available comments | "Show all comments for task 123" |
 | `update_comment` | ✏️ Update a comment | "Update comment 456 content to 'Revised notes'" |
 | `remove_comment` | 🗑️ Remove a comment | "Remove comment with ID 101" |
 

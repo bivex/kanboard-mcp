@@ -107,20 +107,118 @@ func main() {
 			mcp.Required(),
 			mcp.Description("Title of the task to create"),
 		),
+		mcp.WithString("color_id",
+			mcp.Description("Color ID for the task (optional)"),
+		),
+		mcp.WithNumber("column_id",
+			mcp.Description("ID of the column to add the task to (optional)"),
+		),
+		mcp.WithNumber("owner_id",
+			mcp.Description("ID of the task owner (optional)"),
+		),
+		mcp.WithNumber("creator_id",
+			mcp.Description("ID of the task creator (optional)"),
+		),
+		mcp.WithString("date_due",
+			mcp.Description("Due date in YYYY-MM-DD HH:MM format (optional)"),
+		),
+		mcp.WithString("description",
+			mcp.Description("Markdown content for the task description (optional)"),
+		),
+		mcp.WithNumber("category_id",
+			mcp.Description("ID of the task category (optional)"),
+		),
+		mcp.WithNumber("score",
+			mcp.Description("Complexity score of the task (optional)"),
+		),
+		mcp.WithNumber("swimlane_id",
+			mcp.Description("ID of the swimlane to add the task to (optional)"),
+		),
+		mcp.WithNumber("priority",
+			mcp.Description("Priority of the task (optional)"),
+		),
+		mcp.WithNumber("recurrence_status",
+			mcp.Description("Recurrence status of the task (optional)"),
+		),
+		mcp.WithNumber("recurrence_trigger",
+			mcp.Description("Recurrence trigger of the task (optional)"),
+		),
+		mcp.WithNumber("recurrence_factor",
+			mcp.Description("Recurrence factor of the task (optional)"),
+		),
+		mcp.WithNumber("recurrence_timeframe",
+			mcp.Description("Recurrence timeframe of the task (optional)"),
+		),
+		mcp.WithNumber("recurrence_basedate",
+			mcp.Description("Recurrence base date of the task (optional)"),
+		),
+		mcp.WithString("reference",
+			mcp.Description("External reference for the task (optional)"),
+		),
+		mcp.WithArray("tags",
+			mcp.WithStringItems(),
+			mcp.Description("List of tags (array of strings) (optional)"),
+		),
+		mcp.WithString("date_started",
+			mcp.Description("Start date in YYYY-MM-DD HH:MM format (optional)"),
+		),
 	)
 	s.AddTool(tool, kbClient.createTaskHandler)
 
 	tool = mcp.NewTool("update_task",
-		mcp.WithDescription("Modify existing tasks"),
-		mcp.WithNumber("task_id",
+		mcp.WithDescription("Update a task"),
+		mcp.WithNumber("id",
 			mcp.Required(),
 			mcp.Description("ID of the task to update"),
 		),
-		mcp.WithString("description",
-			mcp.Description("New description for the task"),
-		),
 		mcp.WithString("title",
-			mcp.Description("New title for the task"),
+			mcp.Description("New title for the task (optional)"),
+		),
+		mcp.WithString("color_id",
+			mcp.Description("New color ID for the task (optional)"),
+		),
+		mcp.WithNumber("owner_id",
+			mcp.Description("New owner ID for the task (optional)"),
+		),
+		mcp.WithString("date_due",
+			mcp.Description("New due date in YYYY-MM-DD HH:MM format (optional)"),
+		),
+		mcp.WithString("description",
+			mcp.Description("New Markdown content for the task description (optional)"),
+		),
+		mcp.WithNumber("category_id",
+			mcp.Description("New ID of the task category (optional)"),
+		),
+		mcp.WithNumber("score",
+			mcp.Description("New complexity score of the task (optional)"),
+		),
+		mcp.WithNumber("priority",
+			mcp.Description("New priority of the task (optional)"),
+		),
+		mcp.WithNumber("recurrence_status",
+			mcp.Description("New recurrence status of the task (optional)"),
+		),
+		mcp.WithNumber("recurrence_trigger",
+			mcp.Description("New recurrence trigger of the task (optional)"),
+		),
+		mcp.WithNumber("recurrence_factor",
+			mcp.Description("New recurrence factor of the task (optional)"),
+		),
+		mcp.WithNumber("recurrence_timeframe",
+			mcp.Description("New recurrence timeframe of the task (optional)"),
+		),
+		mcp.WithNumber("recurrence_basedate",
+			mcp.Description("New recurrence base date of the task (optional)"),
+		),
+		mcp.WithString("reference",
+			mcp.Description("New external reference for the task (optional)"),
+		),
+		mcp.WithArray("tags",
+			mcp.WithStringItems(),
+			mcp.Description("New list of tags (array of strings) (optional)"),
+		),
+		mcp.WithString("date_started",
+			mcp.Description("New start date in YYYY-MM-DD HH:MM format (optional)"),
 		),
 	)
 	s.AddTool(tool, kbClient.updateTaskHandler)
@@ -134,27 +232,39 @@ func main() {
 	)
 	s.AddTool(tool, kbClient.deleteTaskHandler)
 
-	tool = mcp.NewTool("get_task_details",
-		mcp.WithDescription("Get detailed task info"),
+	tool = mcp.NewTool("get_task",
+		mcp.WithDescription("Get task by the unique id"),
 		mcp.WithNumber("task_id",
 			mcp.Required(),
 			mcp.Description("ID of the task to get details for"),
 		),
 	)
-	s.AddTool(tool, kbClient.getTaskDetailsHandler)
+	s.AddTool(tool, kbClient.getTaskHandler)
 
-	tool = mcp.NewTool("move_task",
-		mcp.WithDescription("Move tasks between columns"),
+	tool = mcp.NewTool("move_task_position",
+		mcp.WithDescription("Move a task to another column, position or swimlane inside the same board"),
+		mcp.WithNumber("project_id",
+			mcp.Required(),
+			mcp.Description("ID of the project containing the task"),
+		),
 		mcp.WithNumber("task_id",
 			mcp.Required(),
 			mcp.Description("ID of the task to move"),
 		),
-		mcp.WithString("column_name",
+		mcp.WithNumber("column_id",
 			mcp.Required(),
-			mcp.Description("Name of the column to move the task to"),
+			mcp.Description("ID of the column to move the task to"),
+		),
+		mcp.WithNumber("position",
+			mcp.Required(),
+			mcp.Description("New position for the task (must be >= 1)"),
+		),
+		mcp.WithNumber("swimlane_id",
+			mcp.Required(),
+			mcp.Description("ID of the swimlane to move the task to"),
 		),
 	)
-	s.AddTool(tool, kbClient.moveTaskHandler)
+	s.AddTool(tool, kbClient.moveTaskPositionHandler)
 
 	tool = mcp.NewTool("get_users",
 		mcp.WithDescription("List all system users"),
@@ -1809,6 +1919,127 @@ func main() {
 	)
 	s.AddTool(tool, kbClient.removeActionHandler)
 
+	tool = mcp.NewTool("get_task_by_reference",
+		mcp.WithDescription("Get task by the external reference"),
+		mcp.WithNumber("project_id",
+			mcp.Required(),
+			mcp.Description("ID of the project"),
+		),
+		mcp.WithString("reference",
+			mcp.Required(),
+			mcp.Description("External reference for the task"),
+		),
+	)
+	s.AddTool(tool, kbClient.getTaskByReferenceHandler)
+
+	tool = mcp.NewTool("get_all_tasks",
+		mcp.WithDescription("Get all available tasks"),
+		mcp.WithNumber("project_id",
+			mcp.Required(),
+			mcp.Description("ID of the project to get tasks from"),
+		),
+		mcp.WithNumber("status_id",
+			mcp.Required(),
+			mcp.Description("The value 1 for active tasks and 0 for inactive"),
+		),
+	)
+	s.AddTool(tool, kbClient.getAllTasksHandler)
+
+	tool = mcp.NewTool("get_overdue_tasks",
+		mcp.WithDescription("Get all overdue tasks"),
+	)
+	s.AddTool(tool, kbClient.getOverdueTasksHandler)
+
+	tool = mcp.NewTool("get_overdue_tasks_by_project",
+		mcp.WithDescription("Get all overdue tasks for a special project"),
+		mcp.WithNumber("project_id",
+			mcp.Required(),
+			mcp.Description("ID of the project"),
+		),
+	)
+	s.AddTool(tool, kbClient.getOverdueTasksByProjectHandler)
+
+	tool = mcp.NewTool("open_task",
+		mcp.WithDescription("Set a task to the status open"),
+		mcp.WithNumber("task_id",
+			mcp.Required(),
+			mcp.Description("ID of the task to open"),
+		),
+	)
+	s.AddTool(tool, kbClient.openTaskHandler)
+
+	tool = mcp.NewTool("close_task",
+		mcp.WithDescription("Set a task to the status close"),
+		mcp.WithNumber("task_id",
+			mcp.Required(),
+			mcp.Description("ID of the task to close"),
+		),
+	)
+	s.AddTool(tool, kbClient.closeTaskHandler)
+
+	tool = mcp.NewTool("move_task_to_project",
+		mcp.WithDescription("Move a task to another project"),
+		mcp.WithNumber("task_id",
+			mcp.Required(),
+			mcp.Description("ID of the task to move"),
+		),
+		mcp.WithNumber("project_id",
+			mcp.Required(),
+			mcp.Description("ID of the project to move the task to"),
+		),
+		mcp.WithNumber("swimlane_id",
+			mcp.Description("ID of the swimlane (optional)"),
+		),
+		mcp.WithNumber("column_id",
+			mcp.Description("ID of the column (optional)"),
+		),
+		mcp.WithNumber("category_id",
+			mcp.Description("ID of the category (optional)"),
+		),
+		mcp.WithNumber("owner_id",
+			mcp.Description("ID of the owner (optional)"),
+		),
+	)
+	s.AddTool(tool, kbClient.moveTaskToProjectHandler)
+
+	tool = mcp.NewTool("duplicate_task_to_project",
+		mcp.WithDescription("Duplicate a task to another project"),
+		mcp.WithNumber("task_id",
+			mcp.Required(),
+			mcp.Description("ID of the task to duplicate"),
+		),
+		mcp.WithNumber("project_id",
+			mcp.Required(),
+			mcp.Description("ID of the project to duplicate the task to"),
+		),
+		mcp.WithNumber("swimlane_id",
+			mcp.Description("ID of the swimlane (optional)"),
+		),
+		mcp.WithNumber("column_id",
+			mcp.Description("ID of the column (optional)"),
+		),
+		mcp.WithNumber("category_id",
+			mcp.Description("ID of the category (optional)"),
+		),
+		mcp.WithNumber("owner_id",
+			mcp.Description("ID of the owner (optional)"),
+		),
+	)
+	s.AddTool(tool, kbClient.duplicateTaskToProjectHandler)
+
+	tool = mcp.NewTool("search_tasks",
+		mcp.WithDescription("Find tasks by using the search engine"),
+		mcp.WithNumber("project_id",
+			mcp.Required(),
+			mcp.Description("ID of the project to search tasks in"),
+		),
+		mcp.WithString("query",
+			mcp.Required(),
+			mcp.Description("Search query string"),
+		),
+	)
+	s.AddTool(tool, kbClient.searchTasksHandler)
+
 	// Start the stdio server
 	if err := server.ServeStdio(s); err != nil {
 		fmt.Printf("Server error: %v\n", err)
@@ -2048,6 +2279,97 @@ func (kc *kanboardClient) createTaskHandler(ctx context.Context, request mcp.Cal
 		"project_id": projectInfo.ID,
 		"title":      title,
 	}
+
+	color_id := request.GetString("color_id", "")
+	if color_id != "" {
+		params["color_id"] = color_id
+	}
+
+	column_id := request.GetInt("column_id", 0)
+	if column_id != 0 {
+		params["column_id"] = column_id
+	}
+
+	owner_id := request.GetInt("owner_id", 0)
+	if owner_id != 0 {
+		params["owner_id"] = owner_id
+	}
+
+	creator_id := request.GetInt("creator_id", 0)
+	if creator_id != 0 {
+		params["creator_id"] = creator_id
+	}
+
+	date_due := request.GetString("date_due", "")
+	if date_due != "" {
+		params["date_due"] = date_due
+	}
+
+	description := request.GetString("description", "")
+	if description != "" {
+		params["description"] = description
+	}
+
+	category_id := request.GetInt("category_id", 0)
+	if category_id != 0 {
+		params["category_id"] = category_id
+	}
+
+	score := request.GetInt("score", 0)
+	if score != 0 {
+		params["score"] = score
+	}
+
+	swimlane_id := request.GetInt("swimlane_id", 0)
+	if swimlane_id != 0 {
+		params["swimlane_id"] = swimlane_id
+	}
+
+	priority := request.GetInt("priority", 0)
+	if priority != 0 {
+		params["priority"] = priority
+	}
+
+	recurrence_status := request.GetInt("recurrence_status", 0)
+	if recurrence_status != 0 {
+		params["recurrence_status"] = recurrence_status
+	}
+
+	recurrence_trigger := request.GetInt("recurrence_trigger", 0)
+	if recurrence_trigger != 0 {
+		params["recurrence_trigger"] = recurrence_trigger
+	}
+
+	recurrence_factor := request.GetInt("recurrence_factor", 0)
+	if recurrence_factor != 0 {
+		params["recurrence_factor"] = recurrence_factor
+	}
+
+	recurrence_timeframe := request.GetInt("recurrence_timeframe", 0)
+	if recurrence_timeframe != 0 {
+		params["recurrence_timeframe"] = recurrence_timeframe
+	}
+
+	recurrence_basedate := request.GetInt("recurrence_basedate", 0)
+	if recurrence_basedate != 0 {
+		params["recurrence_basedate"] = recurrence_basedate
+	}
+
+	reference := request.GetString("reference", "")
+	if reference != "" {
+		params["reference"] = reference
+	}
+
+	tags := request.GetStringSlice("tags", []string{})
+	if len(tags) > 0 {
+		params["tags"] = tags
+	}
+
+	date_started := request.GetString("date_started", "")
+	if date_started != "" {
+		params["date_started"] = date_started
+	}
+
 	result, err = kc.callKanboardAPI(ctx, "createTask", params)
 	if err != nil {
 		return mcp.NewToolResultError(fmt.Sprintf("Failed to create task: %v", err)), nil
@@ -2062,21 +2384,91 @@ func (kc *kanboardClient) createTaskHandler(ctx context.Context, request mcp.Cal
 }
 
 func (kc *kanboardClient) updateTaskHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
-	task_id, err := request.RequireInt("task_id")
+	id, err := request.RequireInt("id")
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
 
-	params := map[string]interface{}{"id": task_id}
+	params := map[string]interface{}{"id": id}
+
+	title := request.GetString("title", "")
+	if title != "" {
+		params["title"] = title
+	}
+
+	color_id := request.GetString("color_id", "")
+	if color_id != "" {
+		params["color_id"] = color_id
+	}
+
+	owner_id := request.GetInt("owner_id", 0)
+	if owner_id != 0 {
+		params["owner_id"] = owner_id
+	}
+
+	date_due := request.GetString("date_due", "")
+	if date_due != "" {
+		params["date_due"] = date_due
+	}
 
 	description := request.GetString("description", "")
 	if description != "" {
 		params["description"] = description
 	}
 
-	title := request.GetString("title", "")
-	if title != "" {
-		params["title"] = title
+	category_id := request.GetInt("category_id", 0)
+	if category_id != 0 {
+		params["category_id"] = category_id
+	}
+
+	score := request.GetInt("score", 0)
+	if score != 0 {
+		params["score"] = score
+	}
+
+	priority := request.GetInt("priority", 0)
+	if priority != 0 {
+		params["priority"] = priority
+	}
+
+	recurrence_status := request.GetInt("recurrence_status", 0)
+	if recurrence_status != 0 {
+		params["recurrence_status"] = recurrence_status
+	}
+
+	recurrence_trigger := request.GetInt("recurrence_trigger", 0)
+	if recurrence_trigger != 0 {
+		params["recurrence_trigger"] = recurrence_trigger
+	}
+
+	recurrence_factor := request.GetInt("recurrence_factor", 0)
+	if recurrence_factor != 0 {
+		params["recurrence_factor"] = recurrence_factor
+	}
+
+	recurrence_timeframe := request.GetInt("recurrence_timeframe", 0)
+	if recurrence_timeframe != 0 {
+		params["recurrence_timeframe"] = recurrence_timeframe
+	}
+
+	recurrence_basedate := request.GetInt("recurrence_basedate", 0)
+	if recurrence_basedate != 0 {
+		params["recurrence_basedate"] = recurrence_basedate
+	}
+
+	reference := request.GetString("reference", "")
+	if reference != "" {
+		params["reference"] = reference
+	}
+
+	tags := request.GetStringSlice("tags", []string{})
+	if len(tags) > 0 {
+		params["tags"] = tags
+	}
+
+	date_started := request.GetString("date_started", "")
+	if date_started != "" {
+		params["date_started"] = date_started
 	}
 
 	result, err := kc.callKanboardAPI(ctx, "updateTask", params)
@@ -2111,7 +2503,7 @@ func (kc *kanboardClient) deleteTaskHandler(ctx context.Context, request mcp.Cal
 	return mcp.NewToolResultText(string(resultBytes)), nil
 }
 
-func (kc *kanboardClient) getTaskDetailsHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+func (kc *kanboardClient) getTaskHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
 	task_id, err := request.RequireInt("task_id")
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
@@ -2130,78 +2522,37 @@ func (kc *kanboardClient) getTaskDetailsHandler(ctx context.Context, request mcp
 	return mcp.NewToolResultText(string(resultBytes)), nil
 }
 
-func (kc *kanboardClient) moveTaskHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+func (kc *kanboardClient) moveTaskPositionHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+	project_id, err := request.RequireInt("project_id")
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
 	task_id, err := request.RequireInt("task_id")
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
-	column_name, err := request.RequireString("column_name")
+	column_id, err := request.RequireInt("column_id")
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	position, err := request.RequireInt("position")
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	swimlane_id, err := request.RequireInt("swimlane_id")
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
 
-	// To move a task, we need the column_id. First, get the project ID for the task.
-	// This involves a couple of steps: get the task, then get its project ID.
-	result, err := kc.callKanboardAPI(ctx, "getTask", map[string]int{"task_id": task_id})
-	if err != nil {
-		return mcp.NewToolResultError(fmt.Sprintf("Failed to get task details: %v", err)), nil
+	params := map[string]interface{}{
+		"project_id":  project_id,
+		"task_id":     task_id,
+		"column_id":   column_id,
+		"position":    position,
+		"swimlane_id": swimlane_id,
 	}
 
-	var taskInfo struct {
-		ProjectID string `json:"project_id"`
-	}
-	tempBytes, err := json.Marshal(result)
-	if err != nil {
-		return mcp.NewToolResultError(fmt.Sprintf("Failed to marshal task info for parsing: %v", err)), nil
-	}
-	if err := json.Unmarshal(tempBytes, &taskInfo); err != nil {
-		return mcp.NewToolResultError(fmt.Sprintf("Failed to parse task info: %v", err)), nil
-	}
-
-	if taskInfo.ProjectID == "" {
-		return mcp.NewToolResultError(fmt.Sprintf("Could not determine project for task #%d", task_id)), nil
-	}
-
-	// Now, get the columns for that project to find the column_id by name.
-	result, err = kc.callKanboardAPI(ctx, "getColumns", map[string]string{"project_id": taskInfo.ProjectID})
-	if err != nil {
-		return mcp.NewToolResultError(fmt.Sprintf("Failed to get columns for project: %v", err)), nil
-	}
-
-	var columns []struct {
-		ID   string `json:"id"`
-		Name string `json:"title"` // Kanboard API returns 'title' for column name
-	}
-
-	tempBytes, err = json.Marshal(result)
-	if err != nil {
-		return mcp.NewToolResultError(fmt.Sprintf("Failed to marshal columns info for parsing: %v", err)), nil
-	}
-	if err := json.Unmarshal(tempBytes, &columns); err != nil {
-		return mcp.NewToolResultError(fmt.Sprintf("Failed to parse columns info: %v", err)), nil
-	}
-
-	var targetColumnID string
-	for _, col := range columns {
-		if col.Name == column_name {
-			targetColumnID = col.ID
-			break
-		}
-	}
-
-	if targetColumnID == "" {
-		return mcp.NewToolResultError(fmt.Sprintf("Column '%s' not found in project for task #%d", column_name, task_id)), nil
-	}
-
-	// Finally, move the task.
-	moveParams := map[string]interface{}{
-		"task_id":    task_id,
-		"column_id":  targetColumnID,
-		"position":   1, // Assuming position 1 for simplicity
-		"swimlane_id": 0, // Assuming default swimlane
-		"project_id": taskInfo.ProjectID, // Required for moveTaskPosition
-	}
-	result, err = kc.callKanboardAPI(ctx, "moveTaskPosition", moveParams)
+	result, err := kc.callKanboardAPI(ctx, "moveTaskPosition", params)
 	if err != nil {
 		return mcp.NewToolResultError(fmt.Sprintf("Failed to move task: %v", err)), nil
 	}
@@ -4309,6 +4660,7 @@ func (kc *kanboardClient) getProjectUserRoleHandler(ctx context.Context, request
 	return mcp.NewToolResultText(string(resultBytes)), nil
 }
 
+// Subtask Management
 func (kc *kanboardClient) createSubtaskHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
 	task_id, err := request.RequireInt("task_id")
 	if err != nil {
@@ -5654,5 +6006,226 @@ func (kc *kanboardClient) removeTaskMetadataHandler(ctx context.Context, request
 		return mcp.NewToolResultError(err.Error()), nil
 	}
 	return mcp.NewToolResultText(strconv.FormatBool(result)), nil
+}
+
+func (kc *kanboardClient) getTaskByReferenceHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+	project_id, err := request.RequireInt("project_id")
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	reference, err := request.RequireString("reference")
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	params := map[string]interface{}{"project_id": project_id, "reference": reference}
+	result, err := kc.callKanboardAPI(ctx, "getTaskByReference", params)
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	resultBytes, err := json.MarshalIndent(result, "", "  ")
+	if err != nil {
+		return mcp.NewToolResultError(fmt.Sprintf("Failed to marshal API result: %v", err)), nil
+	}
+	return mcp.NewToolResultText(string(resultBytes)), nil
+}
+
+func (kc *kanboardClient) getAllTasksHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+	project_id, err := request.RequireInt("project_id")
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	status_id, err := request.RequireInt("status_id")
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	params := map[string]interface{}{"project_id": project_id, "status_id": status_id}
+	result, err := kc.callKanboardAPI(ctx, "getAllTasks", params)
+	if err != nil {
+		return mcp.NewToolResultError(fmt.Sprintf("Failed to get tasks: %v", err)), nil
+	}
+	resultBytes, err := json.MarshalIndent(result, "", "  ")
+	if err != nil {
+		return mcp.NewToolResultError(fmt.Sprintf("Failed to marshal API result: %v", err)), nil
+	}
+	return mcp.NewToolResultText(string(resultBytes)), nil
+}
+
+func (kc *kanboardClient) getOverdueTasksHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+	result, err := kc.callKanboardAPI(ctx, "getOverdueTasks", nil)
+	if err != nil {
+		return mcp.NewToolResultError(fmt.Sprintf("Failed to get overdue tasks: %v", err)), nil
+	}
+	resultBytes, err := json.MarshalIndent(result, "", "  ")
+	if err != nil {
+		return mcp.NewToolResultError(fmt.Sprintf("Failed to marshal API result: %v", err)), nil
+	}
+	return mcp.NewToolResultText(string(resultBytes)), nil
+}
+
+func (kc *kanboardClient) getOverdueTasksByProjectHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+	project_id, err := request.RequireInt("project_id")
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	params := map[string]interface{}{"project_id": project_id}
+	result, err := kc.callKanboardAPI(ctx, "getOverdueTasksByProject", params)
+	if err != nil {
+		return mcp.NewToolResultError(fmt.Sprintf("Failed to get overdue tasks: %v", err)), nil
+	}
+	resultBytes, err := json.MarshalIndent(result, "", "  ")
+	if err != nil {
+		return mcp.NewToolResultError(fmt.Sprintf("Failed to marshal API result: %v", err)), nil
+	}
+	return mcp.NewToolResultText(string(resultBytes)), nil
+}
+
+func (kc *kanboardClient) openTaskHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+	task_id, err := request.RequireInt("task_id")
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	params := map[string]interface{}{"task_id": task_id, "status": "open"}
+	result, err := kc.callKanboardAPI(ctx, "updateTask", params)
+	if err != nil {
+		return mcp.NewToolResultError(fmt.Sprintf("Failed to open task: %v", err)), nil
+	}
+	resultBytes, err := json.MarshalIndent(result, "", "  ")
+	if err != nil {
+		return mcp.NewToolResultError(fmt.Sprintf("Failed to marshal API result: %v", err)), nil
+	}
+	return mcp.NewToolResultText(string(resultBytes)), nil
+}
+
+func (kc *kanboardClient) closeTaskHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+	task_id, err := request.RequireInt("task_id")
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	params := map[string]interface{}{"task_id": task_id, "status": "closed"}
+	result, err := kc.callKanboardAPI(ctx, "updateTask", params)
+	if err != nil {
+		return mcp.NewToolResultError(fmt.Sprintf("Failed to close task: %v", err)), nil
+	}
+	resultBytes, err := json.MarshalIndent(result, "", "  ")
+	if err != nil {
+		return mcp.NewToolResultError(fmt.Sprintf("Failed to marshal API result: %v", err)), nil
+	}
+	return mcp.NewToolResultText(string(resultBytes)), nil
+}
+
+func (kc *kanboardClient) moveTaskToProjectHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+	task_id, err := request.RequireInt("task_id")
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	project_id, err := request.RequireInt("project_id")
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	swimlane_id := request.GetInt("swimlane_id", 0)
+	column_id := request.GetInt("column_id", 0)
+	category_id := request.GetInt("category_id", 0)
+	owner_id := request.GetInt("owner_id", 0)
+
+	params := map[string]interface{}{
+		"task_id":    task_id,
+		"project_id": project_id,
+	}
+	if swimlane_id != 0 {
+		params["swimlane_id"] = swimlane_id
+	}
+	if column_id != 0 {
+		params["column_id"] = column_id
+	}
+	if category_id != 0 {
+		params["category_id"] = category_id
+	}
+	if owner_id != 0 {
+		params["owner_id"] = owner_id
+	}
+
+	result, err := kc.callKanboardAPI(ctx, "moveTaskToProject", params)
+	if err != nil {
+		return mcp.NewToolResultError(fmt.Sprintf("Failed to move task: %v", err)), nil
+	}
+
+	resultBytes, err := json.MarshalIndent(result, "", "  ")
+	if err != nil {
+		return mcp.NewToolResultError(fmt.Sprintf("Failed to marshal API result: %v", err)), nil
+	}
+
+	return mcp.NewToolResultText(string(resultBytes)), nil
+}
+
+func (kc *kanboardClient) duplicateTaskToProjectHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+	task_id, err := request.RequireInt("task_id")
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	project_id, err := request.RequireInt("project_id")
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	swimlane_id := request.GetInt("swimlane_id", 0)
+	column_id := request.GetInt("column_id", 0)
+	category_id := request.GetInt("category_id", 0)
+	owner_id := request.GetInt("owner_id", 0)
+
+	params := map[string]interface{}{
+		"task_id":    task_id,
+		"project_id": project_id,
+	}
+	if swimlane_id != 0 {
+		params["swimlane_id"] = swimlane_id
+	}
+	if column_id != 0 {
+		params["column_id"] = column_id
+	}
+	if category_id != 0 {
+		params["category_id"] = category_id
+	}
+	if owner_id != 0 {
+		params["owner_id"] = owner_id
+	}
+
+	result, err := kc.callKanboardAPI(ctx, "duplicateTaskToProject", params)
+	if err != nil {
+		return mcp.NewToolResultError(fmt.Sprintf("Failed to duplicate task: %v", err)), nil
+	}
+
+	resultBytes, err := json.MarshalIndent(result, "", "  ")
+	if err != nil {
+		return mcp.NewToolResultError(fmt.Sprintf("Failed to marshal API result: %v", err)), nil
+	}
+
+	return mcp.NewToolResultText(string(resultBytes)), nil
+}
+
+func (kc *kanboardClient) searchTasksHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+	project_id, err := request.RequireInt("project_id")
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	query, err := request.RequireString("query")
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+
+	params := map[string]interface{}{
+		"project_id": project_id,
+		"query":      query,
+	}
+
+	result, err := kc.callKanboardAPI(ctx, "searchTasks", params)
+	if err != nil {
+		return mcp.NewToolResultError(fmt.Sprintf("Failed to search tasks: %v", err)), nil
+	}
+
+	resultBytes, err := json.MarshalIndent(result, "", "  ")
+	if err != nil {
+		return mcp.NewToolResultError(fmt.Sprintf("Failed to marshal API result: %v", err)), nil
+	}
+
+	return mcp.NewToolResultText(string(resultBytes)), nil
 }
 
