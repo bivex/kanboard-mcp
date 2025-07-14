@@ -196,6 +196,16 @@ After saving the configuration, restart your MCP client (Cursor, Claude Desktop,
 | `get_all_external_task_links` | 📋 Get all external links attached to a task | "Show all external links for task 123" |
 | `remove_external_task_link` | 🗑️ Remove an external link | "Remove external link 456 from task 789" |
 
+### 🔗 Internal Task Link Management
+
+| Tool | Description | Example |
+|------|-------------|---------|
+| `create_task_link` | ➕ Create a link between two tasks | "Create a link between task 123 and task 456 with link type 1" |
+| `update_task_link` | ✏️ Update task link | "Update task link 789 between task 123 and task 456 with new link type 2" |
+| `get_task_link_by_id` | 🔍 Get a task link by ID | "Get details for task link 101" |
+| `get_all_task_links` | 📋 Get all links related to a task | "Show all links for task 123" |
+| `remove_task_link` | 🗑️ Remove a link between two tasks | "Remove task link 101" |
+
 ### 👥 Group Management
 
 | Tool | Description | Example |

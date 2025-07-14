@@ -728,6 +728,71 @@ func main() {
 	)
 	s.AddTool(tool, kbClient.isGroupMemberHandler)
 
+	tool = mcp.NewTool("create_task_link",
+		mcp.WithDescription("Create a link between two tasks"),
+		mcp.WithNumber("task_id",
+			mcp.Required(),
+			mcp.Description("ID of the first task"),
+		),
+		mcp.WithNumber("opposite_task_id",
+			mcp.Required(),
+			mcp.Description("ID of the opposite task"),
+		),
+		mcp.WithNumber("link_id",
+			mcp.Required(),
+			mcp.Description("ID of the link type"),
+		),
+	)
+	s.AddTool(tool, kbClient.createTaskLinkHandler)
+
+	tool = mcp.NewTool("update_task_link",
+		mcp.WithDescription("Update task link"),
+		mcp.WithNumber("task_link_id",
+			mcp.Required(),
+			mcp.Description("ID of the task link to update"),
+		),
+		mcp.WithNumber("task_id",
+			mcp.Required(),
+			mcp.Description("ID of the first task"),
+		),
+		mcp.WithNumber("opposite_task_id",
+			mcp.Required(),
+			mcp.Description("ID of the opposite task"),
+		),
+		mcp.WithNumber("link_id",
+			mcp.Required(),
+			mcp.Description("ID of the link type"),
+		),
+	)
+	s.AddTool(tool, kbClient.updateTaskLinkHandler)
+
+	tool = mcp.NewTool("get_task_link_by_id",
+		mcp.WithDescription("Get a task link by ID"),
+		mcp.WithNumber("task_link_id",
+			mcp.Required(),
+			mcp.Description("ID of the task link to retrieve"),
+		),
+	)
+	s.AddTool(tool, kbClient.getTaskLinkByIdHandler)
+
+	tool = mcp.NewTool("get_all_task_links",
+		mcp.WithDescription("Get all links related to a task"),
+		mcp.WithNumber("task_id",
+			mcp.Required(),
+			mcp.Description("ID of the task to get links for"),
+		),
+	)
+	s.AddTool(tool, kbClient.getAllTaskLinksHandler)
+
+	tool = mcp.NewTool("remove_task_link",
+		mcp.WithDescription("Remove a link between two tasks"),
+		mcp.WithNumber("task_link_id",
+			mcp.Required(),
+			mcp.Description("ID of the task link to remove"),
+		),
+	)
+	s.AddTool(tool, kbClient.removeTaskLinkHandler)
+
 	// Start the stdio server
 	if err := server.ServeStdio(s); err != nil {
 		fmt.Printf("Server error: %v\n", err)
@@ -2311,6 +2376,120 @@ func (kc *kanboardClient) isGroupMemberHandler(ctx context.Context, request mcp.
 	}
 	params := map[string]int{"group_id": group_id, "user_id": user_id}
 	result, err := kc.callKanboardAPI(ctx, "isGroupMember", params)
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	resultBytes, err := json.MarshalIndent(result, "", "  ")
+	if err != nil {
+		return mcp.NewToolResultError(fmt.Sprintf("Failed to marshal API result: %v", err)), nil
+	}
+	return mcp.NewToolResultText(string(resultBytes)), nil
+}
+
+func (kc *kanboardClient) createTaskLinkHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+	task_id, err := request.RequireInt("task_id")
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	opposite_task_id, err := request.RequireInt("opposite_task_id")
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	link_id, err := request.RequireInt("link_id")
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	params := map[string]int{
+		"task_id":        task_id,
+		"opposite_task_id": opposite_task_id,
+		"link_id":        link_id,
+	}
+	result, err := kc.callKanboardAPI(ctx, "createTaskLink", params)
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	resultBytes, err := json.MarshalIndent(result, "", "  ")
+	if err != nil {
+		return mcp.NewToolResultError(fmt.Sprintf("Failed to marshal API result: %v", err)), nil
+	}
+	return mcp.NewToolResultText(string(resultBytes)), nil
+}
+
+func (kc *kanboardClient) updateTaskLinkHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+	task_link_id, err := request.RequireInt("task_link_id")
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	task_id, err := request.RequireInt("task_id")
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	opposite_task_id, err := request.RequireInt("opposite_task_id")
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	link_id, err := request.RequireInt("link_id")
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	params := map[string]int{
+		"id":             task_link_id,
+		"task_id":        task_id,
+		"opposite_task_id": opposite_task_id,
+		"link_id":        link_id,
+	}
+	result, err := kc.callKanboardAPI(ctx, "updateTaskLink", params)
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	resultBytes, err := json.MarshalIndent(result, "", "  ")
+	if err != nil {
+		return mcp.NewToolResultError(fmt.Sprintf("Failed to marshal API result: %v", err)), nil
+	}
+	return mcp.NewToolResultText(string(resultBytes)), nil
+}
+
+func (kc *kanboardClient) getTaskLinkByIdHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+	task_link_id, err := request.RequireInt("task_link_id")
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	params := map[string]int{"task_link_id": task_link_id}
+	result, err := kc.callKanboardAPI(ctx, "getTaskLinkById", params)
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	resultBytes, err := json.MarshalIndent(result, "", "  ")
+	if err != nil {
+		return mcp.NewToolResultError(fmt.Sprintf("Failed to marshal API result: %v", err)), nil
+	}
+	return mcp.NewToolResultText(string(resultBytes)), nil
+}
+
+func (kc *kanboardClient) getAllTaskLinksHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+	task_id, err := request.RequireInt("task_id")
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	params := map[string]int{"task_id": task_id}
+	result, err := kc.callKanboardAPI(ctx, "getAllTaskLinks", params)
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	resultBytes, err := json.MarshalIndent(result, "", "  ")
+	if err != nil {
+		return mcp.NewToolResultError(fmt.Sprintf("Failed to marshal API result: %v", err)), nil
+	}
+	return mcp.NewToolResultText(string(resultBytes)), nil
+}
+
+func (kc *kanboardClient) removeTaskLinkHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+	task_link_id, err := request.RequireInt("task_link_id")
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	params := map[string]int{"task_link_id": task_link_id}
+	result, err := kc.callKanboardAPI(ctx, "removeTaskLink", params)
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
