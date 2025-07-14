@@ -1161,6 +1161,133 @@ func main() {
 	)
 	s.AddTool(tool, kbClient.removeProjectMetadataHandler)
 
+	// Project Permission Management
+	tool = mcp.NewTool("get_project_users",
+		mcp.WithDescription("Get all members of a project"),
+		mcp.WithNumber("project_id",
+			mcp.Required(),
+			mcp.Description("ID of the project to get users from"),
+		),
+	)
+	s.AddTool(tool, kbClient.getProjectUsersHandler)
+
+	tool = mcp.NewTool("get_assignable_users",
+		mcp.WithDescription("Get users that can be assigned to a task for a project (all members except viewers)"),
+		mcp.WithNumber("project_id",
+			mcp.Required(),
+			mcp.Description("ID of the project"),
+		),
+		mcp.WithBoolean("prepend_unassigned",
+			mcp.Description("Prepend the 'Unassigned' option (optional, default is false)"),
+		),
+	)
+	s.AddTool(tool, kbClient.getAssignableUsersHandler)
+
+	tool = mcp.NewTool("add_project_user",
+		mcp.WithDescription("Grant access to a project for a user"),
+		mcp.WithNumber("project_id",
+			mcp.Required(),
+			mcp.Description("ID of the project"),
+		),
+		mcp.WithNumber("user_id",
+			mcp.Required(),
+			mcp.Description("ID of the user"),
+		),
+		mcp.WithString("role",
+			mcp.Description("Role to assign (optional)"),
+		),
+	)
+	s.AddTool(tool, kbClient.addProjectUserHandler)
+
+	tool = mcp.NewTool("add_project_group",
+		mcp.WithDescription("Grant access to a project for a group"),
+		mcp.WithNumber("project_id",
+			mcp.Required(),
+			mcp.Description("ID of the project"),
+		),
+		mcp.WithNumber("group_id",
+			mcp.Required(),
+			mcp.Description("ID of the group"),
+		),
+		mcp.WithString("role",
+			mcp.Description("Role to assign (optional)"),
+		),
+	)
+	s.AddTool(tool, kbClient.addProjectGroupHandler)
+
+	tool = mcp.NewTool("remove_project_user",
+		mcp.WithDescription("Revoke user access to a project"),
+		mcp.WithNumber("project_id",
+			mcp.Required(),
+			mcp.Description("ID of the project"),
+		),
+		mcp.WithNumber("user_id",
+			mcp.Required(),
+			mcp.Description("ID of the user"),
+		),
+	)
+	s.AddTool(tool, kbClient.removeProjectUserHandler)
+
+	tool = mcp.NewTool("remove_project_group",
+		mcp.WithDescription("Revoke group access to a project"),
+		mcp.WithNumber("project_id",
+			mcp.Required(),
+			mcp.Description("ID of the project"),
+		),
+		mcp.WithNumber("group_id",
+			mcp.Required(),
+			mcp.Description("ID of the group"),
+		),
+	)
+	s.AddTool(tool, kbClient.removeProjectGroupHandler)
+
+	tool = mcp.NewTool("change_project_user_role",
+		mcp.WithDescription("Change role of a user for a project"),
+		mcp.WithNumber("project_id",
+			mcp.Required(),
+			mcp.Description("ID of the project"),
+		),
+		mcp.WithNumber("user_id",
+			mcp.Required(),
+			mcp.Description("ID of the user"),
+		),
+		mcp.WithString("role",
+			mcp.Required(),
+			mcp.Description("New role to assign"),
+		),
+	)
+	s.AddTool(tool, kbClient.changeProjectUserRoleHandler)
+
+	tool = mcp.NewTool("change_project_group_role",
+		mcp.WithDescription("Change role of a group for a project"),
+		mcp.WithNumber("project_id",
+			mcp.Required(),
+			mcp.Description("ID of the project"),
+		),
+		mcp.WithNumber("group_id",
+			mcp.Required(),
+			mcp.Description("ID of the group"),
+		),
+		mcp.WithString("role",
+			mcp.Required(),
+			mcp.Description("New role to assign"),
+		),
+	)
+	s.AddTool(tool, kbClient.changeProjectGroupRoleHandler)
+
+	tool = mcp.NewTool("get_project_user_role",
+		mcp.WithDescription("Get the role of a user for a given project"),
+		mcp.WithNumber("project_id",
+			mcp.Required(),
+			mcp.Description("ID of the project"),
+		),
+		mcp.WithNumber("user_id",
+			mcp.Required(),
+			mcp.Description("ID of the user"),
+		),
+	)
+	s.AddTool(tool, kbClient.getProjectUserRoleHandler)
+
 	// Start the stdio server
 	if err := server.ServeStdio(s); err != nil {
 		fmt.Printf("Server error: %v\n", err)
@@ -3527,6 +3654,206 @@ func (kc *kanboardClient) removeProjectMetadataHandler(ctx context.Context, requ
 	resultBytes, err := json.MarshalIndent(result, "", "  ")
 	if err != nil {
 		return mcp.NewToolResultError(fmt.Sprintf("Failed to marshal API result: %v", err)), nil
+	}
+	return mcp.NewToolResultText(string(resultBytes)), nil
+}
+
+func (kc *kanboardClient) getProjectUsersHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+	project_id, err := request.RequireInt("project_id")
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	params := map[string]interface{}{"project_id": project_id}
+	result, err := kc.callKanboardAPI(ctx, "getProjectUsers", params)
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	resultBytes, err := json.MarshalIndent(result, "", "  ")
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	return mcp.NewToolResultText(string(resultBytes)), nil
+}
+
+func (kc *kanboardClient) getAssignableUsersHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+	project_id, err := request.RequireInt("project_id")
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+
+	prepend_unassigned := request.GetBool("prepend_unassigned", false)
+
+	params := map[string]interface{}{"project_id": project_id, "prepend_unassigned": prepend_unassigned}
+	result, err := kc.callKanboardAPI(ctx, "getAssignableUsers", params)
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	resultBytes, err := json.MarshalIndent(result, "", "  ")
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	return mcp.NewToolResultText(string(resultBytes)), nil
+}
+
+func (kc *kanboardClient) addProjectUserHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+	project_id, err := request.RequireInt("project_id")
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	user_id, err := request.RequireInt("user_id")
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	role := request.GetString("role", "")
+	params := map[string]interface{}{"project_id": project_id, "user_id": user_id}
+	if role != "" {
+		params["role"] = role
+	}
+	result, err := kc.callKanboardAPI(ctx, "addProjectUser", params)
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	resultBytes, err := json.MarshalIndent(result, "", "  ")
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	return mcp.NewToolResultText(string(resultBytes)), nil
+}
+
+func (kc *kanboardClient) addProjectGroupHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+	project_id, err := request.RequireInt("project_id")
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	group_id, err := request.RequireInt("group_id")
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	role := request.GetString("role", "")
+	params := map[string]interface{}{"project_id": project_id, "group_id": group_id}
+	if role != "" {
+		params["role"] = role
+	}
+	result, err := kc.callKanboardAPI(ctx, "addProjectGroup", params)
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	resultBytes, err := json.MarshalIndent(result, "", "  ")
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	return mcp.NewToolResultText(string(resultBytes)), nil
+}
+
+func (kc *kanboardClient) removeProjectUserHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+	project_id, err := request.RequireInt("project_id")
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	user_id, err := request.RequireInt("user_id")
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	params := map[string]interface{}{"project_id": project_id, "user_id": user_id}
+	result, err := kc.callKanboardAPI(ctx, "removeProjectUser", params)
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	resultBytes, err := json.MarshalIndent(result, "", "  ")
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	return mcp.NewToolResultText(string(resultBytes)), nil
+}
+
+func (kc *kanboardClient) removeProjectGroupHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+	project_id, err := request.RequireInt("project_id")
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	group_id, err := request.RequireInt("group_id")
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	params := map[string]interface{}{"project_id": project_id, "group_id": group_id}
+	result, err := kc.callKanboardAPI(ctx, "removeProjectGroup", params)
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	resultBytes, err := json.MarshalIndent(result, "", "  ")
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	return mcp.NewToolResultText(string(resultBytes)), nil
+}
+
+func (kc *kanboardClient) changeProjectUserRoleHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+	project_id, err := request.RequireInt("project_id")
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	user_id, err := request.RequireInt("user_id")
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	role, err := request.RequireString("role")
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	params := map[string]interface{}{"project_id": project_id, "user_id": user_id, "role": role}
+	result, err := kc.callKanboardAPI(ctx, "changeProjectUserRole", params)
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	resultBytes, err := json.MarshalIndent(result, "", "  ")
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	return mcp.NewToolResultText(string(resultBytes)), nil
+}
+
+func (kc *kanboardClient) changeProjectGroupRoleHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+	project_id, err := request.RequireInt("project_id")
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	group_id, err := request.RequireInt("group_id")
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	role, err := request.RequireString("role")
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	params := map[string]interface{}{"project_id": project_id, "group_id": group_id, "role": role}
+	result, err := kc.callKanboardAPI(ctx, "changeProjectGroupRole", params)
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	resultBytes, err := json.MarshalIndent(result, "", "  ")
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	return mcp.NewToolResultText(string(resultBytes)), nil
+}
+
+func (kc *kanboardClient) getProjectUserRoleHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+	project_id, err := request.RequireInt("project_id")
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	user_id, err := request.RequireInt("user_id")
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	params := map[string]interface{}{"project_id": project_id, "user_id": user_id}
+	result, err := kc.callKanboardAPI(ctx, "getProjectUserRole", params)
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	resultBytes, err := json.MarshalIndent(result, "", "  ")
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
 	}
 	return mcp.NewToolResultText(string(resultBytes)), nil
 }

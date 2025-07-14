@@ -251,7 +251,21 @@ After saving the configuration, restart your MCP client (Cursor, Claude Desktop,
 | `save_project_metadata` | 💾 Add or update metadata | "Save metadata 'key1:value1, key2:value2' for project 123" |
 | `remove_project_metadata` | 🗑️ Remove a project metadata | "Remove metadata 'my_key' from project 123" |
 
-### �� Group Management
+### 🔐 Project Permission Management
+
+| Tool | Description | Example |
+|------|-------------|---------|
+| `get_project_users` | 📋 Get all members of a project | "Show all users in project 123" |
+| `get_assignable_users` | 👥 Get users that can be assigned to a task for a project (all members except viewers) | "Get assignable users for project 123" |
+| `add_project_user` | ➕ Grant access to a project for a user | "Add user 1 to project 123 with role 'project-member'" |
+| `add_project_group` | ➕ Grant access to a project for a group | "Add group 456 to project 123 with role 'project-viewer'" |
+| `remove_project_user` | 🗑️ Revoke user access to a project | "Remove user 1 from project 123" |
+| `remove_project_group` | 🗑️ Revoke group access to a project | "Remove group 456 from project 123" |
+| `change_project_user_role` | ✏️ Change role of a user for a project | "Change user 1's role in project 123 to 'project-manager'" |
+| `change_project_group_role` | ✏️ Change role of a group for a project | "Change group 456's role in project 123 to 'project-manager'" |
+| `get_project_user_role` | 🔍 Get the role of a user for a given project | "Get the role of user 1 in project 123" |
+
+###  Group Management
 
 | Tool | Description | Example |
 |------|-------------|---------|
