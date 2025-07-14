@@ -7,6 +7,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"os"
+	"encoding/base64"
 
 	"github.com/mark3labs/mcp-go/mcp"
 	"github.com/mark3labs/mcp-go/server"
@@ -41,7 +42,17 @@ func main() {
 		apiKey = "your-kanboard-api-key"
 	}
 
-	kbClient := newKanboardClient(apiEndpoint, apiKey)
+	kbUsername := os.Getenv("KANBOARD_USERNAME")
+	if kbUsername == "" {
+		kbUsername = "your-kanboard-username" // Default or placeholder
+	}
+
+	kbPassword := os.Getenv("KANBOARD_PASSWORD")
+	if kbPassword == "" {
+		kbPassword = "your-kanboard-password" // Default or placeholder
+	}
+
+	kbClient := newKanboardClient(apiEndpoint, apiKey, kbUsername, kbPassword)
 
 	tool = mcp.NewTool("get_projects",
 		mcp.WithDescription("List all projects"),
@@ -206,12 +217,16 @@ func helloHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallTo
 type kanboardClient struct {
 	apiEndpoint string
 	apiKey      string
+	username    string
+	password    string
 }
 
-func newKanboardClient(apiEndpoint, apiKey string) *kanboardClient {
+func newKanboardClient(apiEndpoint, apiKey, username, password string) *kanboardClient {
 	return &kanboardClient{
 		apiEndpoint: apiEndpoint,
 		apiKey:      apiKey,
+		username:    username,
+		password:    password,
 	}
 }
 
@@ -234,7 +249,14 @@ func (kc *kanboardClient) callKanboardAPI(ctx context.Context, method string, pa
 	}
 
 	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("X-API-Auth", kc.apiKey)
+
+	if kc.username != "" && kc.password != "" {
+		auth := kc.username + ":" + kc.password
+		basicAuth := "Basic " + base64.StdEncoding.EncodeToString([]byte(auth))
+		req.Header.Set("Authorization", basicAuth)
+	} else {
+		req.Header.Set("X-API-Auth", kc.apiKey)
+	}
 
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
