@@ -340,6 +340,58 @@ func main() {
 	)
 	s.AddTool(tool, kbClient.deleteSwimlaneHandler)
 
+	tool = mcp.NewTool("assign_task",
+		mcp.WithDescription("Assign tasks to users"),
+		mcp.WithNumber("task_id",
+			mcp.Required(),
+			mcp.Description("ID of the task to assign"),
+		),
+		mcp.WithNumber("user_id",
+			mcp.Required(),
+			mcp.Description("ID of the user to assign the task to"),
+		),
+	)
+	s.AddTool(tool, kbClient.assignTaskHandler)
+
+	tool = mcp.NewTool("set_task_due_date",
+		mcp.WithDescription("Set task deadlines"),
+		mcp.WithNumber("task_id",
+			mcp.Required(),
+			mcp.Description("ID of the task to set the due date for"),
+		),
+		mcp.WithString("due_date",
+			mcp.Required(),
+			mcp.Description("Due date in YYYY-MM-DD format"),
+		),
+	)
+	s.AddTool(tool, kbClient.setTaskDueDateHandler)
+
+	tool = mcp.NewTool("add_task_comment",
+		mcp.WithDescription("Add task comments"),
+		mcp.WithNumber("task_id",
+			mcp.Required(),
+			mcp.Description("ID of the task to add a comment to"),
+		),
+		mcp.WithNumber("user_id",
+			mcp.Required(),
+			mcp.Description("ID of the user adding the comment"),
+		),
+		mcp.WithString("comment",
+			mcp.Required(),
+			mcp.Description("Content of the comment"),
+		),
+	)
+	s.AddTool(tool, kbClient.addTaskCommentHandler)
+
+	tool = mcp.NewTool("get_task_comments",
+		mcp.WithDescription("Get task comments"),
+		mcp.WithNumber("task_id",
+			mcp.Required(),
+			mcp.Description("ID of the task to get comments for"),
+		),
+	)
+	s.AddTool(tool, kbClient.getTaskCommentsHandler)
+
 	// Start the stdio server
 	if err := server.ServeStdio(s); err != nil {
 		fmt.Printf("Server error: %v\n", err)
@@ -1140,6 +1192,105 @@ func (kc *kanboardClient) deleteSwimlaneHandler(ctx context.Context, request mcp
 	result, err := kc.callKanboardAPI(ctx, "removeSwimlane", params)
 	if err != nil {
 		return mcp.NewToolResultError(fmt.Sprintf("Failed to delete swimlane: %v", err)), nil
+	}
+
+	resultBytes, err := json.MarshalIndent(result, "", "  ")
+	if err != nil {
+		return mcp.NewToolResultError(fmt.Sprintf("Failed to marshal API result: %v", err)), nil
+	}
+
+	return mcp.NewToolResultText(string(resultBytes)), nil
+}
+
+func (kc *kanboardClient) assignTaskHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+	task_id, err := request.RequireInt("task_id")
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	user_id, err := request.RequireInt("user_id")
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+
+	params := map[string]int{"task_id": task_id, "owner_id": user_id}
+	result, err := kc.callKanboardAPI(ctx, "assignTask", params)
+	if err != nil {
+		return mcp.NewToolResultError(fmt.Sprintf("Failed to assign task: %v", err)), nil
+	}
+
+	resultBytes, err := json.MarshalIndent(result, "", "  ")
+	if err != nil {
+		return mcp.NewToolResultError(fmt.Sprintf("Failed to marshal API result: %v", err)), nil
+	}
+
+	return mcp.NewToolResultText(string(resultBytes)), nil
+}
+
+func (kc *kanboardClient) setTaskDueDateHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+	task_id, err := request.RequireInt("task_id")
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	due_date, err := request.RequireString("due_date")
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+
+	params := map[string]interface{}{"task_id": task_id, "date_due": due_date}
+	result, err := kc.callKanboardAPI(ctx, "updateTask", params)
+	if err != nil {
+		return mcp.NewToolResultError(fmt.Sprintf("Failed to set task due date: %v", err)), nil
+	}
+
+	resultBytes, err := json.MarshalIndent(result, "", "  ")
+	if err != nil {
+		return mcp.NewToolResultError(fmt.Sprintf("Failed to marshal API result: %v", err)), nil
+	}
+
+	return mcp.NewToolResultText(string(resultBytes)), nil
+}
+
+func (kc *kanboardClient) addTaskCommentHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+	task_id, err := request.RequireInt("task_id")
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	user_id, err := request.RequireInt("user_id")
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	comment, err := request.RequireString("comment")
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+
+	params := map[string]interface{}{
+		"task_id": task_id,
+		"user_id": user_id,
+		"content": comment,
+	}
+	result, err := kc.callKanboardAPI(ctx, "addComment", params)
+	if err != nil {
+		return mcp.NewToolResultError(fmt.Sprintf("Failed to add task comment: %v", err)), nil
+	}
+
+	resultBytes, err := json.MarshalIndent(result, "", "  ")
+	if err != nil {
+		return mcp.NewToolResultError(fmt.Sprintf("Failed to marshal API result: %v", err)), nil
+	}
+
+	return mcp.NewToolResultText(string(resultBytes)), nil
+}
+
+func (kc *kanboardClient) getTaskCommentsHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+	task_id, err := request.RequireInt("task_id")
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	params := map[string]int{"task_id": task_id}
+	result, err := kc.callKanboardAPI(ctx, "getAllComments", params)
+	if err != nil {
+		return mcp.NewToolResultError(fmt.Sprintf("Failed to get task comments: %v", err)), nil
 	}
 
 	resultBytes, err := json.MarshalIndent(result, "", "  ")

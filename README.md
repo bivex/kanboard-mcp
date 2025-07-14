@@ -68,3 +68,7 @@ Once configured, Cursor will be able to discover and interact with the following
 | `create_swimlane`  | Add team swimlanes        | `"Create a Frontend Team swimlane"`                |
 | `update_swimlane`  | Modify swimlanes          | `"Rename Mobile Team to Cross-Platform Team"`      |
 | `delete_swimlane`  | Remove swimlanes          | `"Delete the inactive team swimlane"`              |
+| `assign_task`      | Assign tasks to users     | `"Assign the API task to John"`                    |
+| `set_task_due_date`| Set task deadlines        | `"Set due date for login task to next Friday"`     |
+| `add_task_comment` | Add task comments         | `"Add comment about testing requirements"`         |
+| `get_task_comments`| Get task comments         | `"Show all comments on this task"`                 |
