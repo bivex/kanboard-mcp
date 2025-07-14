@@ -21,6 +21,8 @@ func main() {
 		server.WithToolCapabilities(false),
 	)
 
+	var tool mcp.Tool
+
 	// Initialize Kanboard API client
 	apiEndpoint := os.Getenv("KANBOARD_API_ENDPOINT")
 	if apiEndpoint == "" {
