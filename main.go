@@ -672,6 +672,62 @@ func main() {
 	)
 	s.AddTool(tool, kbClient.getAllGroupsHandler)
 
+	tool = mcp.NewTool("get_member_groups",
+		mcp.WithDescription("Get all groups for a given user"),
+		mcp.WithNumber("user_id",
+			mcp.Required(),
+			mcp.Description("ID of the user"),
+		),
+	)
+	s.AddTool(tool, kbClient.getMemberGroupsHandler)
+
+	tool = mcp.NewTool("get_group_members",
+		mcp.WithDescription("Get all members of a group"),
+		mcp.WithNumber("group_id",
+			mcp.Required(),
+			mcp.Description("ID of the group"),
+		),
+	)
+	s.AddTool(tool, kbClient.getGroupMembersHandler)
+
+	tool = mcp.NewTool("add_group_member",
+		mcp.WithDescription("Add a user to a group"),
+		mcp.WithNumber("group_id",
+			mcp.Required(),
+			mcp.Description("ID of the group"),
+		),
+		mcp.WithNumber("user_id",
+			mcp.Required(),
+			mcp.Description("ID of the user to add"),
+		),
+	)
+	s.AddTool(tool, kbClient.addGroupMemberHandler)
+
+	tool = mcp.NewTool("remove_group_member",
+		mcp.WithDescription("Remove a user from a group"),
+		mcp.WithNumber("group_id",
+			mcp.Required(),
+			mcp.Description("ID of the group"),		),
+		mcp.WithNumber("user_id",
+			mcp.Required(),
+			mcp.Description("ID of the user to remove"),
+		),
+	)
+	s.AddTool(tool, kbClient.removeGroupMemberHandler)
+
+	tool = mcp.NewTool("is_group_member",
+		mcp.WithDescription("Check if a user is member of a group"),
+		mcp.WithNumber("group_id",
+			mcp.Required(),
+			mcp.Description("ID of the group"),
+		),
+		mcp.WithNumber("user_id",
+			mcp.Required(),
+			mcp.Description("ID of the user"),
+		),
+	)
+	s.AddTool(tool, kbClient.isGroupMemberHandler)
+
 	// Start the stdio server
 	if err := server.ServeStdio(s); err != nil {
 		fmt.Printf("Server error: %v\n", err)
@@ -2158,6 +2214,103 @@ func (kc *kanboardClient) getGroupHandler(ctx context.Context, request mcp.CallT
 
 func (kc *kanboardClient) getAllGroupsHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
 	result, err := kc.callKanboardAPI(ctx, "getAllGroups", nil)
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	resultBytes, err := json.MarshalIndent(result, "", "  ")
+	if err != nil {
+		return mcp.NewToolResultError(fmt.Sprintf("Failed to marshal API result: %v", err)), nil
+	}
+	return mcp.NewToolResultText(string(resultBytes)), nil
+}
+
+func (kc *kanboardClient) getMemberGroupsHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+	user_id, err := request.RequireInt("user_id")
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	params := map[string]int{"user_id": user_id}
+	result, err := kc.callKanboardAPI(ctx, "getMemberGroups", params)
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	resultBytes, err := json.MarshalIndent(result, "", "  ")
+	if err != nil {
+		return mcp.NewToolResultError(fmt.Sprintf("Failed to marshal API result: %v", err)), nil
+	}
+	return mcp.NewToolResultText(string(resultBytes)), nil
+}
+
+func (kc *kanboardClient) getGroupMembersHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+	group_id, err := request.RequireInt("group_id")
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	params := map[string]int{"group_id": group_id}
+	result, err := kc.callKanboardAPI(ctx, "getGroupMembers", params)
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	resultBytes, err := json.MarshalIndent(result, "", "  ")
+	if err != nil {
+		return mcp.NewToolResultError(fmt.Sprintf("Failed to marshal API result: %v", err)), nil
+	}
+	return mcp.NewToolResultText(string(resultBytes)), nil
+}
+
+func (kc *kanboardClient) addGroupMemberHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+	group_id, err := request.RequireInt("group_id")
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	user_id, err := request.RequireInt("user_id")
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	params := map[string]int{"group_id": group_id, "user_id": user_id}
+	result, err := kc.callKanboardAPI(ctx, "addGroupMember", params)
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	resultBytes, err := json.MarshalIndent(result, "", "  ")
+	if err != nil {
+		return mcp.NewToolResultError(fmt.Sprintf("Failed to marshal API result: %v", err)), nil
+	}
+	return mcp.NewToolResultText(string(resultBytes)), nil
+}
+
+func (kc *kanboardClient) removeGroupMemberHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+	group_id, err := request.RequireInt("group_id")
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	user_id, err := request.RequireInt("user_id")
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	params := map[string]int{"group_id": group_id, "user_id": user_id}
+	result, err := kc.callKanboardAPI(ctx, "removeGroupMember", params)
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	resultBytes, err := json.MarshalIndent(result, "", "  ")
+	if err != nil {
+		return mcp.NewToolResultError(fmt.Sprintf("Failed to marshal API result: %v", err)), nil
+	}
+	return mcp.NewToolResultText(string(resultBytes)), nil
+}
+
+func (kc *kanboardClient) isGroupMemberHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+	group_id, err := request.RequireInt("group_id")
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	user_id, err := request.RequireInt("user_id")
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	params := map[string]int{"group_id": group_id, "user_id": user_id}
+	result, err := kc.callKanboardAPI(ctx, "isGroupMember", params)
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}

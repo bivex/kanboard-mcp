@@ -206,6 +206,16 @@ After saving the configuration, restart your MCP client (Cursor, Claude Desktop,
 | `get_group` | 🔍 Get one group | "Get details for group 789" |
 | `get_all_groups` | 📋 Get all groups | "Show me all user groups" |
 
+### 👥 Group Member Management
+
+| Tool | Description | Example |
+|------|-------------|---------|
+| `get_member_groups` | 📋 Get all groups for a given user | "Show me all groups for user 1" |
+| `get_group_members` | 👥 Get all members of a group | "List all members of group 123" |
+| `add_group_member` | ➕ Add a user to a group | "Add user 456 to group 789" |
+| `remove_group_member` | 🗑️ Remove a user from a group | "Remove user 456 from group 789" |
+| `is_group_member` | ❓ Check if a user is member of a group | "Is user 456 a member of group 789?" |
+
 ### 👥 User Management
 
 | Tool | Description | Example |
