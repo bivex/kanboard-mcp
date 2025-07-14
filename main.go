@@ -1418,6 +1418,89 @@ func main() {
 	)
 	s.AddTool(tool, kbClient.getSubtaskTimeSpentHandler)
 
+	// Tag Management
+	tool = mcp.NewTool("get_all_tags",
+		mcp.WithDescription("Get all tags"),
+	)
+	s.AddTool(tool, kbClient.getAllTagsHandler)
+
+	tool = mcp.NewTool("get_tags_by_project",
+		mcp.WithDescription("Get all tags for a given project"),
+		mcp.WithNumber("project_id",
+			mcp.Required(),
+			mcp.Description("ID of the project to get tags for"),
+		),
+	)
+	s.AddTool(tool, kbClient.getTagsByProjectHandler)
+
+	tool = mcp.NewTool("create_tag",
+		mcp.WithDescription("Create a new tag"),
+		mcp.WithNumber("project_id",
+			mcp.Required(),
+			mcp.Description("ID of the project to associate the tag with"),
+		),
+		mcp.WithString("tag",
+			mcp.Required(),
+			mcp.Description("Name of the tag"),
+		),
+		mcp.WithNumber("color_id",
+			mcp.Description("ID of the color for the tag (optional)"),
+		),
+	)
+	s.AddTool(tool, kbClient.createTagHandler)
+
+	tool = mcp.NewTool("update_tag",
+		mcp.WithDescription("Rename a tag"),
+		mcp.WithNumber("tag_id",
+			mcp.Required(),
+			mcp.Description("ID of the tag to update"),
+		),
+		mcp.WithString("tag",
+			mcp.Required(),
+			mcp.Description("New name for the tag"),
+		),
+		mcp.WithNumber("color_id",
+			mcp.Description("New color ID for the tag (optional)"),
+		),
+	)
+	s.AddTool(tool, kbClient.updateTagHandler)
+
+	tool = mcp.NewTool("remove_tag",
+		mcp.WithDescription("Remove a tag"),
+		mcp.WithNumber("tag_id",
+			mcp.Required(),
+			mcp.Description("ID of the tag to remove"),		
+		),
+	)
+	s.AddTool(tool, kbClient.removeTagHandler)
+
+	tool = mcp.NewTool("set_task_tags",
+		mcp.WithDescription("Assign/Create/Update tags for a task"),
+		mcp.WithNumber("project_id",
+			mcp.Required(),
+			mcp.Description("ID of the project"),
+		),
+		mcp.WithNumber("task_id",
+			mcp.Required(),
+			mcp.Description("ID of the task"),
+		),
+		mcp.WithArray("tags",
+			mcp.Required(),
+			mcp.WithStringItems(),
+			mcp.Description("List of tags (array of strings)"),
+		),
+	)
+	s.AddTool(tool, kbClient.setTaskTagsHandler)
+
+	tool = mcp.NewTool("get_task_tags",
+		mcp.WithDescription("Get assigned tags to a task"),
+		mcp.WithNumber("task_id",
+			mcp.Required(),
+			mcp.Description("ID of the task"),
+		),
+	)
+	s.AddTool(tool, kbClient.getTaskTagsHandler)
+
 	// Start the stdio server
 	if err := server.ServeStdio(s); err != nil {
 		fmt.Printf("Server error: %v\n", err)
@@ -4196,6 +4279,144 @@ func (kc *kanboardClient) getSubtaskTimeSpentHandler(ctx context.Context, reques
 		params["user_id"] = user_id
 	}
 	result, err := kc.callKanboardAPI(ctx, "getSubtaskTimeSpent", params)
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	resultBytes, err := json.MarshalIndent(result, "", "  ")
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	return mcp.NewToolResultText(string(resultBytes)), nil
+}
+
+func (kc *kanboardClient) getAllTagsHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+	result, err := kc.callKanboardAPI(ctx, "getAllTags", nil)
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	resultBytes, err := json.MarshalIndent(result, "", "  ")
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	return mcp.NewToolResultText(string(resultBytes)), nil
+}
+
+func (kc *kanboardClient) getTagsByProjectHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+	project_id, err := request.RequireInt("project_id")
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	params := map[string]interface{}{"project_id": project_id}
+	result, err := kc.callKanboardAPI(ctx, "getTagsByProject", params)
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	resultBytes, err := json.MarshalIndent(result, "", "  ")
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	return mcp.NewToolResultText(string(resultBytes)), nil
+}
+
+func (kc *kanboardClient) createTagHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+	project_id, err := request.RequireInt("project_id")
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	tag, err := request.RequireString("tag")
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	params := map[string]interface{}{"project_id": project_id, "tag": tag}
+	color_id := request.GetInt("color_id", 0)
+	if color_id != 0 {
+		params["color_id"] = color_id
+	}
+	result, err := kc.callKanboardAPI(ctx, "createTag", params)
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	resultBytes, err := json.MarshalIndent(result, "", "  ")
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	return mcp.NewToolResultText(string(resultBytes)), nil
+}
+
+func (kc *kanboardClient) updateTagHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+	tag_id, err := request.RequireInt("tag_id")
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	tag, err := request.RequireString("tag")
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	params := map[string]interface{}{"id": tag_id, "name": tag}
+	color_id := request.GetInt("color_id", 0)
+	if color_id != 0 {
+		params["color_id"] = color_id
+	}
+	result, err := kc.callKanboardAPI(ctx, "updateTag", params)
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	resultBytes, err := json.MarshalIndent(result, "", "  ")
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	return mcp.NewToolResultText(string(resultBytes)), nil
+}
+
+func (kc *kanboardClient) removeTagHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+	tag_id, err := request.RequireInt("tag_id")
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	params := map[string]interface{}{"id": tag_id}
+	result, err := kc.callKanboardAPI(ctx, "removeTag", params)
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	resultBytes, err := json.MarshalIndent(result, "", "  ")
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	return mcp.NewToolResultText(string(resultBytes)), nil
+}
+
+func (kc *kanboardClient) setTaskTagsHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+	project_id, err := request.RequireInt("project_id")
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	task_id, err := request.RequireInt("task_id")
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	tags, err := request.RequireStringSlice("tags")
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	params := map[string]interface{}{"project_id": project_id, "task_id": task_id, "tags": tags}
+	result, err := kc.callKanboardAPI(ctx, "setTaskTags", params)
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	resultBytes, err := json.MarshalIndent(result, "", "  ")
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	return mcp.NewToolResultText(string(resultBytes)), nil
+}
+
+func (kc *kanboardClient) getTaskTagsHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+	task_id, err := request.RequireInt("task_id")
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	params := map[string]interface{}{"task_id": task_id}
+	result, err := kc.callKanboardAPI(ctx, "getTaskTags", params)
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}

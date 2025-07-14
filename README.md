@@ -284,7 +284,19 @@ After saving the configuration, restart your MCP client (Cursor, Claude Desktop,
 | `set_subtask_end_time` | ⏹️ Stop subtask timer for a user | "Stop timer for subtask 123 by user 4" |
 | `get_subtask_time_spent` | 📊 Get time spent on a subtask for a user | "Get time spent on subtask 123 by user 4" |
 
-###  Group Management
+### 🏷️ Tag Management
+
+| Tool | Description | Example |
+|------|-------------|---------|
+| `get_all_tags` | 📋 Get all tags | "Show all available tags" |
+| `get_tags_by_project` | 📋 Get all tags for a given project | "Show tags for project 123" |
+| `create_tag` | ➕ Create a new tag | "Create tag 'backend' for project 123 with color 1" |
+| `update_tag` | ✏️ Rename a tag | "Rename tag 456 to 'frontend' and set color to 2" |
+| `remove_tag` | 🗑️ Remove a tag | "Remove tag with ID 456" |
+| `set_task_tags` | 🏷️ Assign/Create/Update tags for a task | "Set tags 'urgent', 'bug' for task 123 in project 456" |
+| `get_task_tags` | 🔍 Get assigned tags to a task | "Get tags assigned to task 123" |
+
+### 👥 Group Management
 
 | Tool | Description | Example |
 |------|-------------|---------|
