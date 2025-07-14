@@ -58,6 +58,33 @@ func main() {
 			mcp.Required(),
 			mcp.Description("Name of the project to create"),
 		),
+		mcp.WithString("description",
+			mcp.Description("Description of the project (optional)"),
+		),
+		mcp.WithNumber("owner_id",
+			mcp.Description("ID of the project owner (optional)"),
+		),
+		mcp.WithString("identifier",
+			mcp.Description("Alphanumeric project identifier (optional)"),
+		),
+		mcp.WithString("start_date",
+			mcp.Description("Project start date in ISO8601 format (optional)"),
+		),
+		mcp.WithString("end_date",
+			mcp.Description("Project end date in ISO8601 format (optional)"),
+		),
+		mcp.WithNumber("priority_default",
+			mcp.Description("Default task priority (optional)"),
+		),
+		mcp.WithNumber("priority_start",
+			mcp.Description("Start priority (optional)"),
+		),
+		mcp.WithNumber("priority_end",
+			mcp.Description("End priority (optional)"),
+		),
+		mcp.WithString("email",
+			mcp.Description("Project email address (optional)"),
+		),
 	)
 	s.AddTool(tool, kbClient.createProjectHandler)
 
@@ -864,6 +891,152 @@ func main() {
 	)
 	s.AddTool(tool, kbClient.removeLinkHandler)
 
+	// Project Management
+
+	tool = mcp.NewTool("get_project_by_id",
+		mcp.WithDescription("Get project information by ID"),
+		mcp.WithNumber("project_id",
+			mcp.Required(),
+			mcp.Description("ID of the project to retrieve"),
+		),
+	)
+	s.AddTool(tool, kbClient.getProjectByIdHandler)
+
+	tool = mcp.NewTool("get_project_by_name",
+		mcp.WithDescription("Get project information by name"),
+		mcp.WithString("name",
+			mcp.Required(),
+			mcp.Description("Name of the project to retrieve"),
+		),
+	)
+	s.AddTool(tool, kbClient.getProjectByNameHandler)
+
+	tool = mcp.NewTool("get_project_by_identifier",
+		mcp.WithDescription("Get project information by identifier"),
+		mcp.WithString("identifier",
+			mcp.Required(),
+			mcp.Description("Identifier of the project to retrieve"),
+		),
+	)
+	s.AddTool(tool, kbClient.getProjectByIdentifierHandler)
+
+	tool = mcp.NewTool("get_project_by_email",
+		mcp.WithDescription("Get project information by email"),
+		mcp.WithString("email",
+			mcp.Required(),
+			mcp.Description("Email of the project to retrieve"),
+		),
+	)
+	s.AddTool(tool, kbClient.getProjectByEmailHandler)
+
+	tool = mcp.NewTool("get_all_projects",
+		mcp.WithDescription("Get all available projects"),
+	)
+	s.AddTool(tool, kbClient.getAllProjectsHandler)
+
+	tool = mcp.NewTool("update_project",
+		mcp.WithDescription("Update a project"),
+		mcp.WithNumber("project_id",
+			mcp.Required(),
+			mcp.Description("ID of the project to update"),
+		),
+		mcp.WithString("name",
+			mcp.Description("New name for the project (optional)"),
+		),
+		mcp.WithString("description",
+			mcp.Description("New description for the project (optional)"),
+		),
+		mcp.WithNumber("owner_id",
+			mcp.Description("New owner ID for the project (optional)"),
+		),
+		mcp.WithString("identifier",
+			mcp.Description("New alphanumeric identifier for the project (optional)"),
+		),
+		mcp.WithString("start_date",
+			mcp.Description("New start date in ISO8601 format (optional)"),
+		),
+		mcp.WithString("end_date",
+			mcp.Description("New end date in ISO8601 format (optional)"),
+		),
+		mcp.WithNumber("priority_default",
+			mcp.Description("New default task priority (optional)"),
+		),
+		mcp.WithNumber("priority_start",
+			mcp.Description("New start priority (optional)"),
+		),
+		mcp.WithNumber("priority_end",
+			mcp.Description("New end priority (optional)"),
+		),
+		mcp.WithString("email",
+			mcp.Description("New project email address (optional)"),
+		),
+	)
+	s.AddTool(tool, kbClient.updateProjectHandler)
+
+	tool = mcp.NewTool("remove_project",
+		mcp.WithDescription("Remove a project"),
+		mcp.WithNumber("project_id",
+			mcp.Required(),
+			mcp.Description("ID of the project to remove"),
+		),
+	)
+	s.AddTool(tool, kbClient.removeProjectHandler)
+
+	tool = mcp.NewTool("enable_project",
+		mcp.WithDescription("Enable a project"),
+		mcp.WithNumber("project_id",
+			mcp.Required(),
+			mcp.Description("ID of the project to enable"),
+		),
+	)
+	s.AddTool(tool, kbClient.enableProjectHandler)
+
+	tool = mcp.NewTool("disable_project",
+		mcp.WithDescription("Disable a project"),
+		mcp.WithNumber("project_id",
+			mcp.Required(),
+			mcp.Description("ID of the project to disable"),
+		),
+	)
+	s.AddTool(tool, kbClient.disableProjectHandler)
+
+	tool = mcp.NewTool("enable_project_public_access",
+		mcp.WithDescription("Enable public access for a given project"),
+		mcp.WithNumber("project_id",
+			mcp.Required(),
+			mcp.Description("ID of the project to enable public access for"),
+		),
+	)
+	s.AddTool(tool, kbClient.enableProjectPublicAccessHandler)
+
+	tool = mcp.NewTool("disable_project_public_access",
+		mcp.WithDescription("Disable public access for a given project"),
+		mcp.WithNumber("project_id",
+			mcp.Required(),
+			mcp.Description("ID of the project to disable public access for"),
+		),
+	)
+	s.AddTool(tool, kbClient.disableProjectPublicAccessHandler)
+
+	tool = mcp.NewTool("get_project_activity",
+		mcp.WithDescription("Get activity stream for a project"),
+		mcp.WithNumber("project_id",
+			mcp.Required(),
+			mcp.Description("ID of the project to get activity for"),
+		),
+	)
+	s.AddTool(tool, kbClient.getProjectActivityHandler)
+
+	tool = mcp.NewTool("get_project_activities",
+		mcp.WithDescription("Get Activityfeed for Project(s)"),
+		mcp.WithArray("project_ids",
+			mcp.Required(),
+			mcp.WithNumberItems(),
+			mcp.Description("Array of project IDs to get activities for"),
+		),
+	)
+	s.AddTool(tool, kbClient.getProjectActivitiesHandler)
+
 	// Start the stdio server
 	if err := server.ServeStdio(s); err != nil {
 		fmt.Printf("Server error: %v\n", err)
@@ -964,7 +1137,54 @@ func (kc *kanboardClient) createProjectHandler(ctx context.Context, request mcp.
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
-	params := map[string]string{"name": name}
+
+	params := map[string]interface{}{"name": name}
+
+	description := request.GetString("description", "")
+	if description != "" {
+		params["description"] = description
+	}
+
+	owner_id := request.GetInt("owner_id", 0)
+	if owner_id != 0 {
+		params["owner_id"] = owner_id
+	}
+
+	identifier := request.GetString("identifier", "")
+	if identifier != "" {
+		params["identifier"] = identifier
+	}
+
+	start_date := request.GetString("start_date", "")
+	if start_date != "" {
+		params["start_date"] = start_date
+	}
+
+	end_date := request.GetString("end_date", "")
+	if end_date != "" {
+		params["end_date"] = end_date
+	}
+
+	priority_default := request.GetInt("priority_default", 0)
+	if priority_default != 0 {
+		params["priority_default"] = priority_default
+	}
+
+	priority_start := request.GetInt("priority_start", 0)
+	if priority_start != 0 {
+		params["priority_start"] = priority_start
+	}
+
+	priority_end := request.GetInt("priority_end", 0)
+	if priority_end != 0 {
+		params["priority_end"] = priority_end
+	}
+
+	email := request.GetString("email", "")
+	if email != "" {
+		params["email"] = email
+	}
+
 	result, err := kc.callKanboardAPI(ctx, "createProject", params)
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
@@ -2697,6 +2917,276 @@ func (kc *kanboardClient) removeLinkHandler(ctx context.Context, request mcp.Cal
 	result, err := kc.callKanboardAPI(ctx, "removeLink", params)
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
+	}
+	resultBytes, err := json.MarshalIndent(result, "", "  ")
+	if err != nil {
+		return mcp.NewToolResultError(fmt.Sprintf("Failed to marshal API result: %v", err)), nil
+	}
+	return mcp.NewToolResultText(string(resultBytes)), nil
+}
+
+func (kc *kanboardClient) getProjectByIdHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+	project_id, err := request.RequireInt("project_id")
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	params := map[string]int{"project_id": project_id}
+	result, err := kc.callKanboardAPI(ctx, "getProjectById", params)
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	resultBytes, err := json.MarshalIndent(result, "", "  ")
+	if err != nil {
+		return mcp.NewToolResultError(fmt.Sprintf("Failed to marshal API result: %v", err)), nil
+	}
+	return mcp.NewToolResultText(string(resultBytes)), nil
+}
+
+func (kc *kanboardClient) getProjectByNameHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+	name, err := request.RequireString("name")
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	params := map[string]string{"name": name}
+	result, err := kc.callKanboardAPI(ctx, "getProjectByName", params)
+	if err != nil {
+		return mcp.NewToolResultError(fmt.Sprintf("Failed to get project by name: %v", err)), nil
+	}
+	resultBytes, err := json.MarshalIndent(result, "", "  ")
+	if err != nil {
+		return mcp.NewToolResultError(fmt.Sprintf("Failed to marshal API result: %v", err)), nil
+	}
+	return mcp.NewToolResultText(string(resultBytes)), nil
+}
+
+func (kc *kanboardClient) getProjectByIdentifierHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+	identifier, err := request.RequireString("identifier")
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	params := map[string]string{"identifier": identifier}
+	result, err := kc.callKanboardAPI(ctx, "getProjectByIdentifier", params)
+	if err != nil {
+		return mcp.NewToolResultError(fmt.Sprintf("Failed to get project by identifier: %v", err)), nil
+	}
+	resultBytes, err := json.MarshalIndent(result, "", "  ")
+	if err != nil {
+		return mcp.NewToolResultError(fmt.Sprintf("Failed to marshal API result: %v", err)), nil
+	}
+	return mcp.NewToolResultText(string(resultBytes)), nil
+}
+
+func (kc *kanboardClient) getProjectByEmailHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+	email, err := request.RequireString("email")
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	params := map[string]string{"email": email}
+	result, err := kc.callKanboardAPI(ctx, "getProjectByEmail", params)
+	if err != nil {
+		return mcp.NewToolResultError(fmt.Sprintf("Failed to get project by email: %v", err)), nil
+	}
+	resultBytes, err := json.MarshalIndent(result, "", "  ")
+	if err != nil {
+		return mcp.NewToolResultError(fmt.Sprintf("Failed to marshal API result: %v", err)), nil
+	}
+	return mcp.NewToolResultText(string(resultBytes)), nil
+}
+
+func (kc *kanboardClient) getAllProjectsHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+	result, err := kc.callKanboardAPI(ctx, "getAllProjects", nil)
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	resultBytes, err := json.MarshalIndent(result, "", "  ")
+	if err != nil {
+		return mcp.NewToolResultError(fmt.Sprintf("Failed to marshal API result: %v", err)), nil
+	}
+	return mcp.NewToolResultText(string(resultBytes)), nil
+}
+
+func (kc *kanboardClient) updateProjectHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+	project_id, err := request.RequireInt("project_id")
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+
+	params := map[string]interface{}{"id": project_id}
+
+	name := request.GetString("name", "")
+	if name != "" {
+		params["name"] = name
+	}
+
+	description := request.GetString("description", "")
+	if description != "" {
+		params["description"] = description
+	}
+
+	owner_id := request.GetInt("owner_id", 0)
+	if owner_id != 0 {
+		params["owner_id"] = owner_id
+	}
+
+	identifier := request.GetString("identifier", "")
+	if identifier != "" {
+		params["identifier"] = identifier
+	}
+
+	start_date := request.GetString("start_date", "")
+	if start_date != "" {
+		params["start_date"] = start_date
+	}
+
+	end_date := request.GetString("end_date", "")
+	if end_date != "" {
+		params["end_date"] = end_date
+	}
+
+	priority_default := request.GetInt("priority_default", 0)
+	if priority_default != 0 {
+		params["priority_default"] = priority_default
+	}
+
+	priority_start := request.GetInt("priority_start", 0)
+	if priority_start != 0 {
+		params["priority_start"] = priority_start
+	}
+
+	priority_end := request.GetInt("priority_end", 0)
+	if priority_end != 0 {
+		params["priority_end"] = priority_end
+	}
+
+	email := request.GetString("email", "")
+	if email != "" {
+		params["email"] = email
+	}
+
+	result, err := kc.callKanboardAPI(ctx, "updateProject", params)
+	if err != nil {
+		return mcp.NewToolResultError(fmt.Sprintf("Failed to update project: %v", err)), nil
+	}
+
+	resultBytes, err := json.MarshalIndent(result, "", "  ")
+	if err != nil {
+		return mcp.NewToolResultError(fmt.Sprintf("Failed to marshal API result: %v", err)), nil
+	}
+
+	return mcp.NewToolResultText(string(resultBytes)), nil
+}
+
+func (kc *kanboardClient) removeProjectHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+	project_id, err := request.RequireInt("project_id")
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	params := map[string]int{"project_id": project_id}
+	result, err := kc.callKanboardAPI(ctx, "removeProject", params)
+	if err != nil {
+		return mcp.NewToolResultError(fmt.Sprintf("Failed to remove project: %v", err)), nil
+	}
+	resultBytes, err := json.MarshalIndent(result, "", "  ")
+	if err != nil {
+		return mcp.NewToolResultError(fmt.Sprintf("Failed to marshal API result: %v", err)), nil
+	}
+	return mcp.NewToolResultText(string(resultBytes)), nil
+}
+
+func (kc *kanboardClient) enableProjectHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+	project_id, err := request.RequireInt("project_id")
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	params := map[string]int{"project_id": project_id}
+	result, err := kc.callKanboardAPI(ctx, "enableProject", params)
+	if err != nil {
+		return mcp.NewToolResultError(fmt.Sprintf("Failed to enable project: %v", err)), nil
+	}
+	resultBytes, err := json.MarshalIndent(result, "", "  ")
+	if err != nil {
+		return mcp.NewToolResultError(fmt.Sprintf("Failed to marshal API result: %v", err)), nil
+	}
+	return mcp.NewToolResultText(string(resultBytes)), nil
+}
+
+func (kc *kanboardClient) disableProjectHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+	project_id, err := request.RequireInt("project_id")
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	params := map[string]int{"project_id": project_id}
+	result, err := kc.callKanboardAPI(ctx, "disableProject", params)
+	if err != nil {
+		return mcp.NewToolResultError(fmt.Sprintf("Failed to disable project: %v", err)), nil
+	}
+	resultBytes, err := json.MarshalIndent(result, "", "  ")
+	if err != nil {
+		return mcp.NewToolResultError(fmt.Sprintf("Failed to marshal API result: %v", err)), nil
+	}
+	return mcp.NewToolResultText(string(resultBytes)), nil
+}
+
+func (kc *kanboardClient) enableProjectPublicAccessHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+	project_id, err := request.RequireInt("project_id")
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	params := map[string]int{"project_id": project_id}
+	result, err := kc.callKanboardAPI(ctx, "enableProjectPublicAccess", params)
+	if err != nil {
+		return mcp.NewToolResultError(fmt.Sprintf("Failed to enable project public access: %v", err)), nil
+	}
+	resultBytes, err := json.MarshalIndent(result, "", "  ")
+	if err != nil {
+		return mcp.NewToolResultError(fmt.Sprintf("Failed to marshal API result: %v", err)), nil
+	}
+	return mcp.NewToolResultText(string(resultBytes)), nil
+}
+
+func (kc *kanboardClient) disableProjectPublicAccessHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+	project_id, err := request.RequireInt("project_id")
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	params := map[string]int{"project_id": project_id}
+	result, err := kc.callKanboardAPI(ctx, "disableProjectPublicAccess", params)
+	if err != nil {
+		return mcp.NewToolResultError(fmt.Sprintf("Failed to disable project public access: %v", err)), nil
+	}
+	resultBytes, err := json.MarshalIndent(result, "", "  ")
+	if err != nil {
+		return mcp.NewToolResultError(fmt.Sprintf("Failed to marshal API result: %v", err)), nil
+	}
+	return mcp.NewToolResultText(string(resultBytes)), nil
+}
+
+func (kc *kanboardClient) getProjectActivityHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+	project_id, err := request.RequireInt("project_id")
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	params := map[string]int{"project_id": project_id}
+	result, err := kc.callKanboardAPI(ctx, "getProjectActivity", params)
+	if err != nil {
+		return mcp.NewToolResultError(fmt.Sprintf("Failed to get project activity: %v", err)), nil
+	}
+	resultBytes, err := json.MarshalIndent(result, "", "  ")
+	if err != nil {
+		return mcp.NewToolResultError(fmt.Sprintf("Failed to marshal API result: %v", err)), nil
+	}
+	return mcp.NewToolResultText(string(resultBytes)), nil
+}
+
+func (kc *kanboardClient) getProjectActivitiesHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+	project_ids, err := request.RequireIntSlice("project_ids")
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	params := map[string]interface{}{"project_ids": project_ids}
+	result, err := kc.callKanboardAPI(ctx, "getProjectActivities", params)
+	if err != nil {
+		return mcp.NewToolResultError(fmt.Sprintf("Failed to get project activities: %v", err)), nil
 	}
 	resultBytes, err := json.MarshalIndent(result, "", "  ")
 	if err != nil {

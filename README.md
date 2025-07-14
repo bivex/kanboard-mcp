@@ -110,7 +110,20 @@ After saving the configuration, restart your MCP client (Cursor, Claude Desktop,
 | Tool | Description | Example |
 |------|-------------|---------|
 | `get_projects` | 📋 List all projects | "Show me all Kanboard projects" |
-| `create_project` | ➕ Create new projects | "Create a project called 'Website Redesign'" |
+| `create_project` | ➕ Create new projects | "Create a project called 'Website Redesign' with description 'Redesign the company website' and owner 1" |
+| `get_project_by_id` | 🔍 Get project information by ID | "Get project details for ID 123" |
+| `get_project_by_name` | 🔍 Get project information by name | "Get project details for name 'My Project'" |
+| `get_project_by_identifier` | 🔍 Get project information by identifier | "Get project details for identifier 'WEB-APP'" |
+| `get_project_by_email` | 🔍 Get project information by email | "Get project details for email 'project@example.com'" |
+| `get_all_projects` | 📋 Get all available projects | "Show me all available projects" |
+| `update_project` | ✏️ Update a project | "Update project 1 with new name 'New Website' and description 'Updated description'" |
+| `remove_project` | 🗑️ Remove a project | "Remove project with ID 456" |
+| `enable_project` | ✅ Enable a project | "Enable project 123" |
+| `disable_project` | 🚫 Disable a project | "Disable project 123" |
+| `enable_project_public_access` | 🌐 Enable public access for a given project | "Enable public access for project 123" |
+| `disable_project_public_access` | 🔒 Disable public access for a given project | "Disable public access for project 123" |
+| `get_project_activity` | 📢 Get activity stream for a project | "Show me activity for project 123" |
+| `get_project_activities` | 📊 Get Activityfeed for Project(s) | "Get activities for projects 1, 2, and 3" |
 
 ### 📝 Task Management
 
