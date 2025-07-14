@@ -375,6 +375,15 @@ func main() {
 	)
 	s.AddTool(tool, kbClient.getSwimlanesHandler)
 
+	tool = mcp.NewTool("get_board",
+		mcp.WithDescription("Get all necessary information to display a board"),
+		mcp.WithNumber("project_id",
+			mcp.Required(),
+			mcp.Description("ID of the project to get board details for"),
+		),
+	)
+	s.AddTool(tool, kbClient.getBoardHandler)
+
 	tool = mcp.NewTool("create_swimlane",
 		mcp.WithDescription("Add team swimlanes"),
 		mcp.WithString("project_id",
@@ -1166,6 +1175,26 @@ func (kc *kanboardClient) getSwimlanesHandler(ctx context.Context, request mcp.C
 
 	if err != nil {
 		return mcp.NewToolResultError(fmt.Sprintf("Failed to get swimlanes: %v", err)), nil
+	}
+
+	resultBytes, err := json.MarshalIndent(result, "", "  ")
+	if err != nil {
+		return mcp.NewToolResultError(fmt.Sprintf("Failed to marshal API result: %v", err)), nil
+	}
+
+	return mcp.NewToolResultText(string(resultBytes)), nil
+}
+
+func (kc *kanboardClient) getBoardHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+	project_id, err := request.RequireInt("project_id")
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+
+	params := []int{project_id}
+	result, err := kc.callKanboardAPI(ctx, "getBoard", params)
+	if err != nil {
+		return mcp.NewToolResultError(fmt.Sprintf("Failed to get board details: %v", err)), nil
 	}
 
 	resultBytes, err := json.MarshalIndent(result, "", "  ")

@@ -155,6 +155,12 @@ After saving the configuration, restart your MCP client (Cursor, Claude Desktop,
 | `update_swimlane` | ✏️ Modify swimlanes | "Rename 'Mobile Team' to 'Cross-Platform Team'" |
 | `delete_swimlane` | 🗑️ Remove swimlanes | "Delete the inactive 'Legacy Team' swimlane" |
 
+### 📋 Board Management
+
+| Tool | Description | Example |
+|------|-------------|---------|
+| `get_board` | 📋 Get all necessary information to display a board | "Show me the board for project 123" |
+
 ### 👥 User Management
 
 | Tool | Description | Example |
