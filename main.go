@@ -297,6 +297,48 @@ func main() {
 	)
 	s.AddTool(tool, kbClient.removeUserHandler)
 
+	tool = mcp.NewTool("get_me",
+		mcp.WithDescription("Get logged user session"),
+	)
+	s.AddTool(tool, kbClient.getMeHandler)
+
+	tool = mcp.NewTool("get_my_dashboard",
+		mcp.WithDescription("Get the dashboard of the logged user without pagination"),
+	)
+	s.AddTool(tool, kbClient.getMyDashboardHandler)
+
+	tool = mcp.NewTool("get_my_activity_stream",
+		mcp.WithDescription("Get the last 100 events for the logged user"),
+	)
+	s.AddTool(tool, kbClient.getMyActivityStreamHandler)
+
+	tool = mcp.NewTool("create_my_private_project",
+		mcp.WithDescription("Create a private project for the logged user"),
+		mcp.WithString("name",
+			mcp.Required(),
+			mcp.Description("Name of the private project to create"),
+		),
+		mcp.WithString("description",
+			mcp.Description("Description of the private project (optional)"),
+		),
+	)
+	s.AddTool(tool, kbClient.createMyPrivateProjectHandler)
+
+	tool = mcp.NewTool("get_my_projects_list",
+		mcp.WithDescription("Get projects of the connected user"),
+	)
+	s.AddTool(tool, kbClient.getMyProjectsListHandler)
+
+	tool = mcp.NewTool("get_my_overdue_tasks",
+		mcp.WithDescription("Get my overdue tasks"),
+	)
+	s.AddTool(tool, kbClient.getMyOverdueTasksHandler)
+
+	tool = mcp.NewTool("get_my_projects",
+		mcp.WithDescription("Get projects of connected user with full details"),
+	)
+	s.AddTool(tool, kbClient.getMyProjectsHandler)
+
 	tool = mcp.NewTool("get_columns",
 		mcp.WithDescription("List project columns"),
 		mcp.WithString("project_id",
