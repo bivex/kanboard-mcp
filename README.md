@@ -231,7 +231,18 @@ After saving the configuration, restart your MCP client (Cursor, Claude Desktop,
 | `update_link` | ✏️ Update a link | "Update link 14 with opposite link 12 and label 'boo'" |
 | `remove_link` | 🗑️ Remove a link | "Remove link with ID 14" |
 
-### 👥 Group Management
+### 📂 Project File Management
+
+| Tool | Description | Example |
+|------|-------------|---------|
+| `create_project_file` | ➕ Create and upload a new project attachment | "Create a file 'My Document.pdf' for project 1 with base64 content 'Zm9vYmFy'" |
+| `get_all_project_files` | 📋 Get all files attached to a project | "Show all files for project 123" |
+| `get_project_file` | 🔍 Get file information | "Get details for file 456 in project 123" |
+| `download_project_file` | 📥 Download project file contents (encoded in base64) | "Download file 456 from project 123" |
+| `remove_project_file` | 🗑️ Remove a file associated to a project | "Remove file 456 from project 123" |
+| `remove_all_project_files` | 🗑️ Remove all files associated to a project | "Remove all files from project 123" |
+
+### �� Group Management
 
 | Tool | Description | Example |
 |------|-------------|---------|

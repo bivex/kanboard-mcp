@@ -1037,6 +1037,81 @@ func main() {
 	)
 	s.AddTool(tool, kbClient.getProjectActivitiesHandler)
 
+	// Project File Management
+	tool = mcp.NewTool("create_project_file",
+		mcp.WithDescription("Create and upload a new project attachment"),
+		mcp.WithNumber("project_id",
+			mcp.Required(),
+			mcp.Description("ID of the project to attach the file to"),
+		),
+		mcp.WithString("filename",
+			mcp.Required(),
+			mcp.Description("Name of the file"),
+		),
+		mcp.WithString("blob",
+			mcp.Required(),
+			mcp.Description("File content encoded in base64"),
+		),
+	)
+	s.AddTool(tool, kbClient.createProjectFileHandler)
+
+	tool = mcp.NewTool("get_all_project_files",
+		mcp.WithDescription("Get all files attached to a project"),
+		mcp.WithNumber("project_id",
+			mcp.Required(),
+			mcp.Description("ID of the project to get files from"),
+		),
+	)
+	s.AddTool(tool, kbClient.getAllProjectFilesHandler)
+
+	tool = mcp.NewTool("get_project_file",
+		mcp.WithDescription("Get file information"),
+		mcp.WithNumber("project_id",
+			mcp.Required(),
+			mcp.Description("ID of the project"),
+		),
+		mcp.WithNumber("file_id",
+			mcp.Required(),
+			mcp.Description("ID of the file to retrieve"),
+		),
+	)
+	s.AddTool(tool, kbClient.getProjectFileHandler)
+
+	tool = mcp.NewTool("download_project_file",
+		mcp.WithDescription("Download project file contents (encoded in base64)"),
+		mcp.WithNumber("project_id",
+			mcp.Required(),
+			mcp.Description("ID of the project"),
+		),
+		mcp.WithNumber("file_id",
+			mcp.Required(),
+			mcp.Description("ID of the file to download"),
+		),
+	)
+	s.AddTool(tool, kbClient.downloadProjectFileHandler)
+
+	tool = mcp.NewTool("remove_project_file",
+		mcp.WithDescription("Remove a file associated to a project"),
+		mcp.WithNumber("project_id",
+			mcp.Required(),
+			mcp.Description("ID of the project"),
+		),
+		mcp.WithNumber("file_id",
+			mcp.Required(),
+			mcp.Description("ID of the file to remove"),
+		),
+	)
+	s.AddTool(tool, kbClient.removeProjectFileHandler)
+
+	tool = mcp.NewTool("remove_all_project_files",
+		mcp.WithDescription("Remove all files associated to a project"),
+		mcp.WithNumber("project_id",
+			mcp.Required(),
+			mcp.Description("ID of the project to remove all files from"),
+		),
+	)
+	s.AddTool(tool, kbClient.removeAllProjectFilesHandler)
+
 	// Start the stdio server
 	if err := server.ServeStdio(s); err != nil {
 		fmt.Printf("Server error: %v\n", err)
@@ -3187,6 +3262,134 @@ func (kc *kanboardClient) getProjectActivitiesHandler(ctx context.Context, reque
 	result, err := kc.callKanboardAPI(ctx, "getProjectActivities", params)
 	if err != nil {
 		return mcp.NewToolResultError(fmt.Sprintf("Failed to get project activities: %v", err)), nil
+	}
+	resultBytes, err := json.MarshalIndent(result, "", "  ")
+	if err != nil {
+		return mcp.NewToolResultError(fmt.Sprintf("Failed to marshal API result: %v", err)), nil
+	}
+	return mcp.NewToolResultText(string(resultBytes)), nil
+}
+
+func (kc *kanboardClient) createProjectFileHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+	project_id, err := request.RequireInt("project_id")
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	filename, err := request.RequireString("filename")
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	blob, err := request.RequireString("blob")
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+
+	params := map[string]interface{}{
+		"project_id": project_id,
+		"filename":   filename,
+		"blob":       blob,
+	}
+
+	result, err := kc.callKanboardAPI(ctx, "createProjectFile", params)
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	resultBytes, err := json.MarshalIndent(result, "", "  ")
+	if err != nil {
+		return mcp.NewToolResultError(fmt.Sprintf("Failed to marshal API result: %v", err)), nil
+	}
+	return mcp.NewToolResultText(string(resultBytes)), nil
+}
+
+func (kc *kanboardClient) getAllProjectFilesHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+	project_id, err := request.RequireInt("project_id")
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	params := map[string]int{"project_id": project_id}
+	result, err := kc.callKanboardAPI(ctx, "getAllProjectFiles", params)
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	resultBytes, err := json.MarshalIndent(result, "", "  ")
+	if err != nil {
+		return mcp.NewToolResultError(fmt.Sprintf("Failed to marshal API result: %v", err)), nil
+	}
+	return mcp.NewToolResultText(string(resultBytes)), nil
+}
+
+func (kc *kanboardClient) getProjectFileHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+	project_id, err := request.RequireInt("project_id")
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	file_id, err := request.RequireInt("file_id")
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	params := map[string]int{"project_id": project_id, "file_id": file_id}
+	result, err := kc.callKanboardAPI(ctx, "getProjectFile", params)
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	resultBytes, err := json.MarshalIndent(result, "", "  ")
+	if err != nil {
+		return mcp.NewToolResultError(fmt.Sprintf("Failed to marshal API result: %v", err)), nil
+	}
+	return mcp.NewToolResultText(string(resultBytes)), nil
+}
+
+func (kc *kanboardClient) downloadProjectFileHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+	project_id, err := request.RequireInt("project_id")
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	file_id, err := request.RequireInt("file_id")
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	params := map[string]int{"project_id": project_id, "file_id": file_id}
+	result, err := kc.callKanboardAPI(ctx, "downloadProjectFile", params)
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	resultBytes, err := json.MarshalIndent(result, "", "  ")
+	if err != nil {
+		return mcp.NewToolResultError(fmt.Sprintf("Failed to marshal API result: %v", err)), nil
+	}
+	return mcp.NewToolResultText(string(resultBytes)), nil
+}
+
+func (kc *kanboardClient) removeProjectFileHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+	project_id, err := request.RequireInt("project_id")
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	file_id, err := request.RequireInt("file_id")
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	params := map[string]int{"project_id": project_id, "file_id": file_id}
+	result, err := kc.callKanboardAPI(ctx, "removeProjectFile", params)
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	resultBytes, err := json.MarshalIndent(result, "", "  ")
+	if err != nil {
+		return mcp.NewToolResultError(fmt.Sprintf("Failed to marshal API result: %v", err)), nil
+	}
+	return mcp.NewToolResultText(string(resultBytes)), nil
+}
+
+func (kc *kanboardClient) removeAllProjectFilesHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+	project_id, err := request.RequireInt("project_id")
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	params := map[string]int{"project_id": project_id}
+	result, err := kc.callKanboardAPI(ctx, "removeAllProjectFiles", params)
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
 	}
 	resultBytes, err := json.MarshalIndent(result, "", "  ")
 	if err != nil {
