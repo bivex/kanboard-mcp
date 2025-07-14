@@ -131,11 +131,12 @@ After saving the configuration, restart your MCP client (Cursor, Claude Desktop,
 
 | Tool | Description | Example |
 |------|-------------|---------|
-| `get_columns` | 📋 List project columns | "Show me all columns in this project" |
-| `create_column` | ➕ Add new columns | "Create a 'Testing' column with 5 task limit" |
-| `update_column` | ✏️ Modify column settings | "Change the 'Review' column limit to 3 tasks" |
+| `get_columns` | 📋 List project columns | "Show me all columns in project 123" |
+| `get_column` | 🔍 Get a single column | "Get details for column 456" |
+| `create_column` | ➕ Add new columns | "Create a 'Testing' column in project 123 with 5 task limit and description 'For UAT testing'" |
+| `update_column` | ✏️ Modify column settings | "Change column 123 title to 'Review' and limit to 3 tasks, with description 'Needs final review'" |
+| `change_column_position` | 🔄 Change column positions | "Move column 123 to position 3 in project 456" |
 | `delete_column` | 🗑️ Remove columns | "Delete the unused 'Draft' column" |
-| `reorder_columns` | 🔄 Change column positions | "Move 'Testing' column before 'Done'" |
 
 ### 🏷️ Category Management
 

@@ -269,18 +269,30 @@ func main() {
 	)
 	s.AddTool(tool, kbClient.getColumnsHandler)
 
+	tool = mcp.NewTool("get_column",
+		mcp.WithDescription("Get a single column"),
+		mcp.WithNumber("column_id",
+			mcp.Required(),
+			mcp.Description("ID of the column to get details for"),
+		),
+	)
+	s.AddTool(tool, kbClient.getColumnHandler)
+
 	tool = mcp.NewTool("create_column",
 		mcp.WithDescription("Add new columns"),
-		mcp.WithString("project_id",
+		mcp.WithNumber("project_id",
 			mcp.Required(),
 			mcp.Description("ID of the project to add the column to"),
 		),
-		mcp.WithString("name",
+		mcp.WithString("title",
 			mcp.Required(),
-			mcp.Description("Name of the column to create"),
+			mcp.Description("Title of the column to create"),
 		),
-		mcp.WithNumber("limit",
+		mcp.WithNumber("task_limit",
 			mcp.Description("Task limit for the new column"),
+		),
+		mcp.WithString("description",
+			mcp.Description("Description for the new column"),
 		),
 	)
 	s.AddTool(tool, kbClient.createColumnHandler)
@@ -291,11 +303,15 @@ func main() {
 			mcp.Required(),
 			mcp.Description("ID of the column to update"),
 		),
-		mcp.WithString("name",
-			mcp.Description("New name for the column"),
+		mcp.WithString("title",
+			mcp.Required(),
+			mcp.Description("New title for the column"),
 		),
-		mcp.WithNumber("limit",
+		mcp.WithNumber("task_limit",
 			mcp.Description("New task limit for the column"),
+		),
+		mcp.WithString("description",
+			mcp.Description("New description for the column"),
 		),
 	)
 	s.AddTool(tool, kbClient.updateColumnHandler)
@@ -311,7 +327,7 @@ func main() {
 
 	tool = mcp.NewTool("reorder_columns",
 		mcp.WithDescription("Change column positions"),
-		mcp.WithString("project_id",
+		mcp.WithNumber("project_id",
 			mcp.Required(),
 			mcp.Description("ID of the project containing the columns"),
 		),
@@ -319,9 +335,9 @@ func main() {
 			mcp.Required(),
 			mcp.Description("ID of the column to reorder"),
 		),
-		mcp.WithNumber("new_position",
+		mcp.WithNumber("position",
 			mcp.Required(),
-			mcp.Description("New position for the column"),
+			mcp.Description("New position for the column (must be >= 1)"),
 		),
 	)
 	s.AddTool(tool, kbClient.reorderColumnsHandler)
@@ -945,6 +961,25 @@ func (kc *kanboardClient) getColumnsHandler(ctx context.Context, request mcp.Cal
 	return mcp.NewToolResultText(string(resultBytes)), nil
 }
 
+func (kc *kanboardClient) getColumnHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+	column_id, err := request.RequireInt("column_id")
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	params := map[string]int{"column_id": column_id}
+	result, err := kc.callKanboardAPI(ctx, "getColumn", params)
+	if err != nil {
+		return mcp.NewToolResultError(fmt.Sprintf("Failed to get column details: %v", err)), nil
+	}
+
+	resultBytes, err := json.MarshalIndent(result, "", "  ")
+	if err != nil {
+		return mcp.NewToolResultError(fmt.Sprintf("Failed to marshal API result: %v", err)), nil
+	}
+
+	return mcp.NewToolResultText(string(resultBytes)), nil
+}
+
 func (kc *kanboardClient) createColumnHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
 	project_id_str, err := request.RequireString("project_id")
 	if err != nil {
@@ -954,19 +989,24 @@ func (kc *kanboardClient) createColumnHandler(ctx context.Context, request mcp.C
 	if err != nil {
 		return mcp.NewToolResultError(fmt.Sprintf("Invalid project_id: %v", err)), nil
 	}
-	name, err := request.RequireString("name")
+	title, err := request.RequireString("title")
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
 
 	params := map[string]interface{}{
 		"project_id": project_id,
-		"title":      name, // Kanboard API expects 'title'
+		"title":      title,
 	}
 
-	limit := request.GetInt("limit", 0)
-	if limit != 0 {
-		params["task_limit"] = limit
+	task_limit := request.GetInt("task_limit", 0)
+	if task_limit != 0 {
+		params["task_limit"] = task_limit
+	}
+
+	description := request.GetString("description", "")
+	if description != "" {
+		params["description"] = description
 	}
 
 	result, err := kc.callKanboardAPI(ctx, "addColumn", params)
@@ -988,33 +1028,21 @@ func (kc *kanboardClient) updateColumnHandler(ctx context.Context, request mcp.C
 		return mcp.NewToolResultError(err.Error()), nil
 	}
 
-	params := map[string]interface{}{"id": column_id}
-
-	name := request.GetString("name", "")
-	if name != "" {
-		params["title"] = name // Kanboard API expects 'title'
-	} else {
-		// If name is not provided, fetch the existing column to get its current title
-		result, err := kc.callKanboardAPI(ctx, "getColumn", map[string]int{"column_id": column_id})
-		if err != nil {
-			return mcp.NewToolResultError(fmt.Sprintf("Failed to get column details to infer title: %v", err)), nil
-		}
-		var columnInfo struct {
-			Title string `json:"title"`
-		}
-		tempBytes, err := json.Marshal(result)
-		if err != nil {
-			return mcp.NewToolResultError(fmt.Sprintf("Failed to marshal column info for parsing: %v", err)), nil
-		}
-		if err := json.Unmarshal(tempBytes, &columnInfo); err != nil {
-			return mcp.NewToolResultError(fmt.Sprintf("Failed to parse column info to infer title: %v", err)), nil
-		}
-		params["title"] = columnInfo.Title // Use the existing title
+	title, err := request.RequireString("title")
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
 	}
 
-	limit := request.GetInt("limit", 0)
-	if limit != 0 {
-		params["task_limit"] = limit
+	params := map[string]interface{}{"id": column_id, "title": title}
+
+	task_limit := request.GetInt("task_limit", 0)
+	if task_limit != 0 {
+		params["task_limit"] = task_limit
+	}
+
+	description := request.GetString("description", "")
+	if description != "" {
+		params["description"] = description
 	}
 
 	result, err := kc.callKanboardAPI(ctx, "updateColumn", params)
@@ -1058,19 +1086,20 @@ func (kc *kanboardClient) reorderColumnsHandler(ctx context.Context, request mcp
 	if err != nil {
 		return mcp.NewToolResultError(fmt.Sprintf("Invalid project_id: %v", err)), nil
 	}
-	new_position, err := request.RequireInt("new_position")
+	column_id, err := request.RequireInt("column_id")
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	position, err := request.RequireInt("position")
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
 
 	params := map[string]interface{}{
 		"project_id":  project_id,
-		"column_id":   request.GetInt("column_id", 0), // column_id is needed but not exposed directly in NLP, might need to get it via column name
-		"position":    new_position,
+		"column_id":   column_id,
+		"position":    position,
 	}
-
-	// Kanboard's moveColumnPosition requires a column_id. If we only have name, we need to resolve it.
-	// For simplicity, assuming column_id is provided, or a mechanism to resolve it exists for the LLM.
 
 	result, err := kc.callKanboardAPI(ctx, "moveColumnPosition", params)
 	if err != nil {
