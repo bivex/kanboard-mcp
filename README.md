@@ -38,4 +38,20 @@ To connect this MCP server to Cursor (or any compatible MCP client like Claude D
 3.  **Restart Cursor:**
     After saving the `mcp_config.json` file, restart your Cursor application for the changes to take effect.
 
-Once configured, Cursor will be able to discover and interact with the `hello_world` tool exposed by this MCP server.
+Once configured, Cursor will be able to discover and interact with the following tools exposed by this MCP server:
+
+| Tool Name          | Description               | NLP Call Example                                   |
+|--------------------|---------------------------|----------------------------------------------------|
+| `get_projects`     | List all projects         | `"List all Kanboard projects for me"`              |
+| `create_project`   | Create new projects       | `"Create a new project called 'My New Project'"`   |
+| `get_tasks`        | Get project tasks         | `"Get tasks for the project 'My Project'"`         |
+| `create_task`      | Create new tasks          | `"Create a task 'Finish report' in project 'My Project'"` |
+| `update_task`      | Modify existing tasks     | `"Update task 123 with description 'New description'"` |
+| `delete_task`      | Remove tasks              | `"Delete task with ID 456"`                        |
+| `get_task_details` | Get detailed task info    | `"Get details for task 789"`                       |
+| `move_task`        | Move tasks between columns| `"Move task 123 to column 'Done'"`                 |
+| `get_users`        | List all users            | `"List all users in Kanboard"`                     |
+| `get_user_by_name` | Get user by name          | `"Find user 'john.doe'"`                           |
+| `create_user`      | Create a new user         | `"Create a new user 'testuser' with password 'pass123'"` |
+| `update_user`      | Modify an existing user   | `"Update user 1 with new email 'test@example.com'"` |
+| `remove_user`      | Remove a user             | `"Remove user with ID 2"`                          |
