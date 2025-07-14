@@ -378,12 +378,17 @@ After saving the configuration, restart your MCP client (Cursor, Claude Desktop,
 
 | Tool | Description | Example |
 |------|-------------|---------|
-| `get_users` | 📋 List all system users | "Show me all team members" |
-| `get_user_by_name` | 🔍 Get user by name | "Find user 'john.doe'" |
-| `create_user` | ➕ Create a new user | "Create user 'testuser' with password 'pass123'" |
-| `update_user` | ✏️ Modify an existing user | "Update user 1 with email 'test@example.com'" |
-| `remove_user` | 🗑️ Remove a user | "Remove user with ID 2" |
-| `assign_user_to_project` | 🔗 Assign user to project | "Assign user 3 to project 10 as project-manager" |
+| `get_users` | 📋 List all system users | "Show me all users" |
+| `create_user` | ➕ Create a new user | "Create user 'john' with password '123456'" |
+| `create_ldap_user` | ➕ Create a new user authenticated by LDAP | "Create LDAP user 'jane'" |
+| `get_user` | 🔍 Get user information by ID | "Get user details for ID 123" |
+| `get_user_by_name` | 🔍 Get user information by username | "Get user details for 'john'" |
+| `update_user` | ✏️ Update a user | "Update user 123 with role 'app-manager'" |
+| `remove_user` | 🗑️ Remove a user | "Remove user with ID 456" |
+| `disable_user` | ❌ Disable a user | "Disable user 123" |
+| `enable_user` | ✅ Enable a user | "Enable user 123" |
+| `is_active_user` | 🔍 Check if a user is active | "Check if user 123 is active" |
+| `assign_user_to_project` | 👤 Assign a user to a project with a specific role | "Assign user 1 to project 'Website' with role 'project-member'" |
 
 ## 📖 Usage Examples
 

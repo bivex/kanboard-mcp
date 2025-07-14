@@ -271,6 +271,112 @@ func main() {
 	)
 	s.AddTool(tool, kbClient.getUsersHandler)
 
+	tool = mcp.NewTool("create_user",
+		mcp.WithDescription("Create a new user"),
+		mcp.WithString("username",
+			mcp.Required(),
+			mcp.Description("Username for the new user (must be unique)"),
+		),
+		mcp.WithString("password",
+			mcp.Required(),
+			mcp.Description("Password for the new user (must have at least 6 characters)"),
+		),
+		mcp.WithString("name",
+			mcp.Description("Full name of the new user (optional)"),
+		),
+		mcp.WithString("email",
+			mcp.Description("Email address of the new user (optional)"),
+		),
+		mcp.WithString("role",
+			mcp.Description("Role for the user (app-admin, app-manager, app-user) (optional)"),
+		),
+	)
+	s.AddTool(tool, kbClient.createUserHandler)
+
+	tool = mcp.NewTool("create_ldap_user",
+		mcp.WithDescription("Create a new user authenticated by LDAP"),
+		mcp.WithString("username",
+			mcp.Required(),
+			mcp.Description("Username for the LDAP user"),
+		),
+	)
+	s.AddTool(tool, kbClient.createLdapUserHandler)
+
+	tool = mcp.NewTool("get_user",
+		mcp.WithDescription("Get user information by ID"),
+		mcp.WithNumber("user_id",
+			mcp.Required(),
+			mcp.Description("ID of the user to retrieve"),
+		),
+	)
+	s.AddTool(tool, kbClient.getUserHandler)
+
+	tool = mcp.NewTool("get_user_by_name",
+		mcp.WithDescription("Get user information by username"),
+		mcp.WithString("username",
+			mcp.Required(),
+			mcp.Description("Username of the user to retrieve"),
+		),
+	)
+	s.AddTool(tool, kbClient.getUserByNameHandler)
+
+	tool = mcp.NewTool("update_user",
+		mcp.WithDescription("Update a user"),
+		mcp.WithNumber("id",
+			mcp.Required(),
+			mcp.Description("ID of the user to update"),
+		),
+		mcp.WithString("username",
+			mcp.Description("New username (optional)"),
+		),
+		mcp.WithString("name",
+			mcp.Description("New full name (optional)"),
+		),
+		mcp.WithString("email",
+			mcp.Description("New email address (optional)"),
+		),
+		mcp.WithString("role",
+			mcp.Description("New role (app-admin, app-manager, app-user) (optional)"),
+		),
+	)
+	s.AddTool(tool, kbClient.updateUserHandler)
+
+	tool = mcp.NewTool("remove_user",
+		mcp.WithDescription("Remove a user"),
+		mcp.WithNumber("user_id",
+			mcp.Required(),
+			mcp.Description("ID of the user to remove"),
+		),
+	)
+	s.AddTool(tool, kbClient.removeUserHandler)
+
+	tool = mcp.NewTool("disable_user",
+		mcp.WithDescription("Disable a user"),
+		mcp.WithNumber("user_id",
+			mcp.Required(),
+			mcp.Description("ID of the user to disable"),
+		),
+	)
+	s.AddTool(tool, kbClient.disableUserHandler)
+
+	tool = mcp.NewTool("enable_user",
+		mcp.WithDescription("Enable a user"),
+		mcp.WithNumber("user_id",
+			mcp.Required(),
+			mcp.Description("ID of the user to enable"),
+		),
+	)
+	s.AddTool(tool, kbClient.enableUserHandler)
+
+	tool = mcp.NewTool("is_active_user",
+		mcp.WithDescription("Check if a user is active"),
+		mcp.WithNumber("user_id",
+			mcp.Required(),
+			mcp.Description("ID of the user to check"),
+		),
+	)
+	s.AddTool(tool, kbClient.isActiveUserHandler)
+
 	tool = mcp.NewTool("assign_task",
 		mcp.WithDescription("Assign tasks to users"),
 		mcp.WithNumber("task_id",
@@ -375,64 +481,6 @@ func main() {
 		),
 	)
 	s.AddTool(tool, kbClient.assignUserToProjectHandler)
-
-	tool = mcp.NewTool("get_user_by_name",
-		mcp.WithDescription("Get user by name"),
-		mcp.WithString("username",
-			mcp.Required(),
-			mcp.Description("Username of the user to retrieve"),
-		),
-	)
-	s.AddTool(tool, kbClient.getUserByNameHandler)
-
-	tool = mcp.NewTool("create_user",
-		mcp.WithDescription("Create a new user"),
-		mcp.WithString("username",
-			mcp.Required(),
-			mcp.Description("Username for the new user"),
-		),
-		mcp.WithString("password",
-			mcp.Required(),
-			mcp.Description("Password for the new user"),
-		),
-		mcp.WithString("name",
-			mcp.Description("Full name of the new user"),
-		),
-		mcp.WithString("email",
-			mcp.Description("Email address of the new user"),
-		),
-	)
-	s.AddTool(tool, kbClient.createUserHandler)
-
-	tool = mcp.NewTool("update_user",
-		mcp.WithDescription("Modify an existing user"),
-		mcp.WithNumber("user_id",
-			mcp.Required(),
-			mcp.Description("ID of the user to update"),
-		),
-		mcp.WithString("username",
-			mcp.Description("New username"),
-		),
-		mcp.WithString("password",
-			mcp.Description("New password"),
-		),
-		mcp.WithString("name",
-			mcp.Description("New full name"),
-		),
-		mcp.WithString("email",
-			mcp.Description("New email address"),
-		),
-	)
-	s.AddTool(tool, kbClient.updateUserHandler)
-
-	tool = mcp.NewTool("remove_user",
-		mcp.WithDescription("Remove a user"),
-		mcp.WithNumber("user_id",
-			mcp.Required(),
-			mcp.Description("ID of the user to remove"),
-		),
-	)
-	s.AddTool(tool, kbClient.removeUserHandler)
 
 	tool = mcp.NewTool("get_me",
 		mcp.WithDescription("Get logged user session"),
@@ -2623,6 +2671,11 @@ func (kc *kanboardClient) createUserHandler(ctx context.Context, request mcp.Cal
 		params["email"] = email
 	}
 
+	role := request.GetString("role", "")
+	if role != "" {
+		params["role"] = role
+	}
+
 	result, err := kc.callKanboardAPI(ctx, "createUser", params)
 	if err != nil {
 		return mcp.NewToolResultError(fmt.Sprintf("Failed to create user: %v", err)), nil
@@ -2637,28 +2690,31 @@ func (kc *kanboardClient) createUserHandler(ctx context.Context, request mcp.Cal
 }
 
 func (kc *kanboardClient) updateUserHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
-	user_id, err := request.RequireInt("user_id")
+	id, err := request.RequireInt("id")
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
 
-	params := map[string]interface{}{"id": user_id}
+	params := map[string]interface{}{"id": id}
 
 	username := request.GetString("username", "")
 	if username != "" {
 		params["username"] = username
 	}
-	password := request.GetString("password", "")
-	if password != "" {
-		params["password"] = password
-	}
+
 	name := request.GetString("name", "")
 	if name != "" {
 		params["name"] = name
 	}
+
 	email := request.GetString("email", "")
 	if email != "" {
 		params["email"] = email
+	}
+
+	role := request.GetString("role", "")
+	if role != "" {
+		params["role"] = role
 	}
 
 	result, err := kc.callKanboardAPI(ctx, "updateUser", params)
@@ -6219,6 +6275,101 @@ func (kc *kanboardClient) searchTasksHandler(ctx context.Context, request mcp.Ca
 	result, err := kc.callKanboardAPI(ctx, "searchTasks", params)
 	if err != nil {
 		return mcp.NewToolResultError(fmt.Sprintf("Failed to search tasks: %v", err)), nil
+	}
+
+	resultBytes, err := json.MarshalIndent(result, "", "  ")
+	if err != nil {
+		return mcp.NewToolResultError(fmt.Sprintf("Failed to marshal API result: %v", err)), nil
+	}
+
+	return mcp.NewToolResultText(string(resultBytes)), nil
+}
+
+func (kc *kanboardClient) createLdapUserHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+	username, err := request.RequireString("username")
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	params := map[string]string{"username": username}
+	result, err := kc.callKanboardAPI(ctx, "createLdapUser", params)
+	if err != nil {
+		return mcp.NewToolResultError(fmt.Sprintf("Failed to create LDAP user: %v", err)), nil
+	}
+
+	resultBytes, err := json.MarshalIndent(result, "", "  ")
+	if err != nil {
+		return mcp.NewToolResultError(fmt.Sprintf("Failed to marshal API result: %v", err)), nil
+	}
+
+	return mcp.NewToolResultText(string(resultBytes)), nil
+}
+
+func (kc *kanboardClient) getUserHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+	user_id, err := request.RequireInt("user_id")
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	params := map[string]int{"user_id": user_id}
+	result, err := kc.callKanboardAPI(ctx, "getUser", params)
+	if err != nil {
+		return mcp.NewToolResultError(fmt.Sprintf("Failed to get user: %v", err)), nil
+	}
+
+	resultBytes, err := json.MarshalIndent(result, "", "  ")
+	if err != nil {
+		return mcp.NewToolResultError(fmt.Sprintf("Failed to marshal API result: %v", err)), nil
+	}
+
+	return mcp.NewToolResultText(string(resultBytes)), nil
+}
+
+func (kc *kanboardClient) disableUserHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+	user_id, err := request.RequireInt("user_id")
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	params := map[string]int{"user_id": user_id}
+	result, err := kc.callKanboardAPI(ctx, "disableUser", params)
+	if err != nil {
+		return mcp.NewToolResultError(fmt.Sprintf("Failed to disable user: %v", err)), nil
+	}
+
+	resultBytes, err := json.MarshalIndent(result, "", "  ")
+	if err != nil {
+		return mcp.NewToolResultError(fmt.Sprintf("Failed to marshal API result: %v", err)), nil
+	}
+
+	return mcp.NewToolResultText(string(resultBytes)), nil
+}
+
+func (kc *kanboardClient) enableUserHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+	user_id, err := request.RequireInt("user_id")
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	params := map[string]int{"user_id": user_id}
+	result, err := kc.callKanboardAPI(ctx, "enableUser", params)
+	if err != nil {
+		return mcp.NewToolResultError(fmt.Sprintf("Failed to enable user: %v", err)), nil
+	}
+
+	resultBytes, err := json.MarshalIndent(result, "", "  ")
+	if err != nil {
+		return mcp.NewToolResultError(fmt.Sprintf("Failed to marshal API result: %v", err)), nil
+	}
+
+	return mcp.NewToolResultText(string(resultBytes)), nil
+}
+
+func (kc *kanboardClient) isActiveUserHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+	user_id, err := request.RequireInt("user_id")
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	params := map[string]int{"user_id": user_id}
+	result, err := kc.callKanboardAPI(ctx, "isActiveUser", params)
+	if err != nil {
+		return mcp.NewToolResultError(fmt.Sprintf("Failed to check if user is active: %v", err)), nil
 	}
 
 	resultBytes, err := json.MarshalIndent(result, "", "  ")
