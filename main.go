@@ -129,9 +129,61 @@ func main() {
 	s.AddTool(tool, kbClient.moveTaskHandler)
 
 	tool = mcp.NewTool("get_users",
-		mcp.WithDescription("List all users"),
+		mcp.WithDescription("List all system users"),
 	)
 	s.AddTool(tool, kbClient.getUsersHandler)
+
+	tool = mcp.NewTool("assign_task",
+		mcp.WithDescription("Assign tasks to users"),
+		mcp.WithNumber("task_id",
+			mcp.Required(),
+			mcp.Description("ID of the task to assign"),
+		),
+		mcp.WithNumber("user_id",
+			mcp.Required(),
+			mcp.Description("ID of the user to assign the task to"),
+		),
+	)
+	s.AddTool(tool, kbClient.assignTaskHandler)
+
+	tool = mcp.NewTool("set_task_due_date",
+		mcp.WithDescription("Set task deadlines"),
+		mcp.WithNumber("task_id",
+			mcp.Required(),
+			mcp.Description("ID of the task to set the due date for"),
+		),
+		mcp.WithString("due_date",
+			mcp.Required(),
+			mcp.Description("Due date in YYYY-MM-DD format"),
+		),
+	)
+	s.AddTool(tool, kbClient.setTaskDueDateHandler)
+
+	tool = mcp.NewTool("add_task_comment",
+		mcp.WithDescription("Add task comments"),
+		mcp.WithNumber("task_id",
+			mcp.Required(),
+			mcp.Description("ID of the task to add a comment to"),
+		),
+		mcp.WithNumber("user_id",
+			mcp.Required(),
+			mcp.Description("ID of the user adding the comment"),
+		),
+		mcp.WithString("comment",
+			mcp.Required(),
+			mcp.Description("Content of the comment"),
+		),
+	)
+	s.AddTool(tool, kbClient.addTaskCommentHandler)
+
+	tool = mcp.NewTool("get_task_comments",
+		mcp.WithDescription("Get task comments"),
+		mcp.WithNumber("task_id",
+			mcp.Required(),
+			mcp.Description("ID of the task to get comments for"),
+		),
+	)
+	s.AddTool(tool, kbClient.getTaskCommentsHandler)
 
 	tool = mcp.NewTool("get_user_by_name",
 		mcp.WithDescription("Get user by name"),
@@ -339,58 +391,6 @@ func main() {
 		),
 	)
 	s.AddTool(tool, kbClient.deleteSwimlaneHandler)
-
-	tool = mcp.NewTool("assign_task",
-		mcp.WithDescription("Assign tasks to users"),
-		mcp.WithNumber("task_id",
-			mcp.Required(),
-			mcp.Description("ID of the task to assign"),
-		),
-		mcp.WithNumber("user_id",
-			mcp.Required(),
-			mcp.Description("ID of the user to assign the task to"),
-		),
-	)
-	s.AddTool(tool, kbClient.assignTaskHandler)
-
-	tool = mcp.NewTool("set_task_due_date",
-		mcp.WithDescription("Set task deadlines"),
-		mcp.WithNumber("task_id",
-			mcp.Required(),
-			mcp.Description("ID of the task to set the due date for"),
-		),
-		mcp.WithString("due_date",
-			mcp.Required(),
-			mcp.Description("Due date in YYYY-MM-DD format"),
-		),
-	)
-	s.AddTool(tool, kbClient.setTaskDueDateHandler)
-
-	tool = mcp.NewTool("add_task_comment",
-		mcp.WithDescription("Add task comments"),
-		mcp.WithNumber("task_id",
-			mcp.Required(),
-			mcp.Description("ID of the task to add a comment to"),
-		),
-		mcp.WithNumber("user_id",
-			mcp.Required(),
-			mcp.Description("ID of the user adding the comment"),
-		),
-		mcp.WithString("comment",
-			mcp.Required(),
-			mcp.Description("Content of the comment"),
-		),
-	)
-	s.AddTool(tool, kbClient.addTaskCommentHandler)
-
-	tool = mcp.NewTool("get_task_comments",
-		mcp.WithDescription("Get task comments"),
-		mcp.WithNumber("task_id",
-			mcp.Required(),
-			mcp.Description("ID of the task to get comments for"),
-		),
-	)
-	s.AddTool(tool, kbClient.getTaskCommentsHandler)
 
 	// Start the stdio server
 	if err := server.ServeStdio(s); err != nil {

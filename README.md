@@ -50,11 +50,6 @@ Once configured, Cursor will be able to discover and interact with the following
 | `delete_task`      | Remove tasks              | `"Delete task with ID 456"`                        |
 | `get_task_details` | Get detailed task info    | `"Get details for task 789"`                       |
 | `move_task`        | Move tasks between columns| `"Move task 123 to column 'Done'"`                 |
-| `get_users`        | List all users            | `"List all users in Kanboard"`                     |
-| `get_user_by_name` | Get user by name          | `"Find user 'john.doe'"`                           |
-| `create_user`      | Create a new user         | `"Create a new user 'testuser' with password 'pass123'"` |
-| `update_user`      | Modify an existing user   | `"Update user 1 with new email 'test@example.com'"` |
-| `remove_user`      | Remove a user             | `"Remove user with ID 2"`                          |
 | `get_columns`      | List project columns      | `"Show me all columns in this project"`            |
 | `create_column`    | Add new columns           | `"Create a Testing column with 5 task limit"`      |
 | `update_column`    | Modify column settings    | `"Change the Review column limit to 3 tasks"`      |
@@ -68,6 +63,11 @@ Once configured, Cursor will be able to discover and interact with the following
 | `create_swimlane`  | Add team swimlanes        | `"Create a Frontend Team swimlane"`                |
 | `update_swimlane`  | Modify swimlanes          | `"Rename Mobile Team to Cross-Platform Team"`      |
 | `delete_swimlane`  | Remove swimlanes          | `"Delete the inactive team swimlane"`              |
+| `get_users`        | List all system users     | `"Show me all team members"`                       |
+| `get_user_by_name` | Get user by name          | `"Find user 'john.doe'"`                           |
+| `create_user`      | Create a new user         | `"Create a new user 'testuser' with password 'pass123'"` |
+| `update_user`      | Modify an existing user   | `"Update user 1 with new email 'test@example.com'"` |
+| `remove_user`      | Remove a user             | `"Remove user with ID 2"`                          |
 | `assign_task`      | Assign tasks to users     | `"Assign the API task to John"`                    |
 | `set_task_due_date`| Set task deadlines        | `"Set due date for login task to next Friday"`     |
 | `add_task_comment` | Add task comments         | `"Add comment about testing requirements"`         |
