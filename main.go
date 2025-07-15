@@ -2297,7 +2297,7 @@ func (kc *kanboardClient) getTasksHandler(ctx context.Context, request mcp.CallT
 	}
 
 	var projectInfo struct {
-		ID string `json:"id"`
+		ID int `json:"id"` // Change type to int
 	}
 	// Marshal and unmarshal from the confirmed map to ensure correct type conversion
 	tempBytes, err := json.Marshal(projectMap) // Marshal the map, not the raw interface{} result
@@ -2308,11 +2308,11 @@ func (kc *kanboardClient) getTasksHandler(ctx context.Context, request mcp.CallT
 		return mcp.NewToolResultError(fmt.Sprintf("Failed to parse project info: %v", err)), nil
 	}
 
-	if projectInfo.ID == "" {
-		return mcp.NewToolResultError(fmt.Sprintf("Project '%s' not found", projectName)), nil
+	if projectInfo.ID == 0 { // Check for 0 instead of empty string
+		return mcp.NewToolResultError(fmt.Sprintf("Project '%s' not found or ID is zero", projectName)), nil
 	}
 
-	params := map[string]interface{}{"project_id": projectInfo.ID}
+	params := map[string]interface{}{"project_id": strconv.Itoa(projectInfo.ID)} // Convert int to string here
 	result, err = kc.callKanboardAPI(ctx, "getAllTasks", params)
 	if err != nil {
 		return mcp.NewToolResultError(fmt.Sprintf("Failed to get tasks: %v", err)), nil
@@ -2373,7 +2373,7 @@ func (kc *kanboardClient) createTaskHandler(ctx context.Context, request mcp.Cal
 	}
 
 	var projectInfo struct {
-		ID string `json:"id"`
+		ID int `json:"id"` // Change type to int
 	}
 	tempBytes, err := json.Marshal(projectMap)
 	if err != nil {
@@ -2383,12 +2383,12 @@ func (kc *kanboardClient) createTaskHandler(ctx context.Context, request mcp.Cal
 		return mcp.NewToolResultError(fmt.Sprintf("Failed to parse project info: %v", err)), nil
 	}
 
-	if projectInfo.ID == "" {
-		return mcp.NewToolResultError(fmt.Sprintf("Project '%s' not found", projectName)), nil
+	if projectInfo.ID == 0 { // Check for 0 instead of empty string
+		return mcp.NewToolResultError(fmt.Sprintf("Project '%s' not found or ID is zero", projectName)), nil
 	}
 
 	params := map[string]interface{}{
-		"project_id": projectInfo.ID,
+		"project_id": strconv.Itoa(projectInfo.ID), // Convert int to string here
 		"title":      title,
 	}
 
