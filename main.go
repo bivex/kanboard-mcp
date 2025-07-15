@@ -2266,12 +2266,41 @@ func (kc *kanboardClient) getTasksHandler(ctx context.Context, request mcp.CallT
 		return mcp.NewToolResultError(fmt.Sprintf("Failed to get project ID: %v", err)), nil
 	}
 
-	// Assuming the result is an object, parse it to extract the ID
+	// Kanboard API sometimes returns a boolean false or true, or an empty array []
+	// instead of a project object when the project is not found.
+	// We need to handle these cases before attempting to unmarshal into a struct.
+	projectMap, ok := result.(map[string]interface{})
+	if !ok {
+		// If it's not a map, check if it's a boolean (false or true).
+		// Kanboard API might return `false` for not found, or `true` if it's a "success" response without data.
+		if b, isBool := result.(bool); isBool {
+			// If boolean false, it's definitively not found.
+			// If boolean true, and it's not a map, it's also not a valid project object.
+			return mcp.NewToolResultError(fmt.Sprintf("Project '%s' not found or API returned an unexpected boolean value: %v", projectName, b)), nil
+		}
+
+		// If it's not a map and not a boolean, check if it's nil or an empty array.
+		if result == nil {
+			return mcp.NewToolResultError(fmt.Sprintf("Project '%s' not found: API returned nil", projectName)), nil
+		}
+		if arr, isArray := result.([]interface{}); isArray && len(arr) == 0 {
+			return mcp.NewToolResultError(fmt.Sprintf("Project '%s' not found: API returned empty array", projectName)), nil
+		}
+
+		// For any other unexpected type
+		return mcp.NewToolResultError(fmt.Sprintf("Project '%s' not found: API returned unexpected type %T", projectName, result)), nil
+	}
+
+	// If projectMap is empty, treat as not found. (e.g., Kanboard returns {} for not found)
+	if len(projectMap) == 0 {
+		return mcp.NewToolResultError(fmt.Sprintf("Project '%s' not found: API returned empty object", projectName)), nil
+	}
+
 	var projectInfo struct {
 		ID string `json:"id"`
 	}
-	// Marshal and unmarshal to ensure correct type conversion from interface{} to struct
-	tempBytes, err := json.Marshal(result)
+	// Marshal and unmarshal from the confirmed map to ensure correct type conversion
+	tempBytes, err := json.Marshal(projectMap) // Marshal the map, not the raw interface{} result
 	if err != nil {
 		return mcp.NewToolResultError(fmt.Sprintf("Failed to marshal project info for parsing: %v", err)), nil
 	}
@@ -2313,10 +2342,40 @@ func (kc *kanboardClient) createTaskHandler(ctx context.Context, request mcp.Cal
 		return mcp.NewToolResultError(fmt.Sprintf("Failed to get project ID: %v", err)), nil
 	}
 
+	// Kanboard API sometimes returns a boolean false or true, or an empty array []
+	// instead of a project object when the project is not found.
+	// We need to handle these cases before attempting to unmarshal into a struct.
+	projectMap, ok := result.(map[string]interface{})
+	if !ok {
+		// If it's not a map, check if it's a boolean (false or true).
+		// Kanboard API might return `false` for not found, or `true` if it's a "success" response without data.
+		if b, isBool := result.(bool); isBool {
+			// If boolean false, it's definitively not found.
+			// If boolean true, and it's not a map, it's also not a valid project object.
+			return mcp.NewToolResultError(fmt.Sprintf("Project '%s' not found or API returned an unexpected boolean value: %v", projectName, b)), nil
+		}
+
+		// If it's not a map and not a boolean, check if it's nil or an empty array.
+		if result == nil {
+			return mcp.NewToolResultError(fmt.Sprintf("Project '%s' not found: API returned nil", projectName)), nil
+		}
+		if arr, isArray := result.([]interface{}); isArray && len(arr) == 0 {
+			return mcp.NewToolResultError(fmt.Sprintf("Project '%s' not found: API returned empty array", projectName)), nil
+		}
+
+		// For any other unexpected type
+		return mcp.NewToolResultError(fmt.Sprintf("Project '%s' not found: API returned unexpected type %T", projectName, result)), nil
+	}
+
+	// If projectMap is empty, treat as not found. (e.g., Kanboard returns {} for not found)
+	if len(projectMap) == 0 {
+		return mcp.NewToolResultError(fmt.Sprintf("Project '%s' not found: API returned empty object", projectName)), nil
+	}
+
 	var projectInfo struct {
 		ID string `json:"id"`
 	}
-	tempBytes, err := json.Marshal(result)
+	tempBytes, err := json.Marshal(projectMap)
 	if err != nil {
 		return mcp.NewToolResultError(fmt.Sprintf("Failed to marshal project info for parsing: %v", err)), nil
 	}
