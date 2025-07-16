@@ -2089,6 +2089,85 @@ func main() {
 	)
 	s.AddTool(tool, kbClient.searchTasksHandler)
 
+	// ScrumSprint Plugin API
+	tool = mcp.NewTool("create_sprint",
+		mcp.WithDescription("Create a new sprint."),
+		mcp.WithString("project_name",
+			mcp.Required(),
+			mcp.Description("Name of the project to create the sprint in"),
+		),
+		mcp.WithString("name",
+			mcp.Required(),
+			mcp.Description("Name of the new sprint"),
+		),
+		mcp.WithString("start_date",
+			mcp.Required(),
+			mcp.Description("Start date of the sprint (YYYY-MM-DD)"),
+		),
+		mcp.WithString("end_date",
+			mcp.Required(),
+			mcp.Description("End date of the sprint (YYYY-MM-DD)"),
+		),
+		mcp.WithString("sprint_goal",
+			mcp.Description("Goal of the sprint (optional)"),
+		),
+	)
+	s.AddTool(tool, kbClient.createSprintHandler)
+
+	tool = mcp.NewTool("get_sprint_by_id",
+		mcp.WithDescription("Retrieve a sprint by its ID."),
+		mcp.WithNumber("sprint_id",
+			mcp.Required(),
+			mcp.Description("ID of the sprint to retrieve"),
+		),
+	)
+	s.AddTool(tool, kbClient.getSprintByIdHandler)
+
+	tool = mcp.NewTool("update_sprint",
+		mcp.WithDescription("Update an existing sprint."),
+		mcp.WithNumber("sprint_id",
+			mcp.Required(),
+			mcp.Description("ID of the sprint to update"),
+		),
+		mcp.WithString("name",
+			mcp.Description("New name for the sprint (optional)"),
+		),
+		mcp.WithString("start_date",
+			mcp.Description("New start date for the sprint (YYYY-MM-DD) (optional)"),
+		),
+		mcp.WithString("end_date",
+			mcp.Description("New end date for the sprint (YYYY-MM-DD) (optional)"),
+		),
+		mcp.WithString("sprint_goal",
+			mcp.Description("New goal for the sprint (optional)"),
+		),
+		mcp.WithBoolean("is_completed",
+			mcp.Description("Whether the sprint is completed (optional)"),
+		),
+		mcp.WithBoolean("is_active",
+			mcp.Description("Whether the sprint is active (optional)"),
+		),
+	)
+	s.AddTool(tool, kbClient.updateSprintHandler)
+
+	tool = mcp.NewTool("remove_sprint",
+		mcp.WithDescription("Remove a sprint by its ID."),
+		mcp.WithNumber("sprint_id",
+			mcp.Required(),
+			mcp.Description("ID of the sprint to remove"),
+		),
+	)
+	s.AddTool(tool, kbClient.removeSprintHandler)
+
+	tool = mcp.NewTool("get_all_sprints_by_project",
+		mcp.WithDescription("Retrieve all sprints for a given project."),
+		mcp.WithString("project_name",
+			mcp.Required(),
+			mcp.Description("Name of the project to retrieve sprints from"),
+		),
+	)
+	s.AddTool(tool, kbClient.getAllSprintsByProjectHandler)
+
 	// Start the stdio server
 	if err := server.ServeStdio(s); err != nil {
 		fmt.Printf("Server error: %v\n", err)
@@ -6437,6 +6516,224 @@ func (kc *kanboardClient) isActiveUserHandler(ctx context.Context, request mcp.C
 	resultBytes, err := json.MarshalIndent(result, "", "  ")
 	if err != nil {
 		return mcp.NewToolResultError(fmt.Sprintf("Failed to marshal API result: %v", err)), nil
+	}
+
+	return mcp.NewToolResultText(string(resultBytes)), nil
+}
+
+func (kc *kanboardClient) createSprintHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+	projectName := request.GetString("project_name", "")
+	if projectName == "" {
+		return mcp.NewToolResultError("Project name is required for createSprint"), nil
+	}
+
+	name := request.GetString("name", "")
+	if name == "" {
+		return mcp.NewToolResultError("Sprint name is required"), nil
+	}
+
+	startDate := request.GetString("start_date", "")
+	if startDate == "" {
+		return mcp.NewToolResultError("Start date is required"), nil
+	}
+
+	endDate := request.GetString("end_date", "")
+	if endDate == "" {
+		return mcp.NewToolResultError("End date is required"), nil
+	}
+
+	sprintGoal := request.GetString("sprint_goal", "")
+
+	// First, get the project ID from the project name
+	result, err := kc.callKanboardAPI(ctx, "getProjectByName", map[string]string{"name": projectName})
+	if err != nil {
+		return mcp.NewToolResultError(fmt.Sprintf("Failed to get project ID: %v", err)), nil
+	}
+
+	projectMap, ok := result.(map[string]interface{})
+	if !ok {
+		if b, isBool := result.(bool); isBool && !b {
+			return mcp.NewToolResultError(fmt.Sprintf("Project '%s' not found or API returned false", projectName)), nil
+		}
+		if result == nil {
+			return mcp.NewToolResultError(fmt.Sprintf("Project '%s' not found: API returned nil", projectName)), nil
+		}
+		if arr, isArray := result.([]interface{}); isArray && len(arr) == 0 {
+			return mcp.NewToolResultError(fmt.Sprintf("Project '%s' not found: API returned empty array", projectName)), nil
+		}
+		return mcp.NewToolResultError(fmt.Sprintf("Unexpected response type for getProjectByName: %T", result)), nil
+	}
+
+	if len(projectMap) == 0 {
+		return mcp.NewToolResultError(fmt.Sprintf("Project '%s' not found: API returned empty object", projectName)), nil
+	}
+
+	var projectInfo struct {
+		ID int `json:"id"`
+	}
+	tempBytes, err := json.Marshal(projectMap)
+	if err != nil {
+		return mcp.NewToolResultError(fmt.Sprintf("Failed to marshal project info for parsing: %v", err)), nil
+	}
+	if err := json.Unmarshal(tempBytes, &projectInfo); err != nil {
+		return mcp.NewToolResultError(fmt.Sprintf("Failed to unmarshal project info: %v", err)), nil
+	}
+
+	projectID := strconv.Itoa(projectInfo.ID)
+
+	params := map[string]string{
+		"project_id": projectID,
+		"name":       name,
+		"start_date": startDate,
+		"end_date":   endDate,
+	}
+
+	if sprintGoal != "" {
+		params["sprint_goal"] = sprintGoal
+	}
+
+	sprintResult, err := kc.callKanboardAPI(ctx, "createSprint", params)
+	if err != nil {
+		return mcp.NewToolResultError(fmt.Sprintf("Failed to create sprint: %v", err)), nil
+	}
+
+	resultBytes, err := json.MarshalIndent(sprintResult, "", "  ")
+	if err != nil {
+		return mcp.NewToolResultError(fmt.Sprintf("Failed to marshal sprint result: %v", err)), nil
+	}
+
+	return mcp.NewToolResultText(string(resultBytes)), nil
+}
+
+func (kc *kanboardClient) getSprintByIdHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+	sprintID := request.GetInt("sprint_id", 0)
+	if sprintID == 0 {
+		return mcp.NewToolResultError("Sprint ID is required"), nil
+	}
+
+	result, err := kc.callKanboardAPI(ctx, "getSprintById", map[string]int{"sprint_id": sprintID})
+	if err != nil {
+		return mcp.NewToolResultError(fmt.Sprintf("Failed to get sprint by ID: %v", err)), nil
+	}
+
+	resultBytes, err := json.MarshalIndent(result, "", "  ")
+	if err != nil {
+		return mcp.NewToolResultError(fmt.Sprintf("Failed to marshal sprint result: %v", err)), nil
+	}
+
+	return mcp.NewToolResultText(string(resultBytes)), nil
+}
+
+func (kc *kanboardClient) updateSprintHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+	sprintID := request.GetInt("sprint_id", 0)
+	if sprintID == 0 {
+		return mcp.NewToolResultError("Sprint ID is required"), nil
+	}
+
+	params := make(map[string]interface{})
+	params["sprint_id"] = sprintID
+
+	if name := request.GetString("name", ""); name != "" {
+		params["name"] = name
+	}
+	if startDate := request.GetString("start_date", ""); startDate != "" {
+		params["start_date"] = startDate
+	}
+	if endDate := request.GetString("end_date", ""); endDate != "" {
+		params["end_date"] = endDate
+	}
+	if sprintGoal := request.GetString("sprint_goal", ""); sprintGoal != "" {
+		params["sprint_goal"] = sprintGoal
+	}
+
+	// Corrected GetBool usage
+	params["is_completed"] = request.GetBool("is_completed", false)
+	params["is_active"] = request.GetBool("is_active", false)
+
+
+	result, err := kc.callKanboardAPI(ctx, "updateSprint", params)
+	if err != nil {
+		return mcp.NewToolResultError(fmt.Sprintf("Failed to update sprint: %v", err)), nil
+	}
+
+	resultBytes, err := json.MarshalIndent(result, "", "  ")
+	if err != nil {
+		return mcp.NewToolResultError(fmt.Sprintf("Failed to marshal sprint result: %v", err)), nil
+	}
+
+	return mcp.NewToolResultText(string(resultBytes)), nil
+}
+
+func (kc *kanboardClient) removeSprintHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+	sprintID := request.GetInt("sprint_id", 0)
+	if sprintID == 0 {
+		return mcp.NewToolResultError("Sprint ID is required"), nil
+	}
+
+	result, err := kc.callKanboardAPI(ctx, "removeSprint", map[string]int{"sprint_id": sprintID})
+	if err != nil {
+		return mcp.NewToolResultError(fmt.Sprintf("Failed to remove sprint: %v", err)), nil
+	}
+
+	resultBytes, err := json.MarshalIndent(result, "", "  ")
+	if err != nil {
+		return mcp.NewToolResultError(fmt.Sprintf("Failed to marshal sprint result: %v", err)), nil
+	}
+
+	return mcp.NewToolResultText(string(resultBytes)), nil
+}
+
+func (kc *kanboardClient) getAllSprintsByProjectHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+	projectName := request.GetString("project_name", "")
+	if projectName == "" {
+		return mcp.NewToolResultError("Project name is required for getAllSprintsByProject"), nil
+	}
+
+	// First, get the project ID from the project name
+	result, err := kc.callKanboardAPI(ctx, "getProjectByName", map[string]string{"name": projectName})
+	if err != nil {
+		return mcp.NewToolResultError(fmt.Sprintf("Failed to get project ID: %v", err)), nil
+	}
+
+	projectMap, ok := result.(map[string]interface{})
+	if !ok {
+		if b, isBool := result.(bool); isBool && !b {
+			return mcp.NewToolResultError(fmt.Sprintf("Project '%s' not found or API returned false", projectName)), nil
+		}
+		if result == nil {
+			return mcp.NewToolResultError(fmt.Sprintf("Project '%s' not found: API returned nil", projectName)), nil
+		}
+		if arr, isArray := result.([]interface{}); isArray && len(arr) == 0 {
+			return mcp.NewToolResultError(fmt.Sprintf("Project '%s' not found: API returned empty array", projectName)), nil
+		}
+		return mcp.NewToolResultError(fmt.Sprintf("Unexpected response type for getProjectByName: %T", result)), nil
+	}
+
+	if len(projectMap) == 0 {
+		return mcp.NewToolResultError(fmt.Sprintf("Project '%s' not found: API returned empty object", projectName)), nil
+	}
+
+	var projectInfo struct {
+		ID int `json:"id"`
+	}
+	tempBytes, err := json.Marshal(projectMap)
+	if err != nil {
+		return mcp.NewToolResultError(fmt.Sprintf("Failed to marshal project info for parsing: %v", err)), nil
+	}
+	if err := json.Unmarshal(tempBytes, &projectInfo); err != nil {
+		return mcp.NewToolResultError(fmt.Sprintf("Failed to unmarshal project info: %v", err)), nil
+	}
+
+	projectID := strconv.Itoa(projectInfo.ID)
+
+	sprintsResult, err := kc.callKanboardAPI(ctx, "getAllSprintsByProject", map[string]string{"project_id": projectID})
+	if err != nil {
+		return mcp.NewToolResultError(fmt.Sprintf("Failed to get all sprints by project: %v", err)), nil
+	}
+
+	resultBytes, err := json.MarshalIndent(sprintsResult, "", "  ")
+	if err != nil {
+		return mcp.NewToolResultError(fmt.Sprintf("Failed to marshal sprints result: %v", err)), nil
 	}
 
 	return mcp.NewToolResultText(string(resultBytes)), nil
