@@ -390,6 +390,16 @@ After saving the configuration, restart your MCP client (Cursor, Claude Desktop,
 | `is_active_user` | 🔍 Check if a user is active | "Check if user 123 is active" |
 | `assign_user_to_project` | 👤 Assign a user to a project with a specific role | "Assign user 1 to project 'Website' with role 'project-member'" |
 
+### 🏃 ScrumSprint Plugin API
+
+| Tool | Description | Example |
+|------|-------------|---------|
+| `create_sprint` | ➕ Create a new sprint | "Create a sprint named 'Sprint 1' in project 'My Project' starting '2024-01-01' and ending '2024-01-14' with goal 'Complete onboarding features'" |
+| `get_sprint_by_id` | 🔍 Retrieve a sprint by its ID | "Get details for sprint with ID 123" |
+| `update_sprint` | ✏️ Update an existing sprint | "Update sprint 123 in project 'My Project' to be completed" |
+| `remove_sprint` | 🗑️ Remove a sprint by its ID | "Remove sprint with ID 123" |
+| `get_all_sprints_by_project` | 📋 Retrieve all sprints for a given project | "Get all sprints for project 'My Project'" |
+
 ## 📖 Usage Examples
 
 ### Project Workflow
