@@ -2376,10 +2376,9 @@ func (kc *kanboardClient) getTasksHandler(ctx context.Context, request mcp.CallT
 	}
 
 	var projectInfo struct {
-		ID int `json:"id"` // Change type to int
+		ID json.RawMessage `json:"id"`
 	}
-	// Marshal and unmarshal from the confirmed map to ensure correct type conversion
-	tempBytes, err := json.Marshal(projectMap) // Marshal the map, not the raw interface{} result
+	tempBytes, err := json.Marshal(projectMap)
 	if err != nil {
 		return mcp.NewToolResultError(fmt.Sprintf("Failed to marshal project info for parsing: %v", err)), nil
 	}
@@ -2387,11 +2386,24 @@ func (kc *kanboardClient) getTasksHandler(ctx context.Context, request mcp.CallT
 		return mcp.NewToolResultError(fmt.Sprintf("Failed to parse project info: %v", err)), nil
 	}
 
-	if projectInfo.ID == 0 { // Check for 0 instead of empty string
-		return mcp.NewToolResultError(fmt.Sprintf("Project '%s' not found or ID is zero", projectName)), nil
+	var projectID string
+	var idInt int
+	if err := json.Unmarshal(projectInfo.ID, &idInt); err == nil {
+		projectID = strconv.Itoa(idInt)
+	} else {
+		var idStr string
+		if err := json.Unmarshal(projectInfo.ID, &idStr); err == nil {
+			projectID = idStr
+		} else {
+			return mcp.NewToolResultError(fmt.Sprintf("Project '%s' id is not a valid int or string: %v", projectName, err)), nil
+		}
 	}
 
-	params := map[string]interface{}{"project_id": strconv.Itoa(projectInfo.ID)} // Convert int to string here
+	if projectID == "" {
+		return mcp.NewToolResultError(fmt.Sprintf("Project '%s' not found or ID is empty", projectName)), nil
+	}
+
+	params := map[string]interface{}{"project_id": projectID}
 	result, err = kc.callKanboardAPI(ctx, "getAllTasks", params)
 	if err != nil {
 		return mcp.NewToolResultError(fmt.Sprintf("Failed to get tasks: %v", err)), nil
@@ -2452,7 +2464,7 @@ func (kc *kanboardClient) createTaskHandler(ctx context.Context, request mcp.Cal
 	}
 
 	var projectInfo struct {
-		ID int `json:"id"` // Change type to int
+		ID json.RawMessage `json:"id"`
 	}
 	tempBytes, err := json.Marshal(projectMap)
 	if err != nil {
@@ -2462,12 +2474,25 @@ func (kc *kanboardClient) createTaskHandler(ctx context.Context, request mcp.Cal
 		return mcp.NewToolResultError(fmt.Sprintf("Failed to parse project info: %v", err)), nil
 	}
 
-	if projectInfo.ID == 0 { // Check for 0 instead of empty string
-		return mcp.NewToolResultError(fmt.Sprintf("Project '%s' not found or ID is zero", projectName)), nil
+	var projectID string
+	var idInt int
+	if err := json.Unmarshal(projectInfo.ID, &idInt); err == nil {
+		projectID = strconv.Itoa(idInt)
+	} else {
+		var idStr string
+		if err := json.Unmarshal(projectInfo.ID, &idStr); err == nil {
+			projectID = idStr
+		} else {
+			return mcp.NewToolResultError(fmt.Sprintf("Project '%s' id is not a valid int or string: %v", projectName, err)), nil
+		}
+	}
+
+	if projectID == "" {
+		return mcp.NewToolResultError(fmt.Sprintf("Project '%s' not found or ID is empty", projectName)), nil
 	}
 
 	params := map[string]interface{}{
-		"project_id": strconv.Itoa(projectInfo.ID), // Convert int to string here
+		"project_id": projectID,
 		"title":      title,
 	}
 
@@ -6569,7 +6594,7 @@ func (kc *kanboardClient) createSprintHandler(ctx context.Context, request mcp.C
 	}
 
 	var projectInfo struct {
-		ID int `json:"id"`
+		ID json.RawMessage `json:"id"`
 	}
 	tempBytes, err := json.Marshal(projectMap)
 	if err != nil {
@@ -6579,7 +6604,22 @@ func (kc *kanboardClient) createSprintHandler(ctx context.Context, request mcp.C
 		return mcp.NewToolResultError(fmt.Sprintf("Failed to unmarshal project info: %v", err)), nil
 	}
 
-	projectID := strconv.Itoa(projectInfo.ID)
+	var projectID string
+	var idInt int
+	if err := json.Unmarshal(projectInfo.ID, &idInt); err == nil {
+		projectID = strconv.Itoa(idInt)
+	} else {
+		var idStr string
+		if err := json.Unmarshal(projectInfo.ID, &idStr); err == nil {
+			projectID = idStr
+		} else {
+			return mcp.NewToolResultError(fmt.Sprintf("Project '%s' id is not a valid int or string: %v", projectName, err)), nil
+		}
+	}
+
+	if projectID == "" {
+		return mcp.NewToolResultError(fmt.Sprintf("Project '%s' not found or ID is empty", projectName)), nil
+	}
 
 	params := map[string]string{
 		"project_id": projectID,
@@ -6646,10 +6686,8 @@ func (kc *kanboardClient) updateSprintHandler(ctx context.Context, request mcp.C
 		params["sprint_goal"] = sprintGoal
 	}
 
-	// Corrected GetBool usage
 	params["is_completed"] = request.GetBool("is_completed", false)
 	params["is_active"] = request.GetBool("is_active", false)
-
 
 	result, err := kc.callKanboardAPI(ctx, "updateSprint", params)
 	if err != nil {
@@ -6714,7 +6752,7 @@ func (kc *kanboardClient) getAllSprintsByProjectHandler(ctx context.Context, req
 	}
 
 	var projectInfo struct {
-		ID int `json:"id"`
+		ID json.RawMessage `json:"id"`
 	}
 	tempBytes, err := json.Marshal(projectMap)
 	if err != nil {
@@ -6724,7 +6762,22 @@ func (kc *kanboardClient) getAllSprintsByProjectHandler(ctx context.Context, req
 		return mcp.NewToolResultError(fmt.Sprintf("Failed to unmarshal project info: %v", err)), nil
 	}
 
-	projectID := strconv.Itoa(projectInfo.ID)
+	var projectID string
+	var idInt int
+	if err := json.Unmarshal(projectInfo.ID, &idInt); err == nil {
+		projectID = strconv.Itoa(idInt)
+	} else {
+		var idStr string
+		if err := json.Unmarshal(projectInfo.ID, &idStr); err == nil {
+			projectID = idStr
+		} else {
+			return mcp.NewToolResultError(fmt.Sprintf("Project '%s' id is not a valid int or string: %v", projectName, err)), nil
+		}
+	}
+
+	if projectID == "" {
+		return mcp.NewToolResultError(fmt.Sprintf("Project '%s' not found or ID is empty", projectName)), nil
+	}
 
 	sprintsResult, err := kc.callKanboardAPI(ctx, "getAllSprintsByProject", map[string]string{"project_id": projectID})
 	if err != nil {
