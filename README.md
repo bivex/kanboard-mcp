@@ -8,6 +8,14 @@ A powerful Go-based MCP server that enables seamless integration between AI assi
 ![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)
 ![MCP](https://img.shields.io/badge/MCP-Protocol-orange?style=for-the-badge)
 
+⚠️ **Warning:** To avoid issues like these:
+
+![Proxy error example 1](https://github.com/user-attachments/assets/db9c0867-6cfd-4c30-831b-d2cc948a4ff5)
+![Proxy error example 2](https://github.com/user-attachments/assets/90a12994-62d1-426f-96af-c8fd63086884)
+
+We recommend using [mcpproxy](https://github.com/bivex/mcpproxy) as a proxy solution.
+
+
 ## 📋 Table of Contents
 
 - [✨ Features](#-features)
