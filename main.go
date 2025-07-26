@@ -10,6 +10,8 @@ import (
 	"net/http"
 	"os"
 	"strconv"
+	"strings"
+	"time"
 
 	"github.com/mark3labs/mcp-go/mcp"
 	"github.com/mark3labs/mcp-go/server"
@@ -2187,78 +2189,234 @@ func newKanboardClient(apiEndpoint, apiKey, username, password string) *kanboard
 	}
 }
 
+// APIResponse represents the standard Kanboard JSON-RPC response structure
+type APIResponse struct {
+	Jsonrpc string      `json:"jsonrpc"`
+	ID      int         `json:"id"`
+	Result  interface{} `json:"result"`
+	Error   *APIError   `json:"error"`
+}
+
+// APIError represents a Kanboard API error response
+type APIError struct {
+	Code    int    `json:"code"`
+	Message string `json:"message"`
+}
+
+// RequestConfig holds configuration for API requests
+type RequestConfig struct {
+	MaxRetries    int
+	RetryDelay    time.Duration
+	Timeout       time.Duration
+	EnableLogging bool
+}
+
+// DefaultRequestConfig returns default configuration for API requests
+func DefaultRequestConfig() *RequestConfig {
+	return &RequestConfig{
+		MaxRetries:    3,
+		RetryDelay:    time.Second * 2,
+		Timeout:       time.Second * 30,
+		EnableLogging: true,
+	}
+}
+
 func (kc *kanboardClient) callKanboardAPI(ctx context.Context, method string, params interface{}) (interface{}, error) {
+	return kc.callKanboardAPIWithConfig(ctx, method, params, DefaultRequestConfig())
+}
+
+func (kc *kanboardClient) callKanboardAPIWithConfig(ctx context.Context, method string, params interface{}, config *RequestConfig) (interface{}, error) {
+	if config == nil {
+		config = DefaultRequestConfig()
+	}
+
+	// Create HTTP client with timeout
+	client := &http.Client{
+		Timeout: config.Timeout,
+	}
+
+	var lastErr error
+	for attempt := 0; attempt <= config.MaxRetries; attempt++ {
+		if attempt > 0 {
+			if config.EnableLogging {
+				fmt.Printf("Retrying API call to %s (attempt %d/%d)\n", method, attempt+1, config.MaxRetries+1)
+			}
+			select {
+			case <-ctx.Done():
+				return nil, ctx.Err()
+			case <-time.After(config.RetryDelay):
+			}
+		}
+
+		result, err := kc.executeAPIRequest(ctx, client, method, params, config)
+		if err == nil {
+			return result, nil
+		}
+
+		lastErr = err
+		
+		// Don't retry on authentication or validation errors
+		if isNonRetryableError(err) {
+			break
+		}
+	}
+
+	return nil, fmt.Errorf("API call failed after %d attempts: %w", config.MaxRetries+1, lastErr)
+}
+
+func (kc *kanboardClient) executeAPIRequest(ctx context.Context, client *http.Client, method string, params interface{}, config *RequestConfig) (interface{}, error) {
+	// Validate inputs
+	if method == "" {
+		return nil, fmt.Errorf("method cannot be empty")
+	}
+
+	// Prepare request body
 	requestBody := map[string]interface{}{
 		"jsonrpc": "2.0",
 		"method":  method,
-		"id":      1,
+		"id":      generateRequestID(),
 		"params":  params,
 	}
 
 	jsonBody, err := json.Marshal(requestBody)
 	if err != nil {
-		return nil, fmt.Errorf("failed to marshal request: %v", err)
+		return nil, fmt.Errorf("failed to marshal request body: %w", err)
 	}
 
+	// Create HTTP request
 	req, err := http.NewRequestWithContext(ctx, "POST", kc.apiEndpoint, bytes.NewBuffer(jsonBody))
 	if err != nil {
-		return nil, fmt.Errorf("failed to create request: %v", err)
+		return nil, fmt.Errorf("failed to create HTTP request: %w", err)
 	}
 
-	// SET ALL REQUIRED HEADERS (to match working PowerShell request)
+	// Set headers
 	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("Accept", "application/json")           // ← FIX: This was missing!
-	req.Header.Set("User-Agent", "KanboardMCP/1.0")       // ← FIX: This was missing!
+	req.Header.Set("Accept", "application/json")
+	req.Header.Set("User-Agent", "KanboardMCP/1.0")
 
-	// FIXED AUTHENTICATION LOGIC - Use only working methods
-	if kc.apiKey != "" && kc.apiKey != "your-kanboard-api-key" {
-		// Method 1: Application credentials (jsonrpc + API token) - WORKS!
+	// Set authentication
+	if err := kc.setAuthentication(req); err != nil {
+		return nil, err
+	}
+
+	// Execute request
+	if config.EnableLogging {
+		fmt.Printf("Making API call to %s\n", method)
+	}
+
+	resp, err := client.Do(req)
+	if err != nil {
+		return nil, fmt.Errorf("HTTP request failed: %w", err)
+	}
+	defer func() {
+		if closeErr := resp.Body.Close(); closeErr != nil && config.EnableLogging {
+			fmt.Printf("Warning: failed to close response body: %v\n", closeErr)
+		}
+	}()
+
+	// Handle HTTP status errors
+	if err := kc.handleHTTPStatus(resp); err != nil {
+		return nil, err
+	}
+
+	// Parse response
+	return kc.parseAPIResponse(resp.Body, config)
+}
+
+func (kc *kanboardClient) setAuthentication(req *http.Request) error {
+	// Priority: API key over username/password
+	if kc.isValidAPIKey() {
 		auth := "jsonrpc:" + kc.apiKey
 		basicAuth := "Basic " + base64.StdEncoding.EncodeToString([]byte(auth))
 		req.Header.Set("Authorization", basicAuth)
-	} else if kc.username != "" && kc.password != "" && 
-			   kc.username != "your-kanboard-username" && kc.password != "your-kanboard-password" {
-		// Method 2: User credentials (username + password) - WORKS!
+		return nil
+	}
+
+	if kc.isValidCredentials() {
 		auth := kc.username + ":" + kc.password
 		basicAuth := "Basic " + base64.StdEncoding.EncodeToString([]byte(auth))
 		req.Header.Set("Authorization", basicAuth)
-	} else {
-		return nil, fmt.Errorf("no valid authentication credentials provided")
+		return nil
 	}
 
-	resp, err := http.DefaultClient.Do(req)
+	return fmt.Errorf("no valid authentication credentials provided")
+}
+
+func (kc *kanboardClient) isValidAPIKey() bool {
+	return kc.apiKey != "" && kc.apiKey != "your-kanboard-api-key"
+}
+
+func (kc *kanboardClient) isValidCredentials() bool {
+	return kc.username != "" && kc.password != "" &&
+		kc.username != "your-kanboard-username" && kc.password != "your-kanboard-password"
+}
+
+func (kc *kanboardClient) handleHTTPStatus(resp *http.Response) error {
+	if resp.StatusCode == http.StatusOK {
+		return nil
+	}
+
+	// Read response body for error details
+	bodyBytes, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return nil, fmt.Errorf("failed to send request: %v", err)
-	}
-	defer func(Body io.ReadCloser) {
-		err := Body.Close()
-		if err != nil {
-		}
-	}(resp.Body)
-
-	if resp.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("API request failed with status code: %d, Response: %s", resp.StatusCode, resp.Status)
+		return fmt.Errorf("HTTP %d: %s (failed to read response body: %w)", resp.StatusCode, resp.Status, err)
 	}
 
-	var apiResponse struct {
-		Jsonrpc string      `json:"jsonrpc"`
-		ID      int         `json:"id"`
-		Result  interface{} `json:"result"`
-		Error   *struct {
-			Code    int    `json:"code"`
-			Message string `json:"message"`
-		} `json:"error"`
+	return fmt.Errorf("HTTP %d: %s - %s", resp.StatusCode, resp.Status, string(bodyBytes))
+}
+
+func (kc *kanboardClient) parseAPIResponse(body io.Reader, config *RequestConfig) (interface{}, error) {
+	var apiResponse APIResponse
+
+	if err := json.NewDecoder(body).Decode(&apiResponse); err != nil {
+		return nil, fmt.Errorf("failed to decode API response: %w", err)
 	}
 
-	if err := json.NewDecoder(resp.Body).Decode(&apiResponse); err != nil {
-		return nil, fmt.Errorf("failed to decode API response: %v", err)
-	}
-
+	// Check for JSON-RPC protocol errors
 	if apiResponse.Error != nil {
-		return nil, fmt.Errorf("kanboard API error: %s (Code: %d)", apiResponse.Error.Message, apiResponse.Error.Code)
+		return nil, fmt.Errorf("kanboard API error (code %d): %s", apiResponse.Error.Code, apiResponse.Error.Message)
+	}
+
+	// Validate JSON-RPC response
+	if apiResponse.Jsonrpc != "2.0" {
+		return nil, fmt.Errorf("invalid JSON-RPC version: %s", apiResponse.Jsonrpc)
 	}
 
 	return apiResponse.Result, nil
+}
+
+func generateRequestID() int {
+	return int(time.Now().UnixNano() % 1000000)
+}
+
+func isNonRetryableError(err error) bool {
+	if err == nil {
+		return false
+	}
+
+	errStr := err.Error()
+	
+	// Authentication errors
+	if strings.Contains(errStr, "authentication") || 
+	   strings.Contains(errStr, "unauthorized") ||
+	   strings.Contains(errStr, "forbidden") {
+		return true
+	}
+
+	// Validation errors
+	if strings.Contains(errStr, "validation") ||
+	   strings.Contains(errStr, "invalid") ||
+	   strings.Contains(errStr, "not found") {
+		return true
+	}
+
+	// JSON-RPC protocol errors
+	if strings.Contains(errStr, "JSON-RPC") ||
+	   strings.Contains(errStr, "jsonrpc") {
+		return true
+	}
+
+	return false
 }
 
 func (kc *kanboardClient) getProjectsHandler(ctx context.Context, _ mcp.CallToolRequest) (*mcp.CallToolResult, error) {
