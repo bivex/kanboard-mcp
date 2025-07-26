@@ -2205,14 +2205,25 @@ func (kc *kanboardClient) callKanboardAPI(ctx context.Context, method string, pa
 		return nil, fmt.Errorf("failed to create request: %v", err)
 	}
 
+	// SET ALL REQUIRED HEADERS (to match working PowerShell request)
 	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Accept", "application/json")           // ← FIX: This was missing!
+	req.Header.Set("User-Agent", "KanboardMCP/1.0")       // ← FIX: This was missing!
 
-	if kc.username != "" && kc.password != "" {
+	// FIXED AUTHENTICATION LOGIC - Use only working methods
+	if kc.apiKey != "" && kc.apiKey != "your-kanboard-api-key" {
+		// Method 1: Application credentials (jsonrpc + API token) - WORKS!
+		auth := "jsonrpc:" + kc.apiKey
+		basicAuth := "Basic " + base64.StdEncoding.EncodeToString([]byte(auth))
+		req.Header.Set("Authorization", basicAuth)
+	} else if kc.username != "" && kc.password != "" && 
+			   kc.username != "your-kanboard-username" && kc.password != "your-kanboard-password" {
+		// Method 2: User credentials (username + password) - WORKS!
 		auth := kc.username + ":" + kc.password
 		basicAuth := "Basic " + base64.StdEncoding.EncodeToString([]byte(auth))
 		req.Header.Set("Authorization", basicAuth)
 	} else {
-		req.Header.Set("X-API-Auth", kc.apiKey)
+		return nil, fmt.Errorf("no valid authentication credentials provided")
 	}
 
 	resp, err := http.DefaultClient.Do(req)
