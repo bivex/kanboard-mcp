@@ -10,6 +10,8 @@ A powerful Go-based MCP server that enables seamless integration between AI assi
 ![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)
 ![MCP](https://img.shields.io/badge/MCP-Protocol-orange?style=for-the-badge)
 
+[![Trust Score](https://archestra.ai/mcp-catalog/api/badge/quality/bivex/kanboard-mcp)](https://archestra.ai/mcp-catalog/bivex__kanboard-mcp)
+
 ⚠️ **Warning:** To avoid issues like these:
 
 ![Proxy error example 1](https://github.com/user-attachments/assets/db9c0867-6cfd-4c30-831b-d2cc948a4ff5)
