@@ -594,3 +594,8 @@ This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md
 [![GitHub issues](https://img.shields.io/github/issues/bivex/kanboard-mcp)](https://github.com/bivex/kanboard-mcp/issues)
 
 </div>
+
+## Hosted deployment
+
+A hosted deployment is available on [Fronteir AI](https://fronteir.ai/mcp/bivex-kanboard-mcp).
+
