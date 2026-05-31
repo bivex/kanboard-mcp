@@ -3112,6 +3112,21 @@ func (kc *kanboardClient) setAuthentication(req *http.Request) error {
 	// Determine authentication method based on available credentials
 	authMethod := strings.ToLower(strings.TrimSpace(os.Getenv("KANBOARD_AUTH_METHOD")))
 
+	// Explicit basic auth method: HTTP Basic Auth with username + password
+	// This is required by some Kanboard instances that don't support JSON-RPC body auth
+	if authMethod == "basic" {
+		if !kc.isValidCredentials() {
+			return fmt.Errorf("KANBOARD_AUTH_METHOD=basic requires valid KANBOARD_USERNAME and KANBOARD_PASSWORD")
+		}
+		auth := kc.username + ":" + kc.password
+		basicAuth := "Basic " + base64.StdEncoding.EncodeToString([]byte(auth))
+		req.Header.Set("Authorization", basicAuth)
+		if os.Getenv("KANBOARD_DEBUG") == "true" {
+			fmt.Fprintf(os.Stderr, "DEBUG: Using HTTP Basic Auth (username:password)\n")
+		}
+		return nil
+	}
+
 	// Priority: API key over username/password
 	if kc.isValidAPIKey() {
 		switch authMethod {
@@ -3152,7 +3167,7 @@ func (kc *kanboardClient) setAuthentication(req *http.Request) error {
 			return nil
 
 		default:
-			return fmt.Errorf("unsupported KANBOARD_AUTH_METHOD: %s (supported: global_token, user_token, bearer)", authMethod)
+			return fmt.Errorf("unsupported KANBOARD_AUTH_METHOD: %s (supported: basic, global_token, user_token, bearer)", authMethod)
 		}
 	}
 
